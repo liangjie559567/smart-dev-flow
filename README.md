@@ -1,4 +1,4 @@
-# smart-dev-flow
+# smart-dev-flow v1.5.0
 
 OMC 执行引擎 + Axiom 状态/记忆/学习引擎深度融合的智能开发助手流程。
 
@@ -39,6 +39,12 @@ claude plugin install .
 | `dual-verify` | 双重验证：自动测试 + AI 审查 |
 | `reflect` | 执行后知识沉淀，写入项目记忆 |
 | `status` | 查看当前状态机阶段与任务进度 |
+| `axiom-start` | 零触感启动 |
+| `axiom-suspend` | 会话挂起 |
+| `axiom-analyze-error` | 错误分析三出口 |
+| `axiom-rollback` | 回滚检查点 |
+| `axiom-knowledge` | 查询知识库 |
+| `axiom-patterns` | 查询模式库 |
 
 ## 工作流程
 
@@ -55,6 +61,12 @@ IDLE ← REFLECTING ← IMPLEMENTING ← CONFIRMING ← DECOMPOSING
 - `/status` — 查看当前阶段、任务列表与进度
 - `/reflect` — 手动触发知识沉淀（写入项目记忆）
 - `/reset` — 重置状态机至 IDLE
+- `/start` — 零触感启动
+- `/suspend` — 会话挂起
+- `/analyze-error` — 错误分析
+- `/rollback` — 回滚检查点
+- `/knowledge [词]` — 查询知识库
+- `/patterns [词]` — 查询模式库
 
 ## 目录结构
 
