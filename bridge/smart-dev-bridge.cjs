@@ -30,6 +30,8 @@ if (cmd === 'status') {
   run('python scripts/status.py');
 } else if (cmd === 'suspend') {
   run('python scripts/suspend.py');
+} else if (cmd === 'hud') {
+  run('node scripts/hud.mjs ' + process.argv.slice(3).join(' '));
 } else {
-  console.log('Usage: smart-dev-flow <status|evolve|reset|start|suspend>');
+  console.log('Usage: smart-dev-flow <status|evolve|reset|start|suspend|hud>');
 }
