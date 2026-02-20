@@ -16,8 +16,8 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `IDLE` | 智能需求收集，调用 `axiom-draft` |
 | `DRAFTING` | 继续 Phase 1，调用 `axiom-draft`（含 PRD 确认流程） |
 | `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review` |
-| `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose`；完成后触发**执行引擎选择**，再调用 `using-git-worktrees` 创建隔离工作区 |
-| `IMPLEMENTING` | 继续 Phase 3，根据 `active_context.md` 中的 `execution_mode` 字段调用对应执行引擎 |
+| `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose`；完成后调用 `using-git-worktrees` 创建隔离工作区 |
+| `IMPLEMENTING` | 继续 Phase 3，若 `execution_mode` 未设置则先触发**执行引擎选择**，再根据选择调用对应执行引擎 |
 | `BLOCKED` | 展示 `blocked_reason`，提供恢复选项 |
 | `REFLECTING` | 调用 `finishing-a-development-branch`（分支收尾），再调用 `axiom-reflect` |
 
@@ -64,9 +64,9 @@ AskUserQuestion({
 3. 将 `task_status` 更新为 `DRAFTING`
 4. 携带收集到的信息调用 `axiom-draft`
 
-## Phase 2 完成后：执行引擎选择（硬门控）
+## Phase 3 完成后：执行引擎选择（硬门控）
 
-`axiom-decompose` 完成后，**必须**通过 `AskUserQuestion` 向用户确认执行引擎，不得跳过。
+`using-git-worktrees` 完成（worktree 创建就绪）后，进入 `IMPLEMENTING` 状态时若 `execution_mode` 未设置，**必须**通过 `AskUserQuestion` 向用户确认执行引擎，不得跳过。
 
 ### 推荐逻辑
 
@@ -85,7 +85,7 @@ AskUserQuestion({
 
 ```
 AskUserQuestion({
-  question: "Phase 2 实现计划已完成，请选择执行引擎。\n\n【推荐：<引擎名>】\n推荐理由：<根据上表自动填写>",
+  question: "Phase 3 隔离工作区已就绪，请选择执行引擎。\n\n【推荐：<引擎名>】\n推荐理由：<根据上表自动填写>",
   header: "选择执行引擎",
   options: [
     {
@@ -129,7 +129,9 @@ AskUserQuestion({
 
 ### IMPLEMENTING 阶段引擎路由
 
-进入 `IMPLEMENTING` 状态时，读取 `active_context.md` 中的 `execution_mode`：
+进入 `IMPLEMENTING` 状态时，若 `execution_mode` **未设置**（空或缺失）→ 先触发上方执行引擎选择 AskUserQuestion，用户确认后写入 `execution_mode`，再按下方路由执行：
+
+若 `execution_mode` **已设置**，直接读取 `active_context.md` 中的 `execution_mode`：
 
 - `standard` → 调用 `axiom-implement`（逐步，每任务确认）
 - `ultrapilot` → 调用 `ultrapilot` 技能（文件分区并行执行）
@@ -252,7 +254,7 @@ Axiom 各阶段与 OMC Team 流水线的对应关系：
 | `last_checkpoint` | git SHA | 最近一次检查点 commit hash | axiom-implement |
 | `session_name` | 字符串 | 任务会话名称 | axiom-draft |
 | `manifest_path` | 路径 | Manifest 文件路径 | axiom-decompose |
-| `execution_mode` | 枚举 | `standard/ultrawork/ralph/team/ultraqa`，Phase 2 完成后写入 | dev-flow |
+| `execution_mode` | 枚举 | `standard/ultrapilot/ultrawork/ralph/team/ultraqa`，Phase 3 完成后写入 | dev-flow |
 | `last_gate` | 字符串 | 最近通过的门禁名称 | 各 skill |
 | `last_updated` | ISO 时间 | 最后更新时间 | 各 skill |
 

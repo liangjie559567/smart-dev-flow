@@ -213,6 +213,8 @@ async function main() {
     const SKILL_HINT = {
       IDLE:         '建议先运行 /brainstorming 探索需求设计',
       DRAFTING:     '建议运行 /writing-plans 制定实现计划',
+      REVIEWING:    '建议运行 /axiom-review 继续专家评审',
+      CONFIRMING:   '建议确认当前阶段输出，运行 /dev-flow 查看详情',
       DECOMPOSING:  '建议运行 /writing-plans 或 /using-git-worktrees 准备工作区',
       IMPLEMENTING: '建议运行 /executing-plans 或 /test-driven-development',
       BLOCKED:      '建议运行 /systematic-debugging 进行根因分析',

@@ -4,12 +4,12 @@ from datetime import datetime
 from typing import Tuple
 
 PHASE_PROGRESS = [
-    ('phase 1.5', ('Phase 1.5 - Reviewing',  40)),
-    ('phase 3',   ('Phase 3 - Done',          95)),
-    ('phase 2',   ('Phase 2 - Decomposing',   55)),
-    ('phase 1',   ('Phase 1 - Drafting',      30)),
-    ('phase 0',   ('Phase 0 - Understanding', 10)),
-    ('reflecting',('REFLECTING',             100)),
+    ('phase 1.5', ('Phase 1.5 - Reviewing',    40)),
+    ('phase 3',   ('Phase 3 - Implementing',   70)),
+    ('phase 2',   ('Phase 2 - Decomposing',    55)),
+    ('phase 1',   ('Phase 1 - Drafting',       30)),
+    ('phase 0',   ('Phase 0 - Understanding',  10)),
+    ('reflecting',('REFLECTING',              100)),
 ]
 KNOWN_STATUSES = {'drafting','confirming','reviewing','decomposing','implementing','reflecting','blocked'}
 
