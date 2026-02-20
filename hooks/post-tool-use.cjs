@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// post-tool-use.cjs - 记忆双写触发
+// post-tool-use.cjs - 记忆双写触发 + 进化引擎钩子
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 async function main() {
   const input = await readStdin();
@@ -16,6 +17,7 @@ async function main() {
   if (!filePath.includes('.agent/memory/')) process.exit(0);
 
   syncToOmc();
+  triggerEvolutionHook(hook);
   process.exit(0);
 }
 
@@ -50,6 +52,25 @@ function syncToOmc() {
   }
 
   fs.writeFileSync(omcFile, JSON.stringify(omc, null, 2));
+}
+
+function triggerEvolutionHook(hook) {
+  const cwd = process.cwd();
+  const scriptPath = path.join(cwd, 'scripts/evolve.py');
+  if (!fs.existsSync(scriptPath)) return;
+
+  const toolName = hook.tool_name || '';
+  const toolResponse = hook.tool_response || {};
+
+  // 任务完成钩子：TodoWrite 标记 completed
+  if (toolName === 'TodoWrite') {
+    const todos = (hook.tool_input || {}).todos || [];
+    todos.filter(t => t.status === 'completed').forEach(t => {
+      try {
+        execSync(`python scripts/evolve.py on-task-completed --task-id "${t.id}" --description "${(t.content || '').replace(/"/g, '')}"`, { cwd, stdio: 'ignore' });
+      } catch {}
+    });
+  }
 }
 
 function readStdin() {

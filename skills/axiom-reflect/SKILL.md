@@ -7,9 +7,57 @@ description: 任务完成后知识沉淀 - Axiom /reflect + /evolve + OMC 双写
 
 ## 流程
 
-1. 执行 Axiom `/reflect` 工作流（`.agent/workflows/reflect.md`）
-2. 执行 Axiom `/evolve` 工作流（`.agent/workflows/evolve.md`）
-3. 将学习结果同步到 OMC：
-   - `.agent/memory/evolution/knowledge_base.md` → `.omc/project-memory.json#techStack`
-   - `.agent/memory/project_decisions.md` → `.omc/project-memory.json#notes`
-4. 更新 `active_context.md`：`task_status: IDLE`
+### 第一步：收集本次会话信息
+
+从 `.agent/memory/active_context.md` 读取：
+- `session_name`（当前任务名）
+- `task_status`（应为 IMPLEMENTING 或 BLOCKED）
+- `auto_fix_count`、`rollback_count`（如有记录）
+
+向用户确认（或自动推断）：
+- 本次耗时（分钟）
+- 做得好的地方（用 `|` 分隔多项）
+- 可改进的地方（用 `|` 分隔多项）
+- 关键学习（用 `|` 分隔多项）
+- 行动项（用 `|` 分隔多项）
+
+### 第二步：执行 reflect（记录反思 + 入队学习）
+
+```bash
+python scripts/evolve.py reflect \
+  --session-name "<session_name>" \
+  --duration <分钟数> \
+  --went-well "<item1|item2>" \
+  --could-improve "<item1|item2>" \
+  --learnings "<item1|item2>" \
+  --action-items "<item1|item2>" \
+  --auto-fix-count <数量> \
+  --rollback-count <数量>
+```
+
+### 第三步：执行 evolve（处理学习队列 → 更新知识库）
+
+```bash
+python scripts/evolve.py evolve
+```
+
+输出进化报告，展示给用户。
+
+### 第四步：同步到 OMC project-memory
+
+将 `.agent/memory/evolution/knowledge_base.md` 摘要写入 `.omc/project-memory.json`：
+- `techStack` 字段：提取知识库中的技术栈条目
+- `notes` 字段：提取最新的 3 条学习记录
+
+### 第五步：重置状态
+
+更新 `.agent/memory/active_context.md`：
+```
+task_status: IDLE
+```
+
+## 自动触发
+
+`axiom-implement` 技能在所有任务完成后自动调用本技能。
+
+也可手动触发：`/axiom-reflect`
