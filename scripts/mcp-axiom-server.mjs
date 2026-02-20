@@ -6,7 +6,7 @@ import { spawn } from 'child_process';
 import { createInterface } from 'readline';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = resolve(__dirname, '..');
@@ -81,6 +81,56 @@ const TOOLS = [
       required: ['session_name'],
     },
   },
+  {
+    name: 'phase_context_write',
+    description: '持久化阶段上下文到 .agent/memory/phase-context.json。用于 axiom-draft/decompose 技能在阶段结束时保存 phase0/phase1/phase2 数据和 kb_context，供下一阶段读取。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        phase: { type: 'string', description: 'phase0 | phase1 | phase2 | kb_context' },
+        data: { type: 'object', description: '要写入的数据对象' },
+      },
+      required: ['phase', 'data'],
+    },
+  },
+  {
+    name: 'phase_context_read',
+    description: '读取 .agent/memory/phase-context.json 中的阶段上下文。用于技能开始时获取前序阶段的产物（验收标准、接口契约、kb_context 等）。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        phase: { type: 'string', description: '要读取的阶段：phase0 | phase1 | phase2 | kb_context | all' },
+      },
+      required: ['phase'],
+    },
+  },
+  {
+    name: 'axiom_write_manifest',
+    description: '将任务清单写入 .agent/memory/manifest.md。由 axiom-decompose 技能在 planner 子代理输出后调用，确保任务清单落地。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        feature: { type: 'string', description: '功能名称' },
+        tasks: {
+          type: 'array',
+          description: '任务列表',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              description: { type: 'string' },
+              priority: { type: 'string' },
+              depends: { type: 'string' },
+              complexity: { type: 'string' },
+              acceptance: { type: 'string' },
+            },
+            required: ['id', 'description'],
+          },
+        },
+      },
+      required: ['feature', 'tasks'],
+    },
+  },
 ];
 
 // 调用 Python 桥接脚本
@@ -152,7 +202,16 @@ rl.on('line', async line => {
   if (method === 'tools/call') {
     const { name, arguments: args = {} } = params;
     try {
-      const result = await callPython(name, args, cwd);
+      let result;
+      if (name === 'phase_context_write') {
+        result = handlePhaseContextWrite(args, cwd);
+      } else if (name === 'phase_context_read') {
+        result = handlePhaseContextRead(args, cwd);
+      } else if (name === 'axiom_write_manifest') {
+        result = handleWriteManifest(args, cwd);
+      } else {
+        result = await callPython(name, args, cwd);
+      }
       const text = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
       send({ jsonrpc: '2.0', id, result: { content: [{ type: 'text', text }] } });
     } catch (e) {
@@ -169,3 +228,35 @@ rl.on('line', async line => {
     send({ jsonrpc: '2.0', id, error: { code: -32601, message: 'Method not found' } });
   }
 });
+
+function phaseContextPath(cwd) {
+  return join(cwd, '.agent', 'memory', 'phase-context.json');
+}
+
+function handlePhaseContextWrite({ phase, data }, cwd) {
+  const path = phaseContextPath(cwd);
+  const ctx = existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {};
+  ctx[phase] = data;
+  ctx._updated = new Date().toISOString();
+  writeFileSync(path, JSON.stringify(ctx, null, 2), 'utf8');
+  return { ok: true, phase, keys: Object.keys(data) };
+}
+
+function handlePhaseContextRead({ phase }, cwd) {
+  const path = phaseContextPath(cwd);
+  if (!existsSync(path)) return phase === 'all' ? {} : null;
+  const ctx = JSON.parse(readFileSync(path, 'utf8'));
+  return phase === 'all' ? ctx : (ctx[phase] ?? null);
+}
+
+function handleWriteManifest({ feature, tasks }, cwd) {
+  const rows = tasks.map(t =>
+    `| ${t.id} | ${t.description} | ${t.priority || 'P1'} | ${t.depends || '-'} | ${t.complexity || '中等'} |`
+  ).join('\n');
+  const checks = tasks.map(t =>
+    `- [ ] ${t.id}: ${t.acceptance || t.description}`
+  ).join('\n');
+  const content = `# Manifest - ${feature}\n生成时间：${new Date().toISOString().slice(0, 10)}\n\n## 任务列表\n| ID | 描述 | 优先级 | 依赖 | 预估复杂度 |\n|----|------|--------|------|----------|\n${rows}\n\n## 验收标准\n${checks}\n`;
+  writeFileSync(join(cwd, '.agent', 'memory', 'manifest.md'), content, 'utf8');
+  return { ok: true, tasks: tasks.length };
+}
