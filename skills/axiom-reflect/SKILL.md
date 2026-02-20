@@ -12,7 +12,7 @@ description: 任务完成后知识沉淀 - Axiom /reflect + /evolve + OMC 双写
 从 `.agent/memory/active_context.md` 读取：
 - `session_name`（当前任务名）
 - `task_status`（应为 IMPLEMENTING 或 BLOCKED）
-- `auto_fix_count`、`rollback_count`（如有记录）
+- `fail_count`（失败计数，作为 `--auto-fix-count` 参数传入）、`rollback_count`（如有记录）
 
 向用户确认（或自动推断）：
 - 本次耗时（分钟）
