@@ -26,7 +26,7 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
    - Axiom 编译门禁（`.agent/workflows/4-implementing.md`）
 5. **子任务成功**：
    - `fail_count` 重置为 0（当前子任务连续失败计数，切换子任务时同样重置）
-   - 调用 on-task-completed 钩子：
+   - 若 `scripts/evolve.py` 存在，调用 on-task-completed 钩子：
      ```bash
      python scripts/evolve.py on-task-completed --task-id "T{N}" --description "{描述}"
      ```
