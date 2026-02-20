@@ -1,6 +1,6 @@
 ---
 name: omc-doctor
-description: Diagnose and fix oh-my-claudecode installation issues
+description: Diagnose and fix smart-dev-flow installation issues
 ---
 
 # Doctor Skill
@@ -15,7 +15,7 @@ You are the OMC Doctor - diagnose and fix installation issues.
 
 ```bash
 # Get installed and latest versions (cross-platform)
-node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','omc','oh-my-claudecode');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));console.log('Installed:',v.length?v[v.length-1]:'(none)')}catch{console.log('Installed: (none)')}"
+node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));console.log('Installed:',v.length?v[v.length-1]:'(none)')}catch{console.log('Installed: (none)')}"
 npm view oh-my-claude-sisyphus version 2>/dev/null || echo "Latest: (unavailable)"
 ```
 
@@ -50,7 +50,7 @@ ls -la ~/.claude/hooks/*.sh 2>/dev/null
 ls -la ~/.claude/CLAUDE.md 2>/dev/null
 
 # Check for OMC marker
-grep -q "oh-my-claudecode Multi-Agent System" ~/.claude/CLAUDE.md 2>/dev/null && echo "Has OMC config" || echo "Missing OMC config"
+grep -q "smart-dev-flow" ~/.claude/CLAUDE.md 2>/dev/null && echo "Has OMC config" || echo "Missing OMC config"
 ```
 
 **Diagnosis**:
@@ -61,7 +61,7 @@ grep -q "oh-my-claudecode Multi-Agent System" ~/.claude/CLAUDE.md 2>/dev/null &&
 
 ```bash
 # Count versions in cache (cross-platform)
-node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','omc','oh-my-claudecode');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x));console.log(v.length+' version(s):',v.join(', '))}catch{console.log('0 versions')}"
+node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x));console.log(v.length+' version(s):',v.join(', '))}catch{console.log('0 versions')}"
 ```
 
 **Diagnosis**:
@@ -83,14 +83,14 @@ ls -la ~/.claude/skills/ 2>/dev/null
 ```
 
 **Diagnosis**:
-- If `~/.claude/agents/` exists with oh-my-claudecode-related files: WARN - legacy agents (now provided by plugin)
-- If `~/.claude/commands/` exists with oh-my-claudecode-related files: WARN - legacy commands (now provided by plugin)
-- If `~/.claude/skills/` exists with oh-my-claudecode-related files: WARN - legacy skills (now provided by plugin)
+- If `~/.claude/agents/` exists with smart-dev-flow-related files: WARN - legacy agents (now provided by plugin)
+- If `~/.claude/commands/` exists with smart-dev-flow-related files: WARN - legacy commands (now provided by plugin)
+- If `~/.claude/skills/` exists with smart-dev-flow-related files: WARN - legacy skills (now provided by plugin)
 
 Look for files like:
 - `architect.md`, `document-specialist.md`, `explore.md`, `executor.md`, etc. in agents/
 - `ultrawork.md`, `deepsearch.md`, etc. in commands/
-- Any oh-my-claudecode-related `.md` files in skills/
+- Any smart-dev-flow-related `.md` files in skills/
 
 ---
 
@@ -147,13 +147,13 @@ rm -f ~/.claude/hooks/stop-continuation.sh
 ### Fix: Outdated Plugin
 ```bash
 # Clear plugin cache (cross-platform)
-node -e "const p=require('path'),f=require('fs'),d=process.env.CLAUDE_CONFIG_DIR||p.join(require('os').homedir(),'.claude'),b=p.join(d,'plugins','cache','omc','oh-my-claudecode');try{f.rmSync(b,{recursive:true,force:true});console.log('Plugin cache cleared. Restart Claude Code to fetch latest version.')}catch{console.log('No plugin cache found')}"
+node -e "const p=require('path'),f=require('fs'),d=process.env.CLAUDE_CONFIG_DIR||p.join(require('os').homedir(),'.claude'),b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');try{f.rmSync(b,{recursive:true,force:true});console.log('Plugin cache cleared. Restart Claude Code to fetch latest version.')}catch{console.log('No plugin cache found')}"
 ```
 
 ### Fix: Stale Cache (multiple versions)
 ```bash
 # Keep only latest version (cross-platform)
-node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','omc','oh-my-claudecode');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));v.slice(0,-1).forEach(x=>f.rmSync(p.join(b,x),{recursive:true,force:true}));console.log('Removed',v.length-1,'old version(s)')}catch(e){console.log('No cache to clean')}"
+node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));v.slice(0,-1).forEach(x=>f.rmSync(p.join(b,x),{recursive:true,force:true}));console.log('Removed',v.length-1,'old version(s)')}catch(e){console.log('No cache to clean')}"
 ```
 
 ### Fix: Missing/Outdated CLAUDE.md
@@ -178,7 +178,7 @@ rm -rf ~/.claude/commands
 rm -rf ~/.claude/skills
 ```
 
-**Note**: Only remove if these contain oh-my-claudecode-related files. If user has custom agents/commands/skills, warn them and ask before removing.
+**Note**: Only remove if these contain smart-dev-flow-related files. If user has custom agents/commands/skills, warn them and ask before removing.
 
 ---
 
