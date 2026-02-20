@@ -37,11 +37,11 @@ python scripts/evolve.py reflect \
 
 ### 第三步：执行 evolve（处理学习队列 → 更新知识库）
 
+若 `scripts/evolve.py` 存在：
 ```bash
 python scripts/evolve.py evolve
 ```
-
-输出进化报告，展示给用户。
+输出进化报告，展示给用户。若脚本不存在，跳过本步骤并提示"进化引擎未安装，知识库更新已跳过"。
 
 ### 第四步：同步到 OMC project-memory
 
