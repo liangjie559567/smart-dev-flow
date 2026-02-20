@@ -14,11 +14,11 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | 状态 | 动作 |
 |------|------|
 | `IDLE` | 智能需求收集，调用 `axiom-draft` |
-| `DRAFTING` | 继续 Phase 1，调用 `axiom-draft` |
+| `DRAFTING` | 继续 Phase 1，调用 `axiom-draft`（含 PRD 确认流程） |
 | `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review` |
 | `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose` |
 | `IMPLEMENTING` | 继续 Phase 3，调用 `axiom-implement` |
-| `CONFIRMING` | 读取 `pending_confirmation`，展示并等待用户确认 |
+| `CONFIRMING` | 调用 `axiom-draft`（继续 PRD 确认流程） |
 | `BLOCKED` | 展示 `blocked_reason`，提供恢复选项 |
 | `REFLECTING` | 调用 `axiom-reflect` |
 
@@ -33,14 +33,6 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 收到回答后：
 1. 将 `task_status` 更新为 `DRAFTING`
 2. 携带收集到的信息调用 `axiom-draft`
-
-## CONFIRMING 状态处理
-
-1. 读取 `.agent/memory/active_context.md` 中的 `pending_confirmation` 字段
-2. 向用户展示待确认内容
-3. 等待用户回复：
-   - 回复"确认" → 清空 `pending_confirmation`，按 `pending_confirmation.next_status` 更新状态，继续流程
-   - 回复"取消" → 将状态回退至上一阶段，提示用户修改
 
 ## BLOCKED 状态处理
 
