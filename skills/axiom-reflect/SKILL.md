@@ -48,6 +48,7 @@ python scripts/evolve.py evolve
 将 `.agent/memory/evolution/knowledge_base.md` 摘要写入 `.omc/project-memory.json`：
 - `techStack` 字段：提取知识库中的技术栈条目
 - `notes` 字段：提取最新的 3 条学习记录
+- 若 `knowledge_base.md` 不存在，跳过本步骤
 
 ### 第五步：重置状态
 
