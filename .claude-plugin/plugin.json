@@ -6,7 +6,8 @@
   "hooks": {
     "SessionStart": ["hooks/session-start.cjs", "hooks/rules-injector.cjs", "node scripts/project-memory-session.mjs"],
     "UserPromptSubmit": ["hooks/user-prompt-submit.cjs", "hooks/think-mode.cjs", "node scripts/keyword-detector.mjs", "node scripts/skill-injector.mjs"],
-    "PreToolUse": ["hooks/pre-tool-use.cjs", "node scripts/pre-tool-enforcer.mjs", "node scripts/permission-handler.mjs"],
+    "PreToolUse": ["hooks/pre-tool-use.cjs", "node scripts/pre-tool-enforcer.mjs"],
+    "PermissionRequest": ["node scripts/permission-handler.mjs"],
     "PostToolUse": ["hooks/post-tool-use.cjs", "hooks/preemptive-compaction.cjs", "hooks/background-notification.cjs", "hooks/recovery.cjs", "node scripts/project-memory-posttool.mjs", "node scripts/post-tool-verifier.mjs"],
     "PreCompact": ["hooks/pre-compact.cjs", "node scripts/project-memory-precompact.mjs", "node scripts/pre-compact.mjs"],
     "SessionEnd": ["hooks/session-end.cjs", "node scripts/session-end.mjs"],
