@@ -54,3 +54,11 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
      last_updated: {timestamp}
      ```
    - 自动触发 `axiom-reflect`
+
+## 降级模式
+
+由 `dev-flow` BLOCKED 状态出口B触发，传入参数 `--degraded`：
+
+- 跳过当前阻塞的子任务，标记为 `SKIPPED`
+- 继续执行后续无依赖的子任务
+- 完成后在报告中列出所有 SKIPPED 任务，提示人工补全
