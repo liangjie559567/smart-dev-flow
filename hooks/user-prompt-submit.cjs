@@ -16,6 +16,9 @@ const KEYWORDS = {
   '/feature-flow':   '检测到 /feature-flow，建议运行 /axiom-feature-flow 启动开发流水线。',
   '/export':         '检测到 /export，建议运行 /axiom-export 导出任务报告。',
   '/meta':           '检测到 /meta，建议运行 /axiom-meta 查看系统配置。',
+  '/code-review':    '检测到 /code-review，调用 OMC code-reviewer（opus）进行全面代码审查。',
+  '/security-review':'检测到 /security-review，调用 OMC security-reviewer（sonnet）进行安全审查。',
+  '/deepinit':       '检测到 /deepinit，调用 OMC deepinit 生成代码库知识图谱（AGENTS.md）。',
 };
 
 const THINK_KEYWORDS = ['think', 'ultrathink', '深度思考', '仔细想想'];

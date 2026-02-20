@@ -51,6 +51,10 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
      - 重试当前子任务
 7. 全部完成后：
    - 写入 `.agent/memory/` + `.omc/` 双写
+   - **代码审查**（team-verify 阶段）：
+     - 并行启动 `code-reviewer`（opus）全面审查
+     - 若需求涉及安全相关功能，同时启动 `security-reviewer`（sonnet）
+     - 审查发现问题 → 路由到 `executor` 修复后重新验证
    - 更新 `active_context.md`：
      ```
      task_status: REFLECTING

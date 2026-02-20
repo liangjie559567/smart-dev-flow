@@ -66,6 +66,9 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `/patterns [词]` | 调用 `axiom-patterns`（查询模式库） |
 | `/ralph` | 调用 OMC `ralph`（持久执行，任务必须完全完成才停止） |
 | `/git` | 调用 OMC `git-master` agent（原子提交、rebase、历史管理） |
+| `/code-review` | 调用 OMC `code-reviewer`（opus）对当前代码库进行全面审查 |
+| `/security-review` | 调用 OMC `security-reviewer`（sonnet）进行安全专项审查 |
+| `/deepinit` | 调用 OMC `deepinit`，分层扫描代码库生成 AGENTS.md 知识图谱 |
 
 ## OMC Team Phase 映射
 
