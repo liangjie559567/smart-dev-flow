@@ -9,10 +9,12 @@ async function main() {
     const data = JSON.parse(input);
     const { createAgentUsageReminderHook } = await import('../omc-dist/hooks/agent-usage-reminder/index.js');
     const hook = createAgentUsageReminderHook();
-    const result = await hook(data);
+    const handler = hook['tool.execute.after'];
+    const result = handler ? await handler(data) : null;
     if (result) console.log(JSON.stringify(result));
-  } catch (error) {
-    console.error('[agent-usage-reminder] Error:', error.message);
+    else console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
 }
 main();

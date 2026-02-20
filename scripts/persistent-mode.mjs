@@ -761,7 +761,7 @@ async function main() {
         writeJsonFile(team.path, team.state);
         console.log(JSON.stringify({
           decision: "block",
-          reason: `[TEAM - Phase: ${team.state.phase}] Team pipeline not complete. Continue working. When done, run /smart-dev-flow:cancel to exit.`,
+          reason: `[TEAM - Phase: ${team.state.phase}] Team pipeline not complete. Continue working. When done, run /oh-my-claudecode:cancel to cleanly exit and clean up state files. If cancel fails, retry with /oh-my-claudecode:cancel --force.`,
         }));
         return;
       }

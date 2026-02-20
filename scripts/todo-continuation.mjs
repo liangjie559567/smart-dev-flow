@@ -8,11 +8,15 @@ async function main() {
   try {
     const data = JSON.parse(input);
     const { createTodoContinuationHook } = await import('../omc-dist/hooks/todo-continuation/index.js');
-    const hook = createTodoContinuationHook(process.cwd());
-    const result = await hook(data);
-    if (result) console.log(JSON.stringify(result));
-  } catch (error) {
-    console.error('[todo-continuation] Error:', error.message);
+    const hook = createTodoContinuationHook(data.cwd || process.cwd());
+    const result = hook.checkIncomplete(data.session_id || '');
+    if (result?.count > 0) {
+      console.log(JSON.stringify({ continue: true, reason: `${result.count} incomplete tasks remain` }));
+    } else {
+      console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+    }
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
 }
 main();

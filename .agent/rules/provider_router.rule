@@ -1,37 +1,58 @@
 ---
-description: Provider 路由规则 (多 CLI Worker)
-version: 1.0
-updated: 2026-02-14
+description: Provider 路由规则（Axiom v4.2 + OMC MCP 融合）
+version: 2.0
+updated: 2026-02-21
 ---
 
 # Provider Router
 
-在所有需要启动 Worker CLI 的流程中，先读取 `.agent/config/agent_config.md` 的 `ACTIVE_PROVIDER`，再按下表构造命令。
+## 1. MCP 工具优先路由（只读分析任务）
 
-## 1) Provider -> Worker 命令模板
+只读分析任务优先使用 MCP 工具（更快更便宜）：
 
-| ACTIVE_PROVIDER | Worker CLI | EXEC_TEMPLATE | 说明 |
-| :--- | :--- | :--- | :--- |
-| `codex` | Codex CLI | `codex exec "{PROMPT}"` | 默认首选 |
-| `claude_code` | Claude Code | `claude "{PROMPT}"` | 按本机安装命令名 |
-| `opencode` | OpenCode CLI | `opencode run "{PROMPT}"` | 以当前 CLI 语法为准 |
-| `gemini_cli` | Gemini CLI | `gemini "{PROMPT}"` | 以当前 CLI 语法为准 |
-| `gemini` | Gemini (legacy) | `codex exec "{PROMPT}"` | 向后兼容 |
-| `claude` | Claude (legacy) | `codex exec "{PROMPT}"` | 向后兼容 |
-| `copilot` | Copilot (legacy) | `codex exec "{PROMPT}"` | 向后兼容 |
+| 任务类型 | 首选 MCP | 降级方案 |
+| :--- | :--- | :--- |
+| 架构评审、计划验证、批判分析 | `mcp__x__ask_codex` (agent_role=architect/critic) | `Task(subagent_type="general-purpose", model="opus")` |
+| UI/UX 设计、文档、大上下文 | `mcp__g__ask_gemini` (agent_role=designer/writer) | `Task(subagent_type="general-purpose", model="sonnet")` |
 
-## 2) 统一占位符
+**使用前必须发现工具**：
+```
+ToolSearch("mcp")  # 发现所有 MCP 工具
+# 若返回空 → MCP 未配置，直接使用 Claude agent 降级方案
+```
 
-- `WORKER_EXEC`: 当前 Provider 的执行命令模板。
-- `WORKER_LABEL`: 当前 Provider 的展示名。
+**MCP 调用模式**：
+```
+# 前台（需要结果后继续）
+mcp__x__ask_codex(prompt="...", agent_role="architect", context_files=["path1", "path2"])
 
-## 3) 回退策略
+# 后台（独立任务）
+mcp__x__ask_codex(prompt="...", background=true)
+job_id = result.job_id
+# 稍后检查
+mcp__x__check_job_status(job_id=job_id)
+mcp__x__wait_for_job(job_id=job_id)
+```
 
-1. 若 `ACTIVE_PROVIDER` 不存在或未命中，回退 `codex`。
-2. 若目标 CLI 未安装，输出缺失提示并给出安装命令。
-3. 仅在当前 Provider 无法执行时，回退到 `codex exec`。
+## 2. Claude Agent 路由（需要工具访问的任务）
 
-## 4) 约束
+以下任务必须使用 Claude agent（不可用 MCP 替代）：
+- `executor`、`deep-executor`：需要写文件
+- `debugger`：需要读文件、运行命令
+- `verifier`：需要运行测试命令
+- `build-fixer`：需要运行构建命令
+- `explore`：需要文件系统访问
 
-- 不在 workflow 中硬编码 `codex exec`。
-- workflow 仅引用 `WORKER_EXEC`。
+```
+Task(
+  subagent_type="general-purpose",
+  model="sonnet",  # haiku/sonnet/opus 按复杂度选择
+  prompt="你是{角色名}。{角色定义}\n\n任务：{具体任务}"
+)
+```
+
+## 3. 回退策略
+
+1. MCP 工具不可用 → 自动降级到对应 Claude agent
+2. Claude agent 失败 → 记录错误，`fail_count += 1`
+3. `fail_count >= 3` → `task_status: BLOCKED`

@@ -8,12 +8,18 @@ async function main() {
   try {
     const data = JSON.parse(input);
     const { nonInteractiveEnvHook } = await import('../omc-dist/hooks/non-interactive-env/index.js');
-    if (data.toolName === 'Bash' && data.toolInput?.command) {
-      const result = await nonInteractiveEnvHook.beforeCommand(data.toolInput.command);
-      if (result?.warning) console.log(JSON.stringify({ continue: true, message: result.warning }));
+    const toolName = data.tool_name || data.toolName || '';
+    const command = data.tool_input?.command || data.toolInput?.command;
+    if (toolName === 'Bash' && command) {
+      const result = nonInteractiveEnvHook.beforeCommand(command);
+      if (result?.modified) {
+        console.log(JSON.stringify({ continue: true, modifiedToolInput: { ...data.tool_input, command: result.command } }));
+        return;
+      }
     }
-  } catch (error) {
-    console.error('[non-interactive-env] Error:', error.message);
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
 }
 main();

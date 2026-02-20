@@ -57,6 +57,17 @@ function loadStats() {
   return { sessions: {} };
 }
 
+// 清理超过7天的过期会话
+function pruneStaleStats(stats) {
+  const cutoff = Math.floor(Date.now() / 1000) - 7 * 24 * 3600;
+  for (const id of Object.keys(stats.sessions)) {
+    const s = stats.sessions[id];
+    if ((s.updated_at || s.started_at || 0) < cutoff) {
+      delete stats.sessions[id];
+    }
+  }
+}
+
 // Save session statistics
 function saveStats(stats) {
   const tmpFile = `${STATE_FILE}.tmp.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2)}`;
@@ -72,6 +83,8 @@ function saveStats(stats) {
 // Update stats for this session
 function updateStats(toolName, sessionId) {
   const stats = loadStats();
+
+  pruneStaleStats(stats);
 
   if (!stats.sessions[sessionId]) {
     stats.sessions[sessionId] = {
@@ -139,15 +152,14 @@ export function detectBashFailure(output) {
   const cleaned = stripClaudeTempCwdErrors(output);
   const errorPatterns = [
     /error:/i,
-    /failed/i,
-    /cannot/i,
+    /\bfailed\b/i,
     /permission denied/i,
     /command not found/i,
-    /no such file/i,
+    /no such file or directory/i,
     /exit code: [1-9]/i,
     /exit status [1-9]/i,
     /fatal:/i,
-    /abort/i,
+    /\baborted\b/i,
   ];
 
   return errorPatterns.some(pattern => pattern.test(cleaned));
@@ -205,6 +217,23 @@ function processRememberTags(output, directory) {
   }
 }
 
+// 写入 last-tool-error.json 供 persistent-mode 的错误重试引导使用
+function writeLastToolError(directory, sessionId, toolName, output) {
+  try {
+    const stateDir = join(directory, '.omc', 'state');
+    mkdirSync(stateDir, { recursive: true });
+    const errorPath = join(stateDir, 'last-tool-error.json');
+    const existing = existsSync(errorPath) ? JSON.parse(readFileSync(errorPath, 'utf-8')) : null;
+    const retryCount = (existing?.retry_count || 0) + 1;
+    writeFileSync(errorPath, JSON.stringify({
+      tool_name: toolName,
+      error: output.slice(0, 500),
+      retry_count: retryCount,
+      timestamp: new Date().toISOString(),
+    }));
+  } catch {}
+}
+
 // Detect write failure
 export function detectWriteFailure(output) {
   const cleaned = stripClaudeTempCwdErrors(output);
@@ -252,6 +281,7 @@ function generateMessage(toolName, toolOutput, sessionId, toolCount, directory) 
   switch (toolName) {
     case 'Bash':
       if (detectBashFailure(toolOutput)) {
+        writeLastToolError(directory, sessionId, 'Bash', toolOutput);
         message = 'Command failed. Please investigate the error and fix before continuing.';
       } else if (detectBackgroundOperation(toolOutput)) {
         message = 'Background operation detected. Remember to verify results before proceeding.';

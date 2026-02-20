@@ -10,7 +10,7 @@ Routes to the designer agent or Gemini MCP for frontend work.
 ## Usage
 
 ```
-/smart-dev-flow:frontend-ui-ux <design task>
+/oh-my-claudecode:frontend-ui-ux <design task>
 ```
 
 ## Routing
@@ -22,7 +22,7 @@ If ToolSearch finds no MCP tools, use the Claude agent fallback below.
 
 ### Fallback: Claude Agent
 ```
-Task(subagent_type="smart-dev-flow:designer", model="sonnet", prompt="{{ARGUMENTS}}")
+Task(subagent_type="oh-my-claudecode:designer", model="sonnet", prompt="{{ARGUMENTS}}")
 ```
 
 ## Capabilities

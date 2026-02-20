@@ -232,8 +232,8 @@ You can also set these via environment variables:
   OMC_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
   OMC_DISCORD_MENTION=<@1465264645320474637>
 
-To reconfigure: /smart-dev-flow:configure-discord
-To configure Telegram: /smart-dev-flow:configure-telegram
+To reconfigure: /oh-my-claudecode:configure-discord
+To configure Telegram: /oh-my-claudecode:configure-telegram
 ```
 
 ## Environment Variable Alternative

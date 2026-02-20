@@ -30,6 +30,20 @@ const cfgDir = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude');
 const USER_SKILLS_DIR = join(cfgDir, 'skills', 'omc-learned');
 const GLOBAL_SKILLS_DIR = join(homedir(), '.omc', 'skills');
 const PROJECT_SKILLS_SUBDIR = join('.omc', 'skills');
+// smart-dev-flow 本地技能目录（项目根 skills/）
+const SDF_SKILLS_SUBDIR = 'skills';
+
+// Superpowers plugin skills directory (all installed versions)
+function getSuperpowersSkillsDirs() {
+  const base = join(homedir(), '.claude', 'plugins', 'cache', 'claude-plugins-official', 'superpowers');
+  if (!existsSync(base)) return [];
+  try {
+    return readdirSync(base, { withFileTypes: true })
+      .filter(d => d.isDirectory())
+      .map(d => join(base, d.name, 'skills'))
+      .filter(existsSync);
+  } catch { return []; }
+}
 const SKILL_EXTENSION = '.md';
 const MAX_SKILLS_PER_SESSION = 5;
 
@@ -66,10 +80,32 @@ function parseSkillFrontmatterFallback(content) {
   return { name, triggers, content: body };
 }
 
+// Recursively collect SKILL.md files (maxDepth=3)
+function collectSkillFiles(dir, scope, seenPaths, candidates, depth = 0) {
+  if (depth > 3 || !existsSync(dir)) return;
+  try {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = join(dir, entry.name);
+      if (entry.isFile() && entry.name === 'SKILL.md') {
+        try {
+          const realPath = realpathSync(fullPath);
+          if (!seenPaths.has(realPath)) { seenPaths.add(realPath); candidates.push({ path: fullPath, scope }); }
+        } catch {}
+      } else if (entry.isDirectory()) {
+        collectSkillFiles(fullPath, scope, seenPaths, candidates, depth + 1);
+      }
+    }
+  } catch {}
+}
+
 // Find all skill files (fallback - NON-RECURSIVE for backward compat)
 function findSkillFilesFallback(directory) {
   const candidates = [];
   const seenPaths = new Set();
+
+  // smart-dev-flow 本地 skills/ 目录（最高优先级，递归扫描 SKILL.md）
+  const sdfSkillsDir = join(directory, SDF_SKILLS_SUBDIR);
+  collectSkillFiles(sdfSkillsDir, 'project', seenPaths, candidates);
 
   // Project-level skills (higher priority)
   const projectDir = join(directory, PROJECT_SKILLS_SUBDIR);
@@ -95,8 +131,8 @@ function findSkillFilesFallback(directory) {
     }
   }
 
-  // User-level skills (search both global and legacy directories)
-  const userDirs = [GLOBAL_SKILLS_DIR, USER_SKILLS_DIR];
+  // User-level skills (search both global and legacy directories, plus superpowers)
+  const userDirs = [GLOBAL_SKILLS_DIR, USER_SKILLS_DIR, ...getSuperpowersSkillsDirs()];
   for (const userDir of userDirs) {
     if (existsSync(userDir)) {
       try {

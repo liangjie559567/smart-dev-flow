@@ -1,7 +1,7 @@
 ---
 session_id: "test-2026-02-21-round2"
 task_status: REFLECTING
-current_phase: Phase 3 - Done
+current_phase: REFLECTING
 current_task: ""
 completed_tasks: ""
 fail_count: 0

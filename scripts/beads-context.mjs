@@ -10,8 +10,9 @@ async function main() {
     const { registerBeadsContext } = await import('../omc-dist/hooks/beads-context/index.js');
     const result = registerBeadsContext(data.sessionId || '');
     if (result) console.log(JSON.stringify({ continue: true }));
-  } catch (error) {
-    console.error('[beads-context] Error:', error.message);
+    else console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
 }
 main();

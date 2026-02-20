@@ -118,7 +118,18 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
    ```
    → 存在 Critical/High → 带问题列表重新调用 executor，禁止继续
 
-   **四层检查全部通过后**，主 Claude 直接运行测试命令（Bash 工具）收集真实输出：
+   **第五层：LSP + AST 检查（类型安全与结构合规）**
+   ```
+   # LSP 诊断（TypeScript/静态类型语言必须）
+   lsp_diagnostics(path="{变更文件目录}")
+   → 存在 Error 级别诊断 → 带诊断信息重新调用 executor，禁止继续
+
+   # AST 结构搜索（验证模式合规）
+   ast_grep_search(pattern="{关键接口或类名}", path="{变更文件目录}")
+   → 实现与接口契约不符 → 带问题重新调用 executor
+   ```
+
+   **五层检查全部通过后**，主 Claude 直接运行测试命令（Bash 工具）收集真实输出：
    - 测试全部通过 → 继续
    - 测试失败 → 将失败输出注入下一次 executor 调用（重新从四层检查开始）
    - 无测试输出证据 → 不得声明子任务完成
@@ -304,6 +315,45 @@ AskUserQuestion({
   ]
 })
 ```
+
+## Team 流水线模式
+
+当 `4-implementing.md` 路由到 `execution_mode: team` 时触发：
+
+```
+# 1. 创建团队
+TeamCreate(team_name="impl-{timestamp}")
+
+# 2. 为每个子任务创建 Task（并行无依赖 / 串行有依赖）
+TaskCreate(subject="T{N}: {描述}", description="{验收标准}")
+...
+
+# 3. 派发 executor agents（无依赖任务并行）
+Task(subagent_type="general-purpose", team_name="impl-{timestamp}",
+  prompt="你是执行者（Executor）。认领并完成任务 T{N}。
+  【接口契约】{phase1.interfaces}
+  【知识库经验】{kb_context}
+  完成后更新 TaskUpdate(taskId, status=completed)")
+
+# 4. 监控进度
+TaskList() → 检查所有 Task 状态
+→ 全部 completed → 进入 team-verify 阶段
+→ 有 failed → 进入 team-fix 循环
+
+# 5. team-verify：并行审查
+Task(subagent_type="general-purpose", prompt="你是验证者（Verifier）。运行测试+构建，输出 PASS/FAIL + 证据")
+Task(subagent_type="general-purpose", prompt="你是安全审查专家（Security Reviewer）。审查变更文件，输出 PASS/FAIL")
+
+# 6. team-fix 循环（最多 3 次）
+→ verify FAIL → TaskCreate(subject="fix: {问题}") → 派发 executor 修复 → 重新 verify
+→ fix_count >= 3 → task_status: BLOCKED
+
+# 7. 完成后同步 Axiom 状态
+Write active_context.md: task_status=REFLECTING
+TeamDelete(team_name="impl-{timestamp}")
+```
+
+**与标准模式的差异**：Team 模式下五层检查由 team-verify 阶段的 verifier/reviewer agents 承担，而非主 Claude 逐层调用。
 
 ## 降级模式
 

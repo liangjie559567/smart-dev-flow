@@ -26,7 +26,7 @@ If a potential skill fails any of these questions, it's not worth saving.
 
 ## Recognition Pattern
 
-Use /smart-dev-flow:learner ONLY after:
+Use /oh-my-claudecode:learner ONLY after:
 - Solving a tricky bug that required deep investigation
 - Discovering a non-obvious workaround specific to this codebase
 - Finding a hidden gotcha that wastes time when forgotten
@@ -131,5 +131,5 @@ If code helps, show it - but as illustration of the principle, not copy-paste ma
 
 ## Related Commands
 
-- /smart-dev-flow:note - Save quick notes that survive compaction (less formal than skills)
-- /smart-dev-flow:ralph - Start a development loop with learning capture
+- /oh-my-claudecode:note - Save quick notes that survive compaction (less formal than skills)
+- /oh-my-claudecode:ralph - Start a development loop with learning capture

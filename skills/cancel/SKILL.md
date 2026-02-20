@@ -29,14 +29,14 @@ Automatically detects which mode is active and cancels it:
 ## Usage
 
 ```
-/smart-dev-flow:cancel
+/oh-my-claudecode:cancel
 ```
 
 Or say: "cancelomc", "stopomc"
 
 ## Auto-Detection
 
-`/smart-dev-flow:cancel` follows the session-aware state contract:
+`/oh-my-claudecode:cancel` follows the session-aware state contract:
 - By default the command inspects the current session via `state_list_active` and `state_get_status`, navigating `.omc/state/sessions/{sessionId}/…` to discover which mode is active.
 - When a session id is provided or already known, that session-scoped path is authoritative. Legacy files in `.omc/state/*.json` are consulted only as a compatibility fallback if the session id is missing or empty.
 - Swarm is a shared SQLite/marker mode (`.omc/state/swarm.db` / `.omc/state/swarm-active.marker`) and is not session-scoped.
@@ -58,11 +58,11 @@ Active modes are still cancelled in dependency order:
 Use `--force` or `--all` when you need to erase every session plus legacy artifacts, e.g., to reset the workspace entirely.
 
 ```
-/smart-dev-flow:cancel --force
+/oh-my-claudecode:cancel --force
 ```
 
 ```
-/smart-dev-flow:cancel --all
+/oh-my-claudecode:cancel --all
 ```
 
 Steps under the hood:
@@ -118,7 +118,7 @@ fi
 The skill now relies on the session-aware state contract rather than hard-coded file paths:
 1. Call `state_list_active` to enumerate `.omc/state/sessions/{sessionId}/…` and discover every active session.
 2. For each session id, call `state_get_status` to learn which mode is running (`autopilot`, `ralph`, `ultrawork`, etc.) and whether dependent modes exist.
-3. If a `session_id` was supplied to `/smart-dev-flow:cancel`, skip legacy fallback entirely and operate solely within that session path; otherwise, consult legacy files in `.omc/state/*.json` only if the state tools report no active session. Swarm remains a shared SQLite/marker mode outside session scoping.
+3. If a `session_id` was supplied to `/oh-my-claudecode:cancel`, skip legacy fallback entirely and operate solely within that session path; otherwise, consult legacy files in `.omc/state/*.json` only if the state tools report no active session. Swarm remains a shared SQLite/marker mode outside session scoping.
 4. Any cancellation logic in this doc mirrors the dependency order discovered via state tools (autopilot → ralph → …).
 
 ### 3A. Force Mode (if --force or --all)
@@ -230,7 +230,7 @@ if [[ -f .omc/state/autopilot-state.json ]]; then
   echo "$CURRENT_STATE" | jq '.active = false' > .omc/state/autopilot-state.json
 
   echo "Autopilot cancelled at phase: $CURRENT_PHASE. Progress preserved for resume."
-  echo "Run /smart-dev-flow:autopilot to resume."
+  echo "Run /oh-my-claudecode:autopilot to resume."
 fi
 ```
 
@@ -276,7 +276,7 @@ if [[ -f .omc/state/ultrawork-state.json ]]; then
   LINKED=$(echo "$UW_STATE" | jq -r '.linked_to_ralph // false')
 
   if [[ "$LINKED" == "true" ]]; then
-    echo "Ultrawork is linked to Ralph. Use /smart-dev-flow:cancel to cancel both."
+    echo "Ultrawork is linked to Ralph. Use /oh-my-claudecode:cancel to cancel both."
     exit 1
   fi
 
@@ -344,7 +344,7 @@ Mode-specific subsections below describe what extra cleanup each handler perform
 
 | Mode | State Preserved | Resume Command |
 |------|-----------------|----------------|
-| Autopilot | Yes (phase, files, spec, plan, verdicts) | `/smart-dev-flow:autopilot` |
+| Autopilot | Yes (phase, files, spec, plan, verdicts) | `/oh-my-claudecode:autopilot` |
 | Ralph | No | N/A |
 | Ultrawork | No | N/A |
 | UltraQA | No | N/A |

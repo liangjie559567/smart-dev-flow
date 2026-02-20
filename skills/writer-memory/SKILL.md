@@ -24,25 +24,25 @@ All data persists in `.writer-memory/memory.json` for git-friendly collaboration
 
 | Command | Action |
 |---------|--------|
-| `/smart-dev-flow:writer-memory init <project-name>` | Initialize new project memory |
-| `/smart-dev-flow:writer-memory status` | Show memory overview (character count, scene count, etc) |
-| `/smart-dev-flow:writer-memory char add <name>` | Add new character |
-| `/smart-dev-flow:writer-memory char <name>` | View character details |
-| `/smart-dev-flow:writer-memory char update <name> <field> <value>` | Update character field |
-| `/smart-dev-flow:writer-memory char list` | List all characters |
-| `/smart-dev-flow:writer-memory rel add <char1> <char2> <type>` | Add relationship |
-| `/smart-dev-flow:writer-memory rel <char1> <char2>` | View relationship |
-| `/smart-dev-flow:writer-memory rel update <char1> <char2> <event>` | Add relationship event |
-| `/smart-dev-flow:writer-memory scene add <title>` | Add new scene |
-| `/smart-dev-flow:writer-memory scene <id>` | View scene details |
-| `/smart-dev-flow:writer-memory scene list` | List all scenes |
-| `/smart-dev-flow:writer-memory theme add <name>` | Add theme |
-| `/smart-dev-flow:writer-memory world set <field> <value>` | Set world attribute |
-| `/smart-dev-flow:writer-memory query <question>` | Query memory naturally (Korean supported) |
-| `/smart-dev-flow:writer-memory validate <character> <dialogue>` | Check if dialogue matches character tone |
-| `/smart-dev-flow:writer-memory synopsis` | Generate emotion-focused synopsis |
-| `/smart-dev-flow:writer-memory export` | Export full memory as readable markdown |
-| `/smart-dev-flow:writer-memory backup` | Create manual backup |
+| `/oh-my-claudecode:writer-memory init <project-name>` | Initialize new project memory |
+| `/oh-my-claudecode:writer-memory status` | Show memory overview (character count, scene count, etc) |
+| `/oh-my-claudecode:writer-memory char add <name>` | Add new character |
+| `/oh-my-claudecode:writer-memory char <name>` | View character details |
+| `/oh-my-claudecode:writer-memory char update <name> <field> <value>` | Update character field |
+| `/oh-my-claudecode:writer-memory char list` | List all characters |
+| `/oh-my-claudecode:writer-memory rel add <char1> <char2> <type>` | Add relationship |
+| `/oh-my-claudecode:writer-memory rel <char1> <char2>` | View relationship |
+| `/oh-my-claudecode:writer-memory rel update <char1> <char2> <event>` | Add relationship event |
+| `/oh-my-claudecode:writer-memory scene add <title>` | Add new scene |
+| `/oh-my-claudecode:writer-memory scene <id>` | View scene details |
+| `/oh-my-claudecode:writer-memory scene list` | List all scenes |
+| `/oh-my-claudecode:writer-memory theme add <name>` | Add theme |
+| `/oh-my-claudecode:writer-memory world set <field> <value>` | Set world attribute |
+| `/oh-my-claudecode:writer-memory query <question>` | Query memory naturally (Korean supported) |
+| `/oh-my-claudecode:writer-memory validate <character> <dialogue>` | Check if dialogue matches character tone |
+| `/oh-my-claudecode:writer-memory synopsis` | Generate emotion-focused synopsis |
+| `/oh-my-claudecode:writer-memory export` | Export full memory as readable markdown |
+| `/oh-my-claudecode:writer-memory backup` | Create manual backup |
 
 ## Memory Types
 
@@ -234,7 +234,7 @@ Writer Memory integrates with `.omc/notepad.md`:
 ### With Architect Agent
 For complex character analysis:
 ```
-Task(subagent_type="smart-dev-flow:architect",
+Task(subagent_type="oh-my-claudecode:architect",
      model="opus",
      prompt="Analyze 새랑's arc across all scenes...")
 ```

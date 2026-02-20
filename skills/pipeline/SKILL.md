@@ -420,7 +420,7 @@ This skill activates when:
 
 **Explicit invocation:**
 ```
-/smart-dev-flow:pipeline review "task"
+/oh-my-claudecode:pipeline review "task"
 ```
 
 **Auto-detection:**

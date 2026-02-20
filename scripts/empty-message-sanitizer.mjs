@@ -9,10 +9,11 @@ async function main() {
     const data = JSON.parse(input);
     const { createEmptyMessageSanitizerHook } = await import('../omc-dist/hooks/empty-message-sanitizer/index.js');
     const hook = createEmptyMessageSanitizerHook({});
-    const result = await hook(data);
+    const result = await hook.sanitize(data);
     if (result) console.log(JSON.stringify(result));
-  } catch (error) {
-    console.error('[empty-message-sanitizer] Error:', error.message);
+    else console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
 }
 main();

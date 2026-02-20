@@ -5,13 +5,13 @@ description: Alias for /plan --review
 
 # Review (Plan Review Alias)
 
-Review is a shorthand alias for `/smart-dev-flow:plan --review`. It triggers Critic evaluation of an existing plan.
+Review is a shorthand alias for `/oh-my-claudecode:plan --review`. It triggers Critic evaluation of an existing plan.
 
 ## Usage
 
 ```
-/smart-dev-flow:review
-/smart-dev-flow:review "path/to/plan.md"
+/oh-my-claudecode:review
+/oh-my-claudecode:review "path/to/plan.md"
 ```
 
 ## Behavior
@@ -19,7 +19,7 @@ Review is a shorthand alias for `/smart-dev-flow:plan --review`. It triggers Cri
 This skill invokes the Plan skill in review mode:
 
 ```
-/smart-dev-flow:plan --review <arguments>
+/oh-my-claudecode:plan --review <arguments>
 ```
 
 The review workflow:

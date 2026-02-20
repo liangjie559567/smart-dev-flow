@@ -1,27 +1,171 @@
 ---
-description: Phase 1: 需求澄清与 PRD 初稿生成工作流
+description: Phase 1: 需求澄清与架构设计工作流（Axiom v4.2）
 ---
 
-# 工作流：PRD 起草 (Phase 1)
+# 工作流：需求澄清与架构设计 (Phase 1)
 
-本工作流旨在澄清您的想法，并将其转化为结构化的 PRD 初稿。
+## 子代理强制调用铁律
 
-## 执行步骤
+主 Claude 只负责：协调、门控、AskUserQuestion、知识库查询/沉淀、交互检查
+主 Claude 禁止：直接分析需求、直接设计架构、直接编写文档
 
-1.  **需求澄清循环 (Clarification Loop)**
-    - **动作**: 对用户输入运行 `requirement-analyst` 技能。
-    - **检查**:
-        - 若结果为 `REJECT` (拒绝): 停止并向用户解释原因。
-        - 若结果为 `CLARIFY` (需澄清) (< 90%): 向用户询问生成的问题。等待回复。使用新输入重复步骤 1。
-        - 若结果为 `PASS` (通过) (> 90%): 进入步骤 2。
+## Phase 0：需求澄清
 
-2.  **生成 PRD 初稿 (Generate Draft)**
-    - **动作**: 使用通过验证的需求上下文，运行 `product-design-expert` 技能。
-    - **输出**: 新文件生成于 `docs/prd/[name]-draft.md`。
+### 步骤1：知识库查询（必须）
+```
+axiom_get_knowledge query="{功能关键词} 需求模式" limit=5
+axiom_search_by_tag tags=["需求", "验收标准"] limit=3
+→ 保存为 kb_context
+```
 
-3.  **用户评审门禁 (User Gate)**
-    - **动作**: 向用户展示 PRD 初稿的路径。
-    - **询问**: "PRD 初稿已就绪。是否进入专家评审阶段？"
-    - **路径**:
-        - **是**: 触发工作流 `.agent/workflows/2-reviewing.md`.
-        - **否**: 在此停止。
+### 步骤2：调用 analyst 子代理（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="opus",
+  prompt="你是需求分析师（Analyst）。
+  【用户需求】{用户输入}
+  【知识库经验】{kb_context}
+  提取：验收标准（可测试）、约束条件、排除范围、隐含风险
+  输出：结构化需求文档草稿"
+)
+```
+
+→ 需求模糊（置信度 < 90%）→ 生成澄清问题，向用户提问，等待回复后重新调用
+→ 需求清晰（置信度 ≥ 90%）→ 进入步骤3
+
+### 步骤3：调用 writer 子代理生成需求文档（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="haiku",
+  prompt="你是技术文档撰写专家（Writer）。
+  【analyst输出】{analyst结果}
+  生成结构化需求文档，保存到 docs/requirements/YYYY-MM-DD-{feature}-requirements.md"
+)
+```
+
+### 步骤4：调用 quality-reviewer 审查需求文档（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="sonnet",
+  prompt="你是代码质量审查专家（Quality Reviewer）。
+  【需求文档】{writer输出}
+  审查：完整性、可测试性、无歧义性，输出问题列表"
+)
+```
+→ 发现问题 → 带问题列表重新调用 writer
+→ 通过 → 进入 Phase 1
+
+### 知识沉淀（必须）
+```
+axiom_harvest source_type=conversation
+  title="需求澄清: {功能名称}"
+  summary="{验收标准数量}条 | {约束条件} | {排除范围} | {隐含风险}"
+```
+
+## Phase 1：架构设计
+
+### 步骤1：知识库查询（必须）
+```
+axiom_get_knowledge query="{功能关键词} 架构模式 接口设计" limit=5
+axiom_search_by_tag tags=["架构", "接口契约", "ADR"] limit=3
+→ 更新 kb_context
+```
+
+### 步骤2：调用 architect 子代理（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="opus",
+  prompt="你是系统架构师（Architect）。
+  【需求文档】{requirements_doc}
+  【知识库经验】{kb_context}
+  设计：系统架构、模块边界、接口契约（含错误码）、ADR
+  输出：架构设计文档草稿"
+)
+```
+
+### 步骤3：调用 critic 子代理挑战方案（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="opus",
+  prompt="你是批判性审查专家（Critic）。
+  【架构设计】{architect输出}
+  挑战所有假设，识别：循环依赖、性能瓶颈、安全边界、可扩展性问题
+  输出：Critical/High/Medium/Low 分级问题列表"
+)
+```
+→ 发现 Critical 问题 → 带问题列表重新调用 architect
+
+### 步骤4：调用 writer 生成设计文档（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="haiku",
+  prompt="你是技术文档撰写专家（Writer）。
+  【architect输出】{architect结果}
+  【critic反馈】{critic结果}
+  生成设计文档，保存到 docs/design/YYYY-MM-DD-{feature}-design.md"
+)
+```
+
+### 步骤5：调用 quality-reviewer 审查设计文档（必须）
+```
+Task(
+  subagent_type="general-purpose",
+  model="sonnet",
+  prompt="你是代码质量审查专家（Quality Reviewer）。
+  【设计文档】{writer输出}
+  审查：接口契约完整性、无循环依赖、错误码定义，输出问题列表"
+)
+```
+→ 发现问题 → 带问题列表重新调用 writer
+→ 通过 → 进入门禁
+
+### 知识沉淀（必须）
+```
+axiom_harvest source_type=code_change
+  title="架构设计: {功能名称}"
+  summary="{架构模式} | {接口数量}个接口 | {ADR决策} | {关键约束}"
+```
+
+## 阶段完成总结（必须输出）
+```
+✅ Phase 1 需求澄清与架构设计完成
+- 验收标准：{N} 条（可测试）
+- 接口契约：{N} 个接口已定义
+- ADR：{N} 条架构决策
+- 需求文档：docs/requirements/YYYY-MM-DD-{feature}-requirements.md
+- 设计文档：docs/design/YYYY-MM-DD-{feature}-design.md
+```
+
+## 硬门控（必须全部通过）
+- [ ] 验收标准已定义且可测试
+- [ ] 技术边界已明确
+- [ ] 接口契约已定义（含错误码）
+- [ ] 无循环依赖
+- [ ] 需求文档和设计文档已生成并通过审查
+
+## 用户确认（必须）
+```
+AskUserQuestion({
+  question: "Phase 1 需求澄清与架构设计已完成。如何继续？",
+  header: "Phase 1 → Phase 1.5",
+  options: [
+    { label: "✅ 进入 Phase 1.5 专家评审", description: "架构设计通过，进行多专家评审" },
+    { label: "📝 需要修改架构", description: "部分设计需要调整" },
+    { label: "⏭️ 跳过评审，直接进入 Phase 2", description: "简单任务，无需专家评审" }
+  ]
+})
+```
+
+## active_context.md 写入格式
+```yaml
+task_status: CONFIRMING
+current_phase: Phase 1 - Done
+last_gate: Gate 1
+last_updated: {timestamp}
+```

@@ -38,8 +38,8 @@ last_updated: 2026-02-09
 | k-024 | CI/CD Pipeline Best Practices | workflow | 0.8 | 2026-02-09 | active |
 | k-025 | Documentation Standards | workflow | 0.8 | 2026-02-09 | active |
 | k-026 | Codex CLI Best Practices (Windows) | tooling | 0.95 | 2026-02-12 | active |
-| k-027 | Async Interaction Pattern (Turn-Based Resume) | pattern | 0.9 | 2026-02-12 | active |
-| k-028 | Unique Artifact Injection Pattern | architecture | 0.95 | 2026-02-12 | active |
+| k-027 | Axiom MCP Bridge Pattern | tooling | 0.9 | 2026-02-21 | active |
+| k-028 | 需求澄清: 任务进度看板 CLI | workflow | 0.9 | 2026-02-21 | active |
 
 ## 2. 分类统计 (Category Stats)
 
@@ -48,8 +48,8 @@ last_updated: 2026-02-09
 | architecture | 15 | 架构相关知识 |
 | debugging | 1 | 调试技巧 |
 | pattern | 3 | 代码模式 |
-| workflow | 4 | 工作流相关 |
-| tooling | 2 | 工具使用 |
+| workflow | 5 | 工作流相关 |
+| tooling | 3 | 工具使用 |
 
 
 ## 3. 标签云 (Tag Cloud)
@@ -126,7 +126,12 @@ last_updated: 2026-02-09
 - documentation: 1
 - dartdoc: 1
 - readme: 1
-
+- mcp: 1
+- python: 1
+- nodejs: 1
+- CLI: 1
+- 看板: 1
+- 需求分析: 1
 ## 4. 知识质量管理
 
 ### 4.1 Confidence 分数说明

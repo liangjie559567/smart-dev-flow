@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// post-tool-use.cjs - 记忆双写触发 + 进化引擎钩子
+// post-tool-use.cjs - 进化引擎钩子
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -10,48 +10,21 @@ async function main() {
   const toolName = hook.tool_name || '';
   const toolInput = hook.tool_input || {};
 
+  // TodoWrite：只触发进化钩子，不做记忆同步
+  if (toolName === 'TodoWrite') {
+    triggerEvolutionHook(hook);
+    process.exit(0);
+  }
+
   // 只监听写入操作
   if (!['Write', 'Edit'].includes(toolName)) process.exit(0);
 
   const filePath = toolInput.file_path || '';
   if (!filePath.includes('.agent/memory/')) process.exit(0);
 
-  syncToOmc();
   triggerEvolutionHook(hook);
+  syncToOmcProjectMemory(filePath);
   process.exit(0);
-}
-
-function syncToOmc() {
-  const cwd = process.cwd();
-  const memDir = path.join(cwd, '.agent/memory');
-  const omcFile = path.join(cwd, '.omc/project-memory.json');
-
-  if (!fs.existsSync(memDir)) return;
-  fs.mkdirSync(path.join(cwd, '.omc'), { recursive: true });
-
-  let omc = {};
-  if (fs.existsSync(omcFile)) {
-    try { omc = JSON.parse(fs.readFileSync(omcFile, 'utf8')); } catch {}
-  }
-
-  // 同步 active_context 状态
-  const ctxFile = path.join(memDir, 'active_context.md');
-  if (fs.existsSync(ctxFile)) {
-    const ctx = fs.readFileSync(ctxFile, 'utf8');
-    const m = ctx.match(/task_status:\s*(\w+)/);
-    if (m) omc.axiom_status = m[1];
-  }
-
-  // 同步 project_decisions 摘要
-  const pdFile = path.join(memDir, 'project_decisions.md');
-  if (fs.existsSync(pdFile)) {
-    const pd = fs.readFileSync(pdFile, 'utf8');
-    if (!omc.notes) omc.notes = [];
-    const summary = pd.slice(0, 500);
-    if (!omc.notes.includes(summary)) omc.notes = [summary];
-  }
-
-  fs.writeFileSync(omcFile, JSON.stringify(omc, null, 2));
 }
 
 function triggerEvolutionHook(hook) {
@@ -71,6 +44,45 @@ function triggerEvolutionHook(hook) {
       } catch {}
     });
   }
+}
+
+function syncToOmcProjectMemory(changedFile) {
+  const cwd = process.cwd();
+  const kbFile = path.join(cwd, '.agent/memory/evolution/knowledge_base.md');
+  const ctxFile = path.join(cwd, '.agent/memory/active_context.md');
+  const omcFile = path.join(cwd, '.omc/project-memory.json');
+
+  try {
+    let mem = {};
+    if (fs.existsSync(omcFile)) {
+      try { mem = JSON.parse(fs.readFileSync(omcFile, 'utf8')); } catch {}
+    }
+
+    // 从 knowledge_base.md 提取技术栈
+    if (fs.existsSync(kbFile)) {
+      const kb = fs.readFileSync(kbFile, 'utf8');
+      const techMatches = kb.match(/tags:.*?(技术栈|framework|library)[^\n]*/gi) || [];
+      if (techMatches.length) mem.techStack = techMatches.slice(0, 5).map(s => s.replace(/^tags:\s*/i, '').trim());
+    }
+
+    // 从 active_context.md 提取最近学习
+    if (fs.existsSync(ctxFile)) {
+      const ctx = fs.readFileSync(ctxFile, 'utf8');
+      const learnings = ctx.match(/learnings?:[^\n]+/gi) || [];
+      if (learnings.length) {
+        mem.notes = mem.notes || [];
+        learnings.slice(0, 3).forEach(l => {
+          const note = l.replace(/^learnings?:\s*/i, '').trim();
+          if (note && !mem.notes.includes(note)) mem.notes.unshift(note);
+        });
+        mem.notes = mem.notes.slice(0, 10);
+      }
+    }
+
+    const omcDir = path.join(cwd, '.omc');
+    if (!fs.existsSync(omcDir)) fs.mkdirSync(omcDir, { recursive: true });
+    fs.writeFileSync(omcFile, JSON.stringify(mem, null, 2));
+  } catch {}
 }
 
 function readStdin() {

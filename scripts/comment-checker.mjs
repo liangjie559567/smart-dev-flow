@@ -9,10 +9,12 @@ async function main() {
     const data = JSON.parse(input);
     const { createCommentCheckerHook } = await import('../omc-dist/hooks/comment-checker/index.js');
     const hook = createCommentCheckerHook({});
-    const result = await hook(data);
+    const result = hook.postToolUse(data);
     if (result) console.log(JSON.stringify(result));
-  } catch (error) {
-    console.error('[comment-checker] Error:', error.message);
+    else console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
+  process.exit(0);
 }
 main();

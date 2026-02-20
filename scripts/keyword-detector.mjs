@@ -544,8 +544,11 @@ async function main() {
       // Remove ultrathink from skill list
       resolved.splice(ultrathinkIndex, 1);
 
-      // If ultrathink was the only match, emit message
+      // If ultrathink was the only match, clean up any states written above and emit message
       if (resolved.length === 0) {
+        for (const mode of stateModes) {
+          clearStateFiles(directory, [mode.name], sessionId);
+        }
         console.log(JSON.stringify(createHookOutput(ULTRATHINK_MESSAGE)));
         return;
       }

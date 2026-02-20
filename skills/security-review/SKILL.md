@@ -62,7 +62,7 @@ Delegates to the `security-reviewer` agent (Opus model) for deep security analys
 
 ```
 Task(
-  subagent_type="smart-dev-flow:security-reviewer",
+  subagent_type="oh-my-claudecode:security-reviewer",
   model="opus",
   prompt="SECURITY REVIEW TASK
 

@@ -5,12 +5,12 @@ description: Learn about your OMC usage patterns and get personalized recommenda
 
 # Learn About OMC
 
-Analyze your OMC usage patterns and provide personalized recommendations for getting more out of smart-dev-flow.
+Analyze your OMC usage patterns and provide personalized recommendations for getting more out of oh-my-claudecode.
 
 ## Usage
 
 ```
-/smart-dev-flow:learn-about-omc
+/oh-my-claudecode:learn-about-omc
 ```
 
 ## Behavior

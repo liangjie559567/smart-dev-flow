@@ -1,6 +1,6 @@
 ---
 name: omc-help
-description: Guide on using smart-dev-flow plugin
+description: Guide on using oh-my-claudecode plugin
 ---
 
 # How OMC Works
@@ -44,7 +44,7 @@ I'll figure out what to stop based on context.
 If you haven't configured OMC yet:
 
 ```
-/smart-dev-flow:omc-setup
+/oh-my-claudecode:omc-setup
 ```
 
 This is the **only command** you need to know. It downloads the configuration and you're done.
@@ -59,9 +59,9 @@ But now you don't NEED them - everything is automatic.
 
 ## Usage Analysis
 
-Analyze your smart-dev-flow usage and get tailored recommendations to improve your workflow.
+Analyze your oh-my-claudecode usage and get tailored recommendations to improve your workflow.
 
-> Note: This replaces the former `/smart-dev-flow:learn-about-omc` skill.
+> Note: This replaces the former `/oh-my-claudecode:learn-about-omc` skill.
 
 ### What It Does
 

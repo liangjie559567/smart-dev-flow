@@ -88,8 +88,8 @@ Jumping into code without understanding requirements leads to rework, scope cree
    - **Reject** — discard the plan entirely
 8. User chooses via the structured `AskUserQuestion` UI (never ask for approval in plain text)
 9. On user approval:
-   - **Approve and execute**: **MUST** invoke `Skill("smart-dev-flow:ralph")` with the approved plan path from `.omc/plans/` as context. Do NOT implement directly. Do NOT edit source code files in the planning agent. The ralph skill handles execution via ultrawork parallel agents.
-   - **Clear context and implement**: First invoke `Skill("compact")` to compress the context window (reduces token usage accumulated during planning), then invoke `Skill("smart-dev-flow:ralph")` with the approved plan path from `.omc/plans/`. This path is recommended when the context window is 50%+ full after the planning session.
+   - **Approve and execute**: **MUST** invoke `Skill("oh-my-claudecode:ralph")` with the approved plan path from `.omc/plans/` as context. Do NOT implement directly. Do NOT edit source code files in the planning agent. The ralph skill handles execution via ultrawork parallel agents.
+   - **Clear context and implement**: First invoke `Skill("compact")` to compress the context window (reduces token usage accumulated during planning), then invoke `Skill("oh-my-claudecode:ralph")` with the approved plan path from `.omc/plans/`. This path is recommended when the context window is 50%+ full after the planning session.
 
 ### Review Mode (`--review`)
 
@@ -119,8 +119,8 @@ Plans are saved to `.omc/plans/`. Drafts go to `.omc/drafts/`.
 - Use `ask_codex` with `agent_role: "critic"` for plan review in consensus and review modes
 - If ToolSearch finds no MCP tools or Codex is unavailable, fall back to equivalent Claude agents -- never block on external tools
 - In consensus mode, **MUST** use `AskUserQuestion` for the user feedback step (step 2) and the final approval step (step 7) -- never ask for approval in plain text
-- In consensus mode, on user approval **MUST** invoke `Skill("smart-dev-flow:ralph")` for execution (step 9) -- never implement directly in the planning agent
-- When user selects "Clear context and implement" in step 7: invoke `Skill("compact")` first to compress the accumulated planning context, then immediately invoke `Skill("smart-dev-flow:ralph")` with the plan path -- the compact step is critical to free up context before the implementation loop begins
+- In consensus mode, on user approval **MUST** invoke `Skill("oh-my-claudecode:ralph")` for execution (step 9) -- never implement directly in the planning agent
+- When user selects "Clear context and implement" in step 7: invoke `Skill("compact")` first to compress the accumulated planning context, then immediately invoke `Skill("oh-my-claudecode:ralph")` with the plan path -- the compact step is critical to free up context before the implementation loop begins
 </Tool_Usage>
 
 <Examples>
@@ -177,7 +177,7 @@ Why bad: Decision fatigue. Present one option with trade-offs, get reaction, the
 - Stop interviewing when requirements are clear enough to plan -- do not over-interview
 - In consensus mode, stop after 5 Planner/Architect/Critic iterations and present the best version
 - Consensus mode requires explicit user approval before any implementation begins
-- If the user says "just do it" or "skip planning", **MUST** invoke `Skill("smart-dev-flow:ralph")` to transition to execution mode. Do NOT implement directly in the planning agent.
+- If the user says "just do it" or "skip planning", **MUST** invoke `Skill("oh-my-claudecode:ralph")` to transition to execution mode. Do NOT implement directly in the planning agent.
 - Escalate to the user when there are irreconcilable trade-offs that require a business decision
 </Escalation_And_Stop_Conditions>
 

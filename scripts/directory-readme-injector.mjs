@@ -8,11 +8,12 @@ async function main() {
   try {
     const data = JSON.parse(input);
     const { createDirectoryReadmeInjectorHook } = await import('../omc-dist/hooks/directory-readme-injector/index.js');
-    const hook = createDirectoryReadmeInjectorHook(process.cwd());
-    const result = await hook(data);
+    const hook = createDirectoryReadmeInjectorHook(data.cwd || process.cwd());
+    const result = await hook.processToolExecution(data);
     if (result) console.log(JSON.stringify(result));
-  } catch (error) {
-    console.error('[directory-readme-injector] Error:', error.message);
+    else console.log(JSON.stringify({ continue: true, suppressOutput: true }));
+  } catch {
+    console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   }
 }
 main();

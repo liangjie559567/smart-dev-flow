@@ -35,7 +35,7 @@ def read_file(p):
 def count_lines_matching(text, pattern):
     return sum(1 for l in text.splitlines() if re.search(pattern, l))
 
-if __name__ == '__main__':
+def main():
     sys.stdout.reconfigure(encoding='utf-8')
     root = Path(__file__).parent.parent
     mem = root / '.agent/memory'
@@ -122,3 +122,6 @@ if __name__ == '__main__':
 当前阶段：{phase_name}
 完成进度：{phase_pct}%
 """)
+
+if __name__ == '__main__':
+    main()
