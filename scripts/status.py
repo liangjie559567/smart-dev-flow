@@ -1,6 +1,27 @@
 import re, json, sys
 from pathlib import Path
 from datetime import datetime
+from typing import Tuple
+
+PHASE_PROGRESS = [
+    ('phase 1.5', ('Phase 1.5 - Reviewing',  40)),
+    ('phase 3',   ('Phase 3 - Done',          95)),
+    ('phase 2',   ('Phase 2 - Decomposing',   55)),
+    ('phase 1',   ('Phase 1 - Drafting',      30)),
+    ('phase 0',   ('Phase 0 - Understanding', 10)),
+    ('reflecting',('REFLECTING',             100)),
+]
+KNOWN_STATUSES = {'drafting','confirming','reviewing','decomposing','implementing','reflecting','blocked'}
+
+def resolve_phase(task_status: str, raw_phase: str) -> Tuple[str, int]:
+    if task_status.lower() not in KNOWN_STATUSES:
+        return ('未知阶段', 0)
+    if not raw_phase or raw_phase == '—':
+        return ('未知阶段', 0)
+    for prefix, result in PHASE_PROGRESS:
+        if raw_phase.lower().startswith(prefix):
+            return result
+    return ('未知阶段', 0)
 
 sys.stdout.reconfigure(encoding='utf-8')
 root = Path(__file__).parent.parent
@@ -52,6 +73,9 @@ ref_rows = '\n'.join(f'| {d.strip()} | {l.strip()[:60]} |' for d, l in ref_entri
 git_pre = '✅' if (root / '.git/hooks/pre-commit').exists() else '❌'
 git_post = '✅' if (root / '.git/hooks/post-commit').exists() else '❌'
 
+# 阶段进度
+phase_name, phase_pct = resolve_phase(status, phase)
+
 # OMC project-memory
 omc_status = 'N/A'
 pm = root / '.omc/project-memory.json'
@@ -92,4 +116,8 @@ print(f"""# 📊 Axiom — System Dashboard
 |------|------|
 | Pre-commit | {git_pre} |
 | Post-commit | {git_post} |
+
+## 📈 阶段进度
+当前阶段：{phase_name}
+完成进度：{phase_pct}%
 """)
