@@ -29,9 +29,6 @@ description: 导出当前任务的 PRD、Manifest、反思日志为 Markdown 报
 ## PRD
 {project_decisions.md 内容}
 
-## 反思摘要（最近3条）
-{reflection_log 最近3条}
-
 ## 知识沉淀
 {knowledge_base 摘要，前500字}
 ```
