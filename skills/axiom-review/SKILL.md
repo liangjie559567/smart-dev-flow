@@ -1,19 +1,22 @@
 ---
 name: axiom-review
-description: Axiom Phase 1.5 专家评审 - 双重质量审查
+description: Axiom Phase 1.5 专家评审 - 5专家并行评审
 ---
 
 # axiom-review
 
 ## 流程
 
-1. 执行 `.agent/workflows/2-reviewing.md`
-2. 并行调用 OMC agents：
-   - `quality-reviewer`（sonnet）：代码质量、逻辑缺陷
-   - `security-reviewer`（sonnet）：安全边界、信任模型
-3. 汇总评审结果，追加写入 `.agent/memory/project_decisions.md`
-4. 更新 `active_context.md`
-5. 展示评审报告，等待用户确认进入拆解
+1. 读取 `.agent/memory/project_decisions.md` 中最新 PRD 草稿
+2. **并行**调用5个 OMC 专家 agent：
+   - `ux-researcher`（sonnet）：用户体验、可用性、交互设计
+   - `product-manager`（sonnet）：产品价值、用户故事完整性、优先级
+   - `analyst`（opus）：领域逻辑、需求完整性、边界条件
+   - `quality-reviewer`（sonnet）：技术可行性、架构合理性
+   - `security-reviewer`（sonnet）：安全边界、信任模型、风险
+3. 按优先级解决冲突：**安全 > 技术 > 战略 > 逻辑 > 体验**
+4. 汇总评审结果，追加写入 `.agent/memory/project_decisions.md`
+5. 更新 `active_context.md`，展示报告等待确认
 
 ## 评审报告格式
 
@@ -23,16 +26,21 @@ description: Axiom Phase 1.5 专家评审 - 双重质量审查
 ## 评审报告 - {需求标题}
 时间：{timestamp}
 
-### 质量评审（quality-reviewer）
-{评审结论}
+| 专家 | 角色 | 评分 | 关键意见 |
+|------|------|------|---------|
+| ux-researcher | UX主任 | {N} | {意见} |
+| product-manager | 产品主任 | {N} | {意见} |
+| analyst | 领域专家 | {N} | {意见} |
+| quality-reviewer | 技术主管 | {N} | {意见} |
+| security-reviewer | 安全评论家 | {N} | {意见} |
 
-### 安全评审（security-reviewer）
-{评审结论}
+### 冲突解决
+{按优先级解决的冲突说明，无冲突则填"无"}
 
 ### 综合结论
-- 评分：{0-100}
+- 综合评分：{0-100}（各专家均分）
 - 建议：通过 / 需修改 / 退回
-- 关键问题：{列表}
+- 必须修复：{列表，无则填"无"}
 ```
 
 ## active_context.md 写入格式

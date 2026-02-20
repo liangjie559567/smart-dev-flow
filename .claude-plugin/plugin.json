@@ -1,6 +1,6 @@
 {
   "name": "smart-dev-flow",
-  "version": "1.6.0",
+  "version": "1.8.0",
   "description": "智能开发助手 - OMC + Axiom 融合",
   "skills": [
     {
@@ -62,6 +62,14 @@
     {
       "name": "axiom-meta",
       "path": "skills/axiom-meta/SKILL.md"
+    },
+    {
+      "name": "axiom-feature-flow",
+      "path": "skills/axiom-feature-flow/SKILL.md"
+    },
+    {
+      "name": "axiom-evolve",
+      "path": "skills/axiom-evolve/SKILL.md"
     }
   ],
   "hooks": {

@@ -12,6 +12,10 @@ const KEYWORDS = {
   '/analyze-error':  '检测到 /analyze-error，建议运行 /axiom-analyze-error 分析错误。',
   '/knowledge':      '检测到 /knowledge，建议运行 /axiom-knowledge 查询知识库。',
   '/patterns':       '检测到 /patterns，建议运行 /axiom-patterns 查询模式库。',
+  '/evolve':         '检测到 /evolve，建议运行 /axiom-evolve 处理学习队列。',
+  '/feature-flow':   '检测到 /feature-flow，建议运行 /axiom-feature-flow 启动开发流水线。',
+  '/export':         '检测到 /export，建议运行 /axiom-export 导出任务报告。',
+  '/meta':           '检测到 /meta，建议运行 /axiom-meta 查看系统配置。',
 };
 
 async function main() {

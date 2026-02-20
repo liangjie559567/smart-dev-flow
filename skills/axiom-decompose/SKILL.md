@@ -7,9 +7,16 @@ description: Axiom Phase 2 任务拆解 - Manifest 生成
 
 ## 流程
 
-1. 执行 `.agent/workflows/3-decomposing.md`
-2. 调用 OMC `architect`（opus）设计系统边界和接口
-3. 调用 OMC `planner`（opus）生成任务 Manifest
+### 门禁：工作量评估
+
+调用 `analyst`（haiku）评估 PRD 工作量：
+- **< 1天**（单文件/单函数级别）→ 跳过拆解，直接更新 `task_status: IMPLEMENTING`，调用 `axiom-implement`
+- **≥ 1天** → 进入完整拆解流程
+
+### 完整拆解流程
+
+1. 调用 OMC `architect`（opus）设计系统边界和接口
+2. 调用 OMC `planner`（opus）生成任务 Manifest
 4. 将 Manifest 写入 `.agent/memory/manifest.md`
 5. 更新 `active_context.md`
 6. 展示 Manifest，等待用户确认

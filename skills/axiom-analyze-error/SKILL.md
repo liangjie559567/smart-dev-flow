@@ -11,11 +11,16 @@ description: 错误分析 - 三出口恢复（自动修复/回滚/阻塞）
 
 ## 流程
 
-### 第一步：读取错误上下文
+### 第一步：收集日志
 
-从 `.agent/memory/active_context.md` 中读取：
-- `fail_count`：当前失败次数
-- `blocked_reason`：已有阻塞原因（如有）
+```bash
+git diff HEAD~1 --stat        # 最近变更摘要
+git status                    # 当前工作区状态
+```
+
+同时读取：
+- `.agent/memory/active_context.md` → `fail_count`、`blocked_reason`
+- 用户粘贴的错误信息（若有）
 
 ### 第二步：并联分析
 
