@@ -10,7 +10,9 @@ description: 查看和修改 smart-dev-flow 系统配置
 
 ## 执行步骤
 
-1. 读取 `.agent/config/agent_config.md`，提取 `ACTIVE_PROVIDER` 和 `shared.guards` 配置。
+1. 读取 `.agent/config/agent_config.md`：
+   - 若文件不存在，提示"配置文件未找到，请先运行项目初始化（`python scripts/setup.py`）"并终止
+   - 提取 `ACTIVE_PROVIDER` 和 `shared.guards` 配置
 
 2. 展示当前配置：
 
