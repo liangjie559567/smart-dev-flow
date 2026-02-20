@@ -11,12 +11,12 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
    - 若状态非 `IDLE`，提示用户："当前有进行中的任务（状态：{task_status}），继续起草将覆盖现有上下文。确认继续？"
    - 用户确认后继续；取消则终止
 2. 执行 `.agent/workflows/1-drafting.md`
-2. 向用户收集需求信息（见"需求收集"）
-3. 调用 OMC `analyst`（opus）澄清需求、定义验收标准
-4. 调用 OMC `planner`（opus）生成任务大纲
-5. 将结果按"PRD 写入格式"写入 `.agent/memory/project_decisions.md`
-6. 按"active_context 写入格式"更新 `active_context.md`
-7. 向用户展示 PRD 草稿，执行"确认流程"
+3. 向用户收集需求信息（见"需求收集"）
+4. 调用 OMC `analyst`（opus）澄清需求、定义验收标准
+5. 调用 OMC `planner`（opus）生成任务大纲
+6. 将结果按"PRD 写入格式"写入 `.agent/memory/project_decisions.md`
+7. 按"active_context 写入格式"更新 `active_context.md`
+8. 向用户展示 PRD 草稿，执行"确认流程"
 
 ## 需求收集
 
@@ -62,10 +62,9 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
 ## active_context 写入格式
 
 ```
-task_status: CONFIRMING
+task_status: DRAFTING
 current_phase: Phase 1 - Drafting
 last_gate: Gate 1
-pending_confirmation: PRD 草稿已生成，请确认后进入评审
 last_updated: {timestamp}
 ```
 
