@@ -14,7 +14,7 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
    current_phase: Phase 3 - Implementing
    omc_team_phase: team-exec
    current_task: T{N} - {描述}
-   completed_tasks: T1,T2
+   completed_tasks:
    fail_count: 0
    last_updated: {timestamp}
    ```
