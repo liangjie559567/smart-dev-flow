@@ -27,12 +27,11 @@ task = ctx.get('current_task', '—')
 updated = ctx.get('last_updated', '—')
 provider = ctx.get('active_provider', 'claude_code')
 
-# 任务进度
-completed = [t.strip() for t in ctx.get('completed_tasks', '').split(',') if t.strip()]
-total_raw = ctx.get('total_tasks', '0')
-try: total = int(total_raw)
-except: total = 0
-done = len(completed)
+# 任务进度（从 manifest.md checkbox 统计）
+manifest_path = ctx.get('manifest_path', '') or str(mem / 'manifest.md')
+manifest_text = read_file(manifest_path)
+total = len(re.findall(r'^\s*-\s+\[[ xX]\]', manifest_text, re.MULTILINE))
+done = len(re.findall(r'^\s*-\s+\[[xX]\]', manifest_text, re.MULTILINE))
 pct = int(done / total * 100) if total > 0 else 0
 bar = '█' * (pct // 10) + '░' * (10 - pct // 10)
 
@@ -74,8 +73,7 @@ print(f"""# 📊 Axiom — System Dashboard
 | OMC Status | {omc_status} |
 
 ## 📋 任务进度
-**{bar} {pct}%** ({done}/{total if total > 0 else '?'} tasks)
-已完成：{', '.join(completed) if completed else '—'}
+**{bar} {pct}%** ({done}/{total if total > 0 else '—'} tasks)
 
 ## 🧬 进化统计
 | 指标 | 数量 |

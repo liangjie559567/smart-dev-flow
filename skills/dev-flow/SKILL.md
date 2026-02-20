@@ -27,14 +27,36 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 IDLE 状态下收到任何新功能/需求请求，必须先调用 `brainstorming` 技能完成设计审批，才能进入 axiom-draft。不允许跳过，不允许直接写代码。唯一例外：用户明确传入 `--skip-brainstorm` 参数。
 </HARD-GATE>
 
-依次询问用户以下四项（可一次性回答）：
+通过**2轮** AskUserQuestion 收集信息（AskUserQuestion 不支持开放文本，需求描述通过对话收集）：
 
-1. **需求描述**：你想构建什么功能或解决什么问题？
-2. **技术栈偏好**：有指定语言/框架/工具吗？（无则留空）
-3. **优先级**：功能完整性 / 开发速度 / 代码质量，哪个最重要？
-4. **执行模式**：
-   - **标准模式**（默认）— 每个阶段需要确认，适合复杂需求
-   - **自动驾驶模式** — 跳过所有确认门禁，调用 OMC autopilot 端到端执行
+**第1步：对话收集需求描述**（直接文本回复，不用 AskUserQuestion）
+- 向用户说："请描述你想构建的功能或解决的问题（可以自由描述）："
+- 等待用户文本回复，记录为需求描述
+
+**第2步：AskUserQuestion 收集优先级**
+```
+AskUserQuestion({
+  question: "开发优先级是什么？",
+  header: "优先级",
+  options: [
+    { label: "功能完整性", description: "确保所有功能正确实现" },
+    { label: "开发速度", description: "尽快交付可用版本" },
+    { label: "代码质量", description: "注重可维护性和测试覆盖" }
+  ]
+})
+```
+
+**第3步：AskUserQuestion 收集执行模式**
+```
+AskUserQuestion({
+  question: "选择执行模式（技术栈偏好可在需求描述中说明）",
+  header: "执行模式",
+  options: [
+    { label: "标准模式（推荐）", description: "每个阶段需要确认，适合复杂需求" },
+    { label: "自动驾驶模式", description: "跳过所有确认门禁，调用 OMC autopilot 端到端执行" }
+  ]
+})
+```
 
 收到回答后：
 1. 若用户传入 `--skip-brainstorm`：跳过 brainstorming，直接执行步骤3
@@ -233,6 +255,16 @@ Axiom 各阶段与 OMC Team 流水线的对应关系：
 | `execution_mode` | 枚举 | `standard/ultrawork/ralph/team/ultraqa`，Phase 2 完成后写入 | dev-flow |
 | `last_gate` | 字符串 | 最近通过的门禁名称 | 各 skill |
 | `last_updated` | ISO 时间 | 最后更新时间 | 各 skill |
+
+### 写入规范（幂等性要求）
+
+写入 `active_context.md` 时**必须整体替换 frontmatter**，禁止追加写入：
+
+1. 读取现有文件内容
+2. 解析现有 frontmatter 中的所有字段
+3. 合并需要更新的字段（保留未变更字段）
+4. 用完整的新 frontmatter 替换旧 frontmatter（`---\n...\n---` 整块替换）
+5. 保留 frontmatter 之后的正文内容不变
 
 ## 能力映射表
 

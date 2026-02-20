@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "defaultModle": "claude-sonnet-4-5-20250929",
+    "allow": [
+      "mcp__desktop-commander__list_directory",
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__github__get_file_contents",
+      "mcp__desktop-commander__start_search",
+      "mcp__desktop-commander__get_file_info",
+      "mcp__desktop-commander__write_file",
+      "mcp__desktop-commander__read_file",
+      "mcp__desktop-commander__edit_block",
+      "mcp__desktop-commander__create_directory",
+      "mcp__desktop-commander__get_more_search_results",
+      "Bash(npm test:*)",
+      "Bash(npm install:*)",
+      "mcp__firecrawl__firecrawl_search",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(claude-code:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "sequential-thinking",
+    "software-planning-tool",
+    "context7",
+    "firecrawl",
+    "desktop-commander",
+    "github"
+  ]
+}

@@ -95,7 +95,8 @@ Task(
 ```
 
 **步骤4：主 Claude 交互检查**
-- 若 quality-reviewer 发现问题 → 带问题列表重新调用 writer
+- 若 quality-reviewer 发现**需求歧义/逻辑缺口**（High/Critical）→ 退回 analyst 重新分析，不得直接调用 writer 修补
+- 若 quality-reviewer 发现**文档格式/表达问题**（Medium/Low）→ 带问题列表重新调用 writer
 - 全部通过 → 写入 phase0 上下文，记录文档路径
 
 **知识沉淀（必须）**：
@@ -109,6 +110,8 @@ axiom_harvest source_type=conversation
 - [ ] 验收标准已定义且可测试
 - [ ] 技术边界已明确
 - [ ] 需求文档已生成并通过审查：`docs/requirements/YYYY-MM-DD-{feature}-requirements.md`
+
+> ⚠️ **Phase 0 完成后禁止出现确认框**。必须直接继续执行 Phase 1 架构设计，确认框只在 Phase 0+1 全部完成后出现。
 
 ### Phase 1：架构设计
 
@@ -137,9 +140,12 @@ Task(
   subagent_type="general-purpose",
   model="opus",
   prompt="你是批判性审查专家（Critic）。
+  **必须先读取以下文件，再进行分析，禁止基于假设输出结论**：
+  - 读取 docs/design/YYYY-MM-DD-{feature}-design.md（若已存在）
+  - 读取 docs/requirements/YYYY-MM-DD-{feature}-requirements.md
   【架构方案】{architect输出}
   【phase0约束】{phase0.constraints}
-  识别设计缺陷、循环依赖、违反约束的问题，输出问题列表"
+  识别设计缺陷、循环依赖、违反约束的问题，输出问题列表（每条问题必须引用文件行号作为证据）"
 )
 ```
 

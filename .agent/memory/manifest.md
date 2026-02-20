@@ -1,18 +1,18 @@
-# Manifest - HUD 任务进度看板
-生成时间：2026-02-20
+# Manifest - 任务进度看板 CLI
+生成时间：2026-02-21
 
 ## 任务列表
 | ID | 描述 | 优先级 | 依赖 | 预估复杂度 |
 |----|------|--------|------|-----------|
-| T1 | 数据源读取层：Axiom frontmatter + OMC JSON 读取，失败返回 null | P0 | - | 简单 |
-| T2 | 聚合逻辑层：双数据源优先级判断（ralph>team>ultrawork>autopilot） | P0 | T1 | 中等 |
-| T3 | 显示格式层：三种预设输出（minimal/focused/full） | P0 | T2 | 中等 |
-| T4 | 降级处理：数据源缺失时优雅降级，不显示 null/undefined | P1 | T2 | 简单 |
-| T5 | 集成验证：四种场景测试（双源/仅Axiom/仅OMC/都缺失） | P1 | T1-T4 | 中等 |
+| T1 | 实现 readFile(path) — 读取文件，异常返回 null | P0 | - | 简单 |
+| T2 | 实现 parseContext(text) — 解析 active_context.md frontmatter，提取6个字段 | P0 | T1 | 简单 |
+| T3 | 实现 parseManifest(text) — 解析 manifest.md checkbox 行 | P0 | T1 | 简单 |
+| T4 | 实现 render(ctx, tasks, useColor) — ANSI 彩色看板输出 | P0 | T2,T3 | 中等 |
+| T5 | 实现 main() — 处理 --json flag 与 isTTY 检测 | P0 | T1,T2,T3,T4 | 简单 |
 
 ## 验收标准
-- [ ] T1: 正确读取两个数据源，解析失败返回 null
-- [ ] T2: active_omc_mode 优先级顺序正确
-- [ ] T3: 三种预设格式输出正确
-- [ ] T4: 所有降级场景无 null/undefined 输出
-- [ ] T5: 四种场景全部通过
+- [ ] T1: readFile 对不存在路径返回 null，有效路径返回文件字符串
+- [ ] T2: parseContext 正确提取6个字段，缺失字段给默认值
+- [ ] T3: parseManifest 识别 [x]/[ ] 状态，提取 id 和 desc
+- [ ] T4: 彩色输出（完成=绿、进行中=蓝、失败=红、待开始=黄），显示 fail_count/rollback_count 和最近5条完成记录
+- [ ] T5: isTTY=false 或 --json 时输出 JSON，否则彩色看板，执行时间 <500ms

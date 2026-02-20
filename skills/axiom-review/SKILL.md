@@ -1,11 +1,52 @@
 ---
 name: axiom-review
-description: Axiom Phase 1.5 专家评审 - 5专家并行评审
+description: Axiom Phase 1.5 专家评审 - critic 主导 + 5专家并行评审（含子代理强制调用铁律）
 ---
 
 # axiom-review
 
+## 子代理强制调用铁律
+
+```
+主 Claude 禁止：直接评审 PRD、直接给出评分、直接分析需求缺陷
+每个评审工作必须通过 Task() 调用子代理完成。
+```
+
 ## 流程
+
+### 前置：知识库查询（必须）
+
+```
+axiom_get_knowledge query="PRD 评审 {功能关键词}" limit=5
+axiom_search_by_tag tags=["需求评审", "验收标准"] limit=3
+→ 将查询结果保存为 kb_context
+```
+
+### 步骤1：调用 critic 子代理进行批判性评审（必须）
+
+```
+Task(
+  subagent_type="general-purpose",
+  model="opus",
+  prompt="你是批判性审查专家（Critic）。
+  **必须先读取以下文件，再进行分析，禁止基于假设输出结论**：
+  - 读取 .agent/memory/project_decisions.md（获取最新 PRD）
+  - 读取 docs/requirements/ 目录下最新需求文档
+  - 读取 docs/design/ 目录下最新设计文档（若存在）
+  【知识库经验】{kb_context}
+  对 PRD 进行批判性评审：
+  - 挑战所有假设，识别隐含风险
+  - 找出需求缺口和边界条件遗漏
+  - 评估技术可行性和架构风险
+  - 识别安全边界和信任模型问题
+  每条问题必须引用文件行号作为证据，禁止无引用的断言。
+  输出：Critical/High/Medium/Low 分级问题列表 + 综合评分(0-100)"
+)
+```
+
+→ critic 发现 Critical 问题 → **强制退回 axiom-draft，不得继续**（此规则优先于评分阈值，无论综合评分多少）
+
+### 步骤2：critic 通过后，并行调用5个专家 agent
 
 1. 读取 `.agent/memory/project_decisions.md` 中最新 PRD 草稿
 2. **并行**调用5个专家 agent：
@@ -54,8 +95,39 @@ last_gate: Gate 2
 last_updated: {timestamp}
 ```
 
+## 知识沉淀（必须）
+
+```
+axiom_harvest source_type=conversation
+  title="PRD评审: {功能名称}"
+  summary="{综合评分} | {critic关键问题} | {必须修复项} | {通过条件}"
+```
+
+## 阶段完成总结（必须输出）
+
+```
+✅ Phase 1.5 专家评审完成
+- critic 评审：通过（无 Critical 问题）
+- 综合评分：{N}/100
+- 专家意见：{N} 条（已解决 {N} 条）
+- 必须修复：{N} 项
+```
+
 ## 确认流程
 
-- 用户回复"确认" → `task_status: DECOMPOSING`，调用 `axiom-decompose`
-- 用户回复"修改" → `task_status: DRAFTING`，重新调用 `axiom-draft`
+```
+AskUserQuestion({
+  question: "Phase 1.5 专家评审已完成，综合评分 {N}/100。如何继续？",
+  header: "Phase 1.5 → Phase 2",
+  options: [
+    { label: "✅ 进入 Phase 2 任务拆解", description: "评审通过，开始任务分解" },
+    { label: "📝 需要修改后再进入", description: "部分问题需要调整" },
+    { label: "🔄 返工 Phase 1", description: "重新起草需求" }
+  ]
+})
+```
+
+- 用户选择"进入 Phase 2" → `task_status: DECOMPOSING`，调用 `axiom-decompose`
+- 用户选择"需要修改" → `task_status: DRAFTING`，重新调用 `axiom-draft`
 - 评分 < 60 → 强制退回，不允许确认通过
+- **规则优先级：critic 发现 Critical 问题 → 强制退回（优先于评分阈值）；评分 < 60 → 强制退回；两者均满足时按 Critical 规则处理**
