@@ -16,12 +16,16 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `IDLE` | 智能需求收集，调用 `axiom-draft` |
 | `DRAFTING` | 继续 Phase 1，调用 `axiom-draft`（含 PRD 确认流程） |
 | `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review` |
-| `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose` |
-| `IMPLEMENTING` | 继续 Phase 3，调用 `axiom-implement` |
+| `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose`；完成后触发**执行引擎选择**，再调用 `using-git-worktrees` 创建隔离工作区 |
+| `IMPLEMENTING` | 继续 Phase 3，根据 `active_context.md` 中的 `execution_mode` 字段调用对应执行引擎 |
 | `BLOCKED` | 展示 `blocked_reason`，提供恢复选项 |
-| `REFLECTING` | 调用 `axiom-reflect` |
+| `REFLECTING` | 调用 `finishing-a-development-branch`（分支收尾），再调用 `axiom-reflect` |
 
 ## IDLE 时的引导
+
+<HARD-GATE>
+IDLE 状态下收到任何新功能/需求请求，必须先调用 `brainstorming` 技能完成设计审批，才能进入 axiom-draft。不允许跳过，不允许直接写代码。唯一例外：用户明确传入 `--skip-brainstorm` 参数。
+</HARD-GATE>
 
 依次询问用户以下四项（可一次性回答）：
 
@@ -33,17 +37,95 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
    - **自动驾驶模式** — 跳过所有确认门禁，调用 OMC autopilot 端到端执行
 
 收到回答后：
-1. 将 `task_status` 更新为 `DRAFTING`
-2. 携带收集到的信息调用 `axiom-draft`
+1. 若用户传入 `--skip-brainstorm`：跳过 brainstorming，直接执行步骤3
+2. 否则调用 `brainstorming` 技能（硬门控，等待设计审批）
+3. 将 `task_status` 更新为 `DRAFTING`
+4. 携带收集到的信息调用 `axiom-draft`
+
+## Phase 2 完成后：执行引擎选择（硬门控）
+
+`axiom-decompose` 完成后，**必须**通过 `AskUserQuestion` 向用户确认执行引擎，不得跳过。
+
+### 推荐逻辑
+
+根据任务特征自动推荐，并向用户说明推荐理由：
+
+| 任务特征 | 推荐引擎 | 推荐理由 |
+|---------|---------|---------|
+| 任务数 ≤ 3，变更文件 < 10 | **标准模式** | 任务简单，逐步确认更安全 |
+| 任务数 3-8，有独立并行子任务，文件边界清晰 | **ultrapilot** | 文件所有权分区，最多 5 个 worker，适合多组件系统 |
+| 任务数 4-8，有独立并行子任务 | **ultrawork** | 独立任务可并行，显著提速 |
+| 任务数 > 8 或需要持续到完成 | **ralph** | 任务量大，需要持久执行保证完成 |
+| 跨模块、需要多角色协作 | **team** | 多 agent 流水线，质量更高 |
+| 实现完成后需要密集 QA 循环 | **ultraqa** | 专注测试-修复循环，适合质量要求高的场景 |
+
+### 执行引擎说明
+
+```
+AskUserQuestion({
+  question: "Phase 2 实现计划已完成，请选择执行引擎。\n\n【推荐：<引擎名>】\n推荐理由：<根据上表自动填写>",
+  header: "选择执行引擎",
+  options: [
+    {
+      label: "标准模式（逐步确认）",
+      description: "每个子任务完成后确认，适合复杂/高风险需求。调用 axiom-implement 逐步执行。"
+    },
+    {
+      label: "ultrapilot（分区并行）",
+      description: "文件所有权分区，最多 5 个 worker 并行执行，适合多组件系统，避免文件冲突。"
+    },
+    {
+      label: "ultrawork（并行加速）",
+      description: "将独立任务分发给多个并行 agent 同时执行，适合任务间无依赖的场景。"
+    },
+    {
+      label: "ralph（持久执行）",
+      description: "自我循环直到所有任务完成，中途不停止。适合任务量大、需要保证完成的场景。"
+    },
+    {
+      label: "team（多 agent 流水线）",
+      description: "team-plan → team-exec → team-verify → team-fix 完整流水线，质量最高。"
+    },
+    {
+      label: "ultraqa（QA 循环）",
+      description: "实现完成后进入测试-修复密集循环，适合质量要求极高的场景。"
+    }
+  ]
+})
+```
+
+### 选择后的动作
+
+| 选择 | 动作 |
+|------|------|
+| 标准模式 | 写入 `execution_mode: standard`，调用 `axiom-implement` |
+| ultrapilot | 写入 `execution_mode: ultrapilot`，调用 `ultrapilot` 技能，传入 Phase 2 任务列表 |
+| ultrawork | 写入 `execution_mode: ultrawork`，调用 OMC `ultrawork` 技能，传入 Phase 2 任务列表 |
+| ralph | 写入 `execution_mode: ralph`，调用 OMC `ralph` 技能，传入实现目标 |
+| team | 写入 `execution_mode: team`，调用 OMC `team` 技能，进入 team-plan 阶段 |
+| ultraqa | 写入 `execution_mode: ultraqa`，先调用 `axiom-implement`（标准），完成后调用 OMC `ultraqa` |
+
+### IMPLEMENTING 阶段引擎路由
+
+进入 `IMPLEMENTING` 状态时，读取 `active_context.md` 中的 `execution_mode`：
+
+- `standard` → 调用 `axiom-implement`（逐步，每任务确认）
+- `ultrapilot` → 调用 `ultrapilot` 技能（文件分区并行执行）
+- `ultrawork` → 调用 OMC `ultrawork`（并行 agent 编排）
+- `ralph` → 调用 OMC `ralph`（持久循环直到完成）
+- `team` → 调用 OMC `team`（多 agent 流水线）
+- `ultraqa` → 调用 `axiom-implement` 完成后接 OMC `ultraqa`（QA 循环）
 
 ## BLOCKED 状态处理
 
 1. 读取 `.agent/memory/active_context.md` 中的 `blocked_reason` 字段并展示
-2. 提供三个选项：
+2. 通过 `AskUserQuestion` 提供五个恢复选项：
 
-   **A. 继续尝试** — 重新调用 `axiom-implement`，清空失败计数  
-   **B. 降级方案** — 调用 `axiom-implement`（降级模式），跳过当前阻塞点  
-   **C. 人工介入** — 将状态置为 `IDLE`，输出阻塞摘要供用户手动处理
+   **A. 继续尝试** — 重新调用当前执行引擎，清空失败计数
+   **B. 切换引擎重试** — 重新触发执行引擎选择，换一种引擎执行
+   **C. 调用 debugger** — 调用 OMC `debugger` agent 进行根因分析，分析完成后重新执行
+   **D. 降级跳过** — 调用 `axiom-implement`（标准模式），跳过当前阻塞点继续
+   **E. 人工介入** — 将状态置为 `IDLE`，输出阻塞摘要供用户手动处理
 
 ## 错误恢复
 
@@ -55,6 +137,9 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 
 | 命令 | 动作 |
 |------|------|
+| `/brainstorm` | 调用 `brainstorming` 技能（需求设计，IDLE 硬门控） |
+| `/write-plan` | 调用 `writing-plans` 技能（制定实现计划） |
+| `/execute-plan` | 调用 `executing-plans` 技能（分批执行计划） |
 | `/status` | 调用 `axiom-status` |
 | `/reflect` | 调用 `axiom-reflect` |
 | `/reset` | 将 `task_status` 重置为 `IDLE`，清空 `blocked_reason`、`fail_count`、`rollback_count`、`last_checkpoint` |
@@ -65,6 +150,9 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `/knowledge [词]` | 调用 `axiom-knowledge`（查询知识库） |
 | `/patterns [词]` | 调用 `axiom-patterns`（查询模式库） |
 | `/ralph` | 调用 OMC `ralph`（持久执行，任务必须完全完成才停止） |
+| `/ultrawork` | 调用 OMC `ultrawork`（并行 agent 执行独立任务） |
+| `/team [需求]` | 调用 OMC `team`（多 agent 流水线：plan→exec→verify→fix） |
+| `/ultraqa` | 调用 OMC `ultraqa`（测试-修复密集循环） |
 | `/git` | 调用 OMC `git-master` agent（原子提交、rebase、历史管理） |
 | `/code-review` | 调用 OMC `code-reviewer`（opus）对当前代码库进行全面审查 |
 | `/security-review` | 调用 OMC `security-reviewer`（sonnet）进行安全专项审查 |
@@ -73,6 +161,48 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `/ralplan [需求]` | 调用 OMC `ralplan`，Planner+Architect+Critic 三方共识规划 |
 | `/doctor` | 调用 OMC `omc-doctor`，诊断并修复环境配置问题 |
 | `/research [主题]` | 调用 OMC `external-context`，并行 document-specialist 网页搜索 |
+| `/hud` | 调用 OMC `hud`，显示当前任务状态仪表盘 |
+| `/ask-codex [角色] [问题]` | 调用 `mcp__x__ask_codex`（architect/planner/critic/analyst/code-reviewer） |
+| `/ask-gemini [角色] [问题]` | 调用 `mcp__g__ask_gemini`（designer/writer/vision） |
+
+## MCP 工具集成
+
+### 发现机制（每次会话首次使用前必须执行）
+
+```
+ToolSearch("mcp")  // 发现所有 MCP 工具（优先）
+// 若无结果 → 降级到等效 Claude agent，不阻塞流程
+```
+
+### 各阶段 MCP 路由
+
+| 阶段 | 优先 MCP 工具 | agent_role | 降级方案 |
+|------|-------------|-----------|---------|
+| axiom-draft（需求分析） | `mcp__x__ask_codex` | `analyst` | `analyst` agent (opus) |
+| axiom-decompose（任务规划） | `mcp__x__ask_codex` | `planner` | `planner` agent (opus) |
+| axiom-decompose（架构验证） | `mcp__x__ask_codex` | `architect` | `architect` agent (opus) |
+| axiom-implement（代码审查） | `mcp__x__ask_codex` | `code-reviewer` | `code-reviewer` agent (opus) |
+| axiom-implement（安全审查） | `mcp__x__ask_codex` | `security-reviewer` | `security-reviewer` agent (sonnet) |
+| axiom-implement（测试策略） | `mcp__x__ask_codex` | `tdd-guide` | `test-engineer` agent (sonnet) |
+| axiom-review（批判性评审） | `mcp__x__ask_codex` | `critic` | `critic` agent (opus) |
+| axiom-draft（UI/UX 设计） | `mcp__g__ask_gemini` | `designer` | `designer` agent (sonnet) |
+| axiom-draft（文档生成） | `mcp__g__ask_gemini` | `writer` | `writer` agent (haiku) |
+| 大上下文分析（>50文件） | `mcp__g__ask_gemini` | `analyst` | `analyst` agent (opus) |
+
+### 使用规则
+
+- **只读分析任务**优先用 MCP（更快更省），实现/调试/验证必须用 Claude agent（需要工具访问）
+- 调用时**必须附带** `context_files`（相关源文件路径列表）
+- MCP 输出为**建议性**，最终验证（测试、类型检查）由 Claude agent 执行
+- Codex 调用最长耗时 1 小时，可用 `background: true` + `wait_for_job` 异步等待
+- **不可用时立即降级**，不得因 MCP 不可用而阻塞流程
+
+### 快捷命令
+
+| 命令 | 动作 |
+|------|------|
+| `/ask-codex [角色] [问题]` | 调用 `mcp__x__ask_codex`，角色可选 architect/planner/critic/analyst/code-reviewer |
+| `/ask-gemini [角色] [问题]` | 调用 `mcp__g__ask_gemini`，角色可选 designer/writer/vision |
 
 ## OMC Team Phase 映射
 
@@ -100,5 +230,74 @@ Axiom 各阶段与 OMC Team 流水线的对应关系：
 | `last_checkpoint` | git SHA | 最近一次检查点 commit hash | axiom-implement |
 | `session_name` | 字符串 | 任务会话名称 | axiom-draft |
 | `manifest_path` | 路径 | Manifest 文件路径 | axiom-decompose |
+| `execution_mode` | 枚举 | `standard/ultrawork/ralph/team/ultraqa`，Phase 2 完成后写入 | dev-flow |
 | `last_gate` | 字符串 | 最近通过的门禁名称 | 各 skill |
 | `last_updated` | ISO 时间 | 最后更新时间 | 各 skill |
+
+## 能力映射表
+
+smart-dev-flow 自身包含所有能力，无需外部仓库：
+
+| 能力类别 | 技能/Agent | 调用方式 |
+|---------|-----------|---------|
+| 需求分析 | analyst, writer, quality-reviewer | `Task(subagent_type="general-purpose", prompt="你是{角色}...")` |
+| 架构设计 | architect, critic | 同上 |
+| 任务规划 | planner | 同上 |
+| TDD 实现 | executor, deep-executor | 同上 |
+| 调试修复 | debugger + `systematic-debugging` | 同上 + `Skill("systematic-debugging")` |
+| 代码审查 | quality-reviewer, security-reviewer, api-reviewer, style-reviewer | 同上 |
+| 文档编写 | writer | 同上 |
+| 验证 | verifier + `verification-before-completion` | 同上 + `Skill("verification-before-completion")` |
+| 分支管理 | `finishing-a-development-branch`, `using-git-worktrees` | `Skill("finishing-a-development-branch")` |
+| 并行执行 | `ultrawork` | `Skill("ultrawork")` |
+| 持久执行 | `ralph` | `Skill("ralph")` |
+| 多 agent 流水线 | `team` | `Skill("team")` |
+| 知识库 | axiom_get_knowledge, axiom_harvest, axiom_evolve | MCP 工具直接调用 |
+
+## 阶段间数据传递规范
+
+各技能通过以下结构化上下文对象传递数据：
+
+```json
+{
+  "feature": "<功能名称>",
+  "phase0": {
+    "acceptance_criteria": [],
+    "constraints": [],
+    "risks": [],
+    "requirements_doc": "docs/requirements/YYYY-MM-DD-<feature>-requirements.md"
+  },
+  "phase1": {
+    "architecture": "",
+    "interfaces": [],
+    "adr": "",
+    "design_doc": "docs/design/YYYY-MM-DD-<feature>-design.md"
+  },
+  "phase2": {
+    "tasks": [],
+    "critical_path": [],
+    "test_strategy": "",
+    "plan_file": "docs/plans/YYYY-MM-DD-<feature>-plan.md"
+  },
+  "phase3": {
+    "branch": "",
+    "worktree": "",
+    "skipped": false
+  }
+}
+```
+
+每个技能结束时将自身阶段数据写入 `.agent/memory/project_decisions.md`，供后续技能读取。
+
+## 异常处理
+
+| 情况 | 处理方式 |
+|------|---------|
+| 阶段门控失败 | 返工当前阶段，不得跳过 |
+| 工具调用失败 | 查 `axiom_get_knowledge`，记录到日志 |
+| 需求变更 | 返回 axiom-draft，重新澄清，更新上下文 |
+| 连续 3 次失败 | 触发 Phase 5 系统调试（axiom-implement 内置） |
+| 知识库无结果 | 继续执行，结束后沉淀新知识 |
+| 需要回滚代码 | 调用 `axiom-rollback` → 回滚到 last_checkpoint（需用户确认） |
+| 技能不可用 | 降级为主 Claude 直接执行该阶段职责，记录降级原因 |
+| MCP 工具不可用 | 降级为对应 Claude agent，不阻塞流程 |
