@@ -30,6 +30,14 @@ async function main() {
     process.exit(0);
   }
 
+  if (status === 'REFLECTING') {
+    console.log(JSON.stringify({
+      decision: 'block',
+      reason: `[smart-dev-flow] 当前状态 REFLECTING，正在进行知识沉淀。请等待 axiom-reflect 完成。`
+    }));
+    process.exit(0);
+  }
+
   if (status === 'BLOCKED') {
     const isDebug = hook.tool_input?.prompt?.includes('debugger') ||
                     hook.tool_input?.prompt?.includes('analyze-error');
