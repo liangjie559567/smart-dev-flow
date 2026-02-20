@@ -61,3 +61,20 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `/rollback` | 调用 `axiom-rollback`（回滚检查点） |
 | `/knowledge [词]` | 调用 `axiom-knowledge`（查询知识库） |
 | `/patterns [词]` | 调用 `axiom-patterns`（查询模式库） |
+
+## active_context.md 字段规范
+
+| 字段 | 类型 | 说明 | 写入方 |
+|------|------|------|--------|
+| `task_status` | 枚举 | `IDLE/DRAFTING/REVIEWING/DECOMPOSING/IMPLEMENTING/REFLECTING/BLOCKED` | 各 skill |
+| `current_phase` | 字符串 | 当前阶段描述 | 各 skill |
+| `current_task` | 字符串 | 当前执行的子任务 ID 和描述 | axiom-implement |
+| `completed_tasks` | 逗号列表 | 已完成子任务 ID | axiom-implement |
+| `fail_count` | 整数 | 当前子任务连续失败次数，成功或切换子任务时重置为 0 | axiom-implement |
+| `rollback_count` | 整数 | 本任务累计回滚次数 | axiom-rollback |
+| `blocked_reason` | 字符串 | 阻塞原因描述 | axiom-implement / axiom-analyze-error |
+| `last_checkpoint` | git SHA | 最近一次检查点 commit hash | axiom-implement |
+| `session_name` | 字符串 | 任务会话名称 | axiom-draft |
+| `manifest_path` | 路径 | Manifest 文件路径 | axiom-decompose |
+| `last_gate` | 字符串 | 最近通过的门禁名称 | 各 skill |
+| `last_updated` | ISO 时间 | 最后更新时间 | 各 skill |
