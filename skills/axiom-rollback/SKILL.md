@@ -23,6 +23,7 @@ description: 回滚到上一个检查点
    task_status: IDLE
    blocked_reason: —
    fail_count: 0
+   rollback_count: {rollback_count + 1}
    last_updated: {timestamp}
    ```
 6. 输出回滚结果：已回滚到 `{last_checkpoint}`，状态重置为 IDLE
