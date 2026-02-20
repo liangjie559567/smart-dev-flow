@@ -742,6 +742,31 @@ async function main() {
       return;
     }
 
+    // Priority 8: Team pipeline
+    const team = readStateFileWithSession(stateDir, globalStateDir, "team-state.json", sessionId);
+    if (
+      team.state?.active &&
+      team.state?.phase !== 'complete' &&
+      team.state?.phase !== 'failed' &&
+      !isStaleState(team.state) &&
+      (hasValidSessionId
+        ? team.state.session_id === sessionId
+        : !team.state.session_id || team.state.session_id === sessionId) &&
+      isStateForCurrentProject(team.state, directory, team.isGlobal)
+    ) {
+      const newCount = (team.state.reinforcement_count || 0) + 1;
+      if (newCount <= 25) {
+        team.state.reinforcement_count = newCount;
+        team.state.last_checked_at = new Date().toISOString();
+        writeJsonFile(team.path, team.state);
+        console.log(JSON.stringify({
+          decision: "block",
+          reason: `[TEAM - Phase: ${team.state.phase}] Team pipeline not complete. Continue working. When done, run /smart-dev-flow:cancel to exit.`,
+        }));
+        return;
+      }
+    }
+
     // No blocking needed
     console.log(JSON.stringify({ continue: true, suppressOutput: true }));
   } catch (error) {
