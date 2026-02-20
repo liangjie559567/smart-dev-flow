@@ -1,0 +1,29 @@
+{
+  "name": "smart-dev-flow",
+  "version": "1.0.0",
+  "description": "智能开发助手流程 - oh-my-claudecode + Axiom 深度融合",
+  "type": "module",
+  "files": [
+    "skills",
+    "hooks",
+    "bridge",
+    ".agent",
+    ".claude-plugin",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "bin": {
+    "smart-dev-flow": "bridge/smart-dev-bridge.cjs"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "install-hooks": "python .agent/guards/install_hooks.py"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": ["claude-code", "axiom", "multi-agent", "dev-flow", "ai"],
+  "license": "MIT"
+}

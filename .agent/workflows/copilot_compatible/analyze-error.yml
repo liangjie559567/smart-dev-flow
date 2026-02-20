@@ -1,0 +1,35 @@
+name: "Error Analysis"
+description: "收集日志、定位根因并执行修复决策。"
+steps:
+  - name: "收集上下文"
+    type: "script"
+    run: |
+      project_root = git_root_or_cwd()
+      read_file(f"{project_root}/.agent/memory/active_context.md")
+      read_file(f"{project_root}/.agent/memory/project_decisions.md")
+
+  - name: "收集日志"
+    type: "script"
+    run: |
+      run("git -C ${project_root} status --short")
+      run("git -C ${project_root} diff --stat")
+      run("flutter analyze", allow_fail=true)
+      run("flutter test", allow_fail=true)
+
+  - name: "根因分析"
+    uses: "analyze-error"
+    with:
+      context_files:
+        - ".agent/memory/active_context.md"
+        - ".agent/memory/project_decisions.md"
+
+  - name: "修复决策"
+    type: "gate"
+    message: "选择处理方式：自动修复 / 回滚到检查点 / 标记阻塞"
+    options:
+      - label: "自动修复"
+        run: "apply-fix"
+      - label: "回滚"
+        run: "workflow: rollback"
+      - label: "标记阻塞"
+        run: "mark-blocked"

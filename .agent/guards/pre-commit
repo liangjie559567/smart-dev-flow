@@ -1,0 +1,68 @@
+#!/bin/sh
+# ============================================================
+# Axiom — Pre-commit Guard (T-301)
+#
+# 功能: 检查 active_context.md 是否在本次提交中被更新
+# 行为: 警告模式 (warning-only)，不阻断 commit
+# 安装: cp .agent/guards/pre-commit .git/hooks/pre-commit
+#        chmod +x .git/hooks/pre-commit
+# ============================================================
+
+CONTEXT_FILE="active_context.md"
+GUARD_NAME="Axiom Guard"
+
+# ── 1. 检查 active_context.md 是否被 staged ──
+if ! git diff --cached --name-only | grep -q "$CONTEXT_FILE"; then
+    echo ""
+    echo "⚠️  [$GUARD_NAME] $CONTEXT_FILE 未在本次提交中更新。"
+    echo "   建议: 请确保任务状态已同步到记忆文件。"
+    echo "   提示: 执行 /suspend 可自动保存上下文。"
+    echo ""
+    # 不阻断 (exit 0)，仅警告
+fi
+
+# ── 2. 检查是否有未解决的冲突标记 ──
+CONFLICT_FILES=$(git diff --cached --name-only | xargs grep -l "<<<<<<< " 2>/dev/null || true)
+if [ -n "$CONFLICT_FILES" ]; then
+    echo ""
+    echo "❌ [$GUARD_NAME] 检测到未解决的合并冲突:"
+    echo "$CONFLICT_FILES"
+    echo "   请手动解决冲突后再提交。"
+    echo ""
+    exit 1  # 冲突必须阻断
+fi
+
+# ── 3. CI Gate (Flutter analyze + test) ──
+if [ -f "pubspec.yaml" ]; then
+    if ! command -v flutter >/dev/null 2>&1; then
+        echo ""
+        echo "❌ [$GUARD_NAME] 检测到 Flutter 项目，但未找到 flutter 命令。"
+        echo "   请先安装 Flutter 并确保 flutter analyze / flutter test 可用。"
+        echo ""
+        exit 1
+    fi
+
+    echo "🔍 [$GUARD_NAME] 运行 flutter analyze ..."
+    if ! flutter analyze; then
+        echo "❌ [$GUARD_NAME] flutter analyze 失败，已阻断提交。"
+        exit 1
+    fi
+
+    echo "🧪 [$GUARD_NAME] 运行 flutter test ..."
+    if ! flutter test; then
+        echo "❌ [$GUARD_NAME] flutter test 失败，已阻断提交。"
+        exit 1
+    fi
+fi
+
+# ── 4. 检查 .agent/ 目录中是否有 TODO/FIXME 标记 ──
+AGENT_TODOS=$(git diff --cached --name-only -- '.agent/' | xargs grep -n "TODO\|FIXME\|HACK\|XXX" 2>/dev/null || true)
+if [ -n "$AGENT_TODOS" ]; then
+    echo ""
+    echo "💡 [$GUARD_NAME] .agent/ 中发现 TODO/FIXME 标记:"
+    echo "$AGENT_TODOS" | head -5
+    echo "   (仅提醒，不阻断)"
+    echo ""
+fi
+
+exit 0

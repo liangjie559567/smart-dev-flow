@@ -1,0 +1,6 @@
+.omc/
+__pycache__/
+*.pyc
+.agent/memory/watchdog_status.lock
+.agent/memory/evolution/reports/
+node_modules/

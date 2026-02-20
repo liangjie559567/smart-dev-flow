@@ -1,0 +1,18 @@
+{
+  "name": "smart-dev-flow",
+  "version": "1.0.0",
+  "description": "智能开发助手 - OMC + Axiom 融合",
+  "skills": [
+    { "name": "dev-flow", "path": "skills/dev-flow/SKILL.md" },
+    { "name": "axiom-draft", "path": "skills/axiom-draft/SKILL.md" },
+    { "name": "axiom-review", "path": "skills/axiom-review/SKILL.md" },
+    { "name": "axiom-decompose", "path": "skills/axiom-decompose/SKILL.md" },
+    { "name": "axiom-implement", "path": "skills/axiom-implement/SKILL.md" },
+    { "name": "axiom-reflect", "path": "skills/axiom-reflect/SKILL.md" },
+    { "name": "axiom-status", "path": "skills/axiom-status/SKILL.md" }
+  ],
+  "hooks": {
+    "PreToolUse": "hooks/pre-tool-use.cjs",
+    "PostToolUse": "hooks/post-tool-use.cjs"
+  }
+}
