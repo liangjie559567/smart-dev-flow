@@ -32,6 +32,12 @@ if (cmd === 'status') {
   run('python scripts/suspend.py');
 } else if (cmd === 'hud') {
   run('node scripts/hud.mjs ' + process.argv.slice(3).join(' '));
+} else if (cmd === 'mcp-codex') {
+  run('node scripts/mcp-codex-server.mjs');
+} else if (cmd === 'mcp-gemini') {
+  run('node scripts/mcp-gemini-server.mjs');
+} else if (cmd === 'mcp-tools') {
+  run('node scripts/mcp-omc-tools-server.mjs');
 } else {
-  console.log('Usage: smart-dev-flow <status|evolve|reset|start|suspend|hud>');
+  console.log('Usage: smart-dev-flow <status|evolve|reset|start|suspend|hud|mcp-codex|mcp-gemini|mcp-tools>');
 }
