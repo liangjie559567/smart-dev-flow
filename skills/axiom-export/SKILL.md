@@ -12,8 +12,8 @@ description: 导出当前任务的 PRD、Manifest、反思日志为 Markdown 报
 
 1. 读取以下文件，从 `active_context.md` 提取 `session_name`、`task_status`、`current_phase`、`completed_tasks`：
    - `.agent/memory/active_context.md` — 任务状态（`session_name` 来源）
-   - `.agent/memory/project_decisions.md` — PRD
-   - `.agent/memory/evolution/knowledge_base.md` — 知识库（含反思记录）
+   - `.agent/memory/project_decisions.md` — PRD（若不存在，报告中显示"PRD 尚未生成"）
+   - `.agent/memory/evolution/knowledge_base.md` — 知识库（若不存在，报告中显示"知识库尚未初始化"）
 
 2. 生成导出报告，写入 `.agent/memory/export-{session_name}-{timestamp}.md`：
 

@@ -10,7 +10,7 @@ async function main() {
   if (!fs.existsSync(ctxFile)) { process.exit(0); }
 
   let ctx = fs.readFileSync(ctxFile, 'utf8');
-  const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+  const now = new Date().toISOString();
 
   // 更新或追加 last_updated
   if (/last_updated:/.test(ctx)) {

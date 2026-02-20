@@ -21,6 +21,7 @@ description: 零触感启动 - 读取上下文并建议下一步
      fail_count: 0
      rollback_count: 0
      blocked_reason:
+     session_name:
      last_updated: {timestamp}
      ```
      然后提示"系统已初始化，请描述你的需求"。
