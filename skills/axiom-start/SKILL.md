@@ -19,6 +19,7 @@ description: 零触感启动 - 读取上下文并建议下一步
      current_task:
      completed_tasks:
      fail_count: 0
+     rollback_count: 0
      blocked_reason:
      last_updated: {timestamp}
      ```
