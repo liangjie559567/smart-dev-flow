@@ -1,12 +1,105 @@
-# dev-flow 流程测试分析报告
+# Dev-Flow 实际执行 vs 定义不一致分析报告（第二轮：AI API 中转站）
 
-**测试需求**：axiom-status 任务进度从 manifest.md 读取
+**测试需求**：复刻 bltcy.ai 柏拉图 AI API 中转站（全功能）
 **测试日期**：2026-02-21
-**测试结果**：实现完成（5/5 测试通过，AC-1/2/3/4/5 全部通过）
+**执行模式**：team（多 agent 流水线）
+**P0 任务完成**：T01-T08（8/14）
 
 ---
 
-## 一、不一致问题汇总（7条）
+## 一、不一致问题汇总（第二轮：9条）
+
+### C-1 executor 子代理未初始化项目结构
+**阶段**：Phase 4 TDD 实现 - T01
+**定义行为**：T01 任务"初始化 Next.js 项目"应执行 `npx create-next-app` 创建完整项目结构
+**实际行为**：executor 只写了 `src/db/schema.ts` 文件，未执行任何初始化命令，导致整个 worktree 无 package.json
+**根因**：executor prompt 未明确要求"先执行 shell 命令初始化，再写代码"；子代理默认只用 Write 工具
+**影响**：Phase 7 无法运行构建/测试，被迫降级为静态验收标准核对，验证质量大幅下降
+**建议**：executor prompt 中对"初始化类任务"强制要求先执行 `Bash` 命令，再写代码；或在 Phase 2 任务描述中明确"步骤1：执行 shell 命令"
+
+---
+
+### C-2 多 executor 子代理接口契约不一致
+**阶段**：Phase 4 TDD 实现 - T05/T06/T07
+**定义行为**：各 executor 子代理应基于 Phase 1 接口契约实现，字段名保持一致
+**实际行为**：billing/route.ts（T05）和 completions/route.ts（T06）由不同子代理实现，字段名各自"发明"：`reservationId` vs `transactionId`、`amount_sub` vs `estimated_cost`、`inputTokens` vs `actualInputTokens`
+**根因**：每个 executor 子代理独立运行，无法看到其他子代理的实现；Phase 1 接口契约文档不够详细（未列出所有字段名）
+**影响**：需要 3 轮 quality-reviewer + security-reviewer 审查循环才能发现并修复所有不一致，耗时约 40 分钟
+**建议**：Phase 1 接口契约必须包含完整的请求/响应 JSON 示例；executor prompt 中注入所有相关接口的完整字段定义
+
+---
+
+### H-1 Phase 4 TDD 无法执行（无测试框架）
+**阶段**：Phase 4 TDD 实现
+**定义行为**：TDD 要求先写失败测试，再写实现，测试全部通过后才能进入下一阶段
+**实际行为**：worktree 无 package.json，无法安装测试框架，TDD 流程完全无法执行；executor 直接写实现代码，跳过测试
+**根因**：C-1 的连锁影响；dev-flow 未定义"无测试框架时的降级策略"
+**影响**：Phase 4 硬门控（测试覆盖率≥80%）形同虚设，代码质量无法通过自动化验证
+**建议**：Phase 4 开始前检查测试框架是否可用；若不可用，强制暂停并要求修复 Phase 3 环境，而非静默跳过
+
+---
+
+### H-2 Phase 5 多次触发但未显式记录
+**阶段**：Phase 5 系统调试
+**定义行为**：Phase 5 仅在"同一问题失败≥3次"时触发，触发后应记录根因和修复方案
+**实际行为**：Phase 5 实际触发了 3 次（quality-reviewer 发现 Critical → executor 修复 → security-reviewer 发现 Critical → executor 修复 → verifier 发现严重问题 → executor 修复），但每次都以"Phase 6 审查循环"名义执行，未显式标记为 Phase 5
+**根因**：dev-flow 定义的 Phase 5 触发条件（"同一问题失败≥3次"）与实际情况（不同审查者发现不同问题）不匹配
+**影响**：无法从流程日志中识别调试循环次数；知识沉淀缺失（未调用 `axiom_harvest source_type=error_fix`）
+**建议**：将触发条件改为"任意阶段发现 Critical 问题需要修复"；每次修复循环都显式记录到 operations-log.md
+
+---
+
+### H-3 Phase 6 四视角审查未并行执行
+**阶段**：Phase 6 代码审查
+**定义行为**：quality-reviewer + security-reviewer + api-reviewer + style-reviewer 四个子代理并行调用
+**实际行为**：quality-reviewer 先执行，发现问题后 executor 修复，再执行 security-reviewer，再修复，串行执行
+**根因**：主 Claude 未按 dev-flow 定义的并行模式调度；串行执行更符合"发现问题立即修复"的直觉
+**影响**：Phase 6 耗时约 50 分钟（串行），若并行执行预计可缩短至 20 分钟
+**建议**：Phase 6 强制并行调用四个审查子代理，收集所有问题后统一修复，而非逐个修复
+
+---
+
+### H-4 manifest.md 任务状态未实时更新
+**阶段**：Phase 4 TDD 实现（全程）
+**定义行为**：每个任务完成后应更新 manifest.md 中对应任务的 checkbox 状态
+**实际行为**：T01-T08 全部完成后，manifest.md 中所有任务仍显示 `[ ]`（未完成）
+**根因**：executor 子代理只负责实现代码，不负责更新 manifest；主 Claude 未在每个任务完成后执行状态更新
+**影响**：无法通过 manifest.md 追踪实时进度；Phase 9 需要手动批量更新状态
+**建议**：主 Claude 在每个 executor 子代理完成后，立即更新 manifest.md 对应任务状态
+
+---
+
+### M-1 Phase 1.5 专家评审不在 dev-flow 定义中
+**阶段**：Phase 1 → Phase 2 过渡
+**定义行为**：dev-flow SKILL.md 定义的阶段为 Phase 0-9，无 Phase 1.5
+**实际行为**：axiom-review 技能被调用，执行了 Phase 1.5 专家评审（6个子代理并行）
+**根因**：dev-flow 技能调用了 axiom-review，但 dev-flow SKILL.md 中未文档化此阶段
+**影响**：用户看到"Phase 1.5"时困惑，不知道这是否是标准流程的一部分
+**建议**：在 dev-flow SKILL.md 中正式添加 Phase 1.5 定义，或将其合并到 Phase 1 的硬门控中
+
+---
+
+### M-2 缺少 .env.example 文件
+**阶段**：Phase 4 TDD 实现
+**定义行为**：涉及环境变量的项目应提供 .env.example 作为配置模板
+**实际行为**：实现了 10+ 个环境变量（DATABASE_URL、NEXTAUTH_SECRET、REDIS_URL 等），但未生成 .env.example
+**根因**：executor prompt 未要求生成配置模板；dev-flow 无此检查项
+**影响**：项目无法直接部署，需要手动整理所有环境变量
+**建议**：Phase 4 完成后，verifier 检查是否存在 .env.example；若不存在则要求补充
+
+---
+
+### M-3 P1 任务（T09-T14）未实现
+**阶段**：Phase 4 TDD 实现
+**定义行为**：dev-flow 应完成所有规划任务
+**实际行为**：仅完成 T01-T08（P0 核心功能），T09-T14（用户控制台、统计图表、管理后台、定时任务、部署配置）未实现
+**根因**：用户在 Phase 2 选择了"仅实现 P0 任务"；这是有意的范围缩减
+**影响**：项目功能不完整，无法直接上线
+**建议**：此为预期行为，无需修复；但 dev-flow 应在完成报告中明确标注"P1 任务待实现"
+
+---
+
+## 一、不一致问题汇总（第一轮：7条，历史参考）
 
 ### #1 初始化状态污染
 **阶段**：会话初始化
@@ -126,3 +219,61 @@
 | Phase 3 TDD 实现 | 完成 | ~10分钟 | 5/5 测试通过 |
 
 **总计**：完整走完一个 SMALL 需求的 dev-flow 流程约需 75 分钟，其中约 30% 时间用于处理流程不一致问题。
+
+---
+
+## 五、第二轮问题分类分析
+
+### 按根因分类
+
+| 类别 | 问题编号 | 数量 |
+|------|---------|------|
+| 子代理行为缺陷（未执行 shell 命令/接口不一致） | C-1、C-2 | 2 |
+| 流程定义缺陷（无降级策略/触发条件不匹配） | H-1、H-2 | 2 |
+| 执行效率缺陷（串行替代并行） | H-3 | 1 |
+| 状态同步缺陷（manifest 未实时更新） | H-4 | 1 |
+| 文档缺失（Phase 1.5 未定义/.env.example 未生成） | M-1、M-2 | 2 |
+| 范围决策（P1 任务未实现，预期行为） | M-3 | 1 |
+
+### 按严重程度分类
+
+| 严重程度 | 问题编号 | 说明 |
+|---------|---------|------|
+| 严重（阻断验证质量） | C-1、H-1 | Phase 7 无法运行自动化测试 |
+| 高（增加大量返工） | C-2、H-2、H-3 | 多轮修复循环，耗时 40-50 分钟 |
+| 中（影响可追踪性） | H-4、M-1 | 状态不透明，文档不完整 |
+| 低（可接受） | M-2、M-3 | 缺少配置模板，范围缩减 |
+
+---
+
+## 六、第二轮改进优先级建议
+
+1. **P0 - 立即修复**：
+   - C-1 executor prompt 强制要求初始化类任务先执行 shell 命令
+   - H-1 Phase 4 开始前检查测试框架可用性，不可用则强制暂停
+
+2. **P1 - 近期修复**：
+   - C-2 Phase 1 接口契约必须包含完整 JSON 字段示例
+   - H-3 Phase 6 强制并行调用四视角审查子代理
+   - H-4 主 Claude 在每个任务完成后立即更新 manifest.md
+
+3. **P2 - 长期优化**：
+   - H-2 重新定义 Phase 5 触发条件
+   - M-1 在 dev-flow SKILL.md 中正式添加 Phase 1.5 定义
+   - M-2 Phase 4 完成后 verifier 检查 .env.example
+
+---
+
+## 七、两轮测试对比总结
+
+| 维度 | 第一轮（简单需求） | 第二轮（复杂需求） |
+|------|-----------------|-----------------|
+| 需求规模 | SMALL（单功能） | LARGE（全栈应用，14个任务） |
+| 执行模式 | 单 agent | team（多 agent 流水线） |
+| 主要问题类型 | 工具约束、规则设计 | 子代理协调、接口一致性 |
+| 流程完成度 | Phase 0-3（完整） | Phase 0-9（完整，但 Phase 7 降级） |
+| 不一致数量 | 7条 | 9条 |
+| 人工干预次数 | 3次 | 5次 |
+| 核心瓶颈 | AskUserQuestion 工具限制 | 多 executor 接口契约不一致 |
+
+**结论**：dev-flow 在复杂需求下暴露出更多子代理协调问题。最高优先级改进是：① executor 初始化任务必须执行 shell 命令；② Phase 1 接口契约必须包含完整字段定义。这两项改进可消除约 60% 的返工时间。
