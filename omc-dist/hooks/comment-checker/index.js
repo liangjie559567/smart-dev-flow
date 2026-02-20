@@ -271,7 +271,8 @@ export function createCommentCheckerHook(config) {
             }
             // Check if tool execution failed
             if (input.tool_response) {
-                const responseLower = input.tool_response.toLowerCase();
+                const responseStr = typeof input.tool_response === 'string' ? input.tool_response : JSON.stringify(input.tool_response);
+                const responseLower = responseStr.toLowerCase();
                 const isToolFailure = responseLower.includes('error:') ||
                     responseLower.includes('failed to') ||
                     responseLower.includes('could not') ||
