@@ -16,6 +16,8 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
    current_task: T{N} - {描述}
    completed_tasks:
    fail_count: 0
+   rollback_count: 0
+   last_checkpoint:
    last_updated: {timestamp}
    ```
 3. 启动 OMC Team `team-exec` 阶段，按以下规则分配每个子任务：
