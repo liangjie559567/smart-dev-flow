@@ -1,3 +1,59 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## 安装与启动
+
+```bash
+# Linux/macOS
+./setup.sh
+
+# Windows
+.\setup.ps1
+
+# 注册插件
+claude plugin install .
+```
+
+前置要求：Node.js 20+、Python 3.8+
+
+## 构建命令
+
+```bash
+# 构建所有 MCP 服务器
+npm run build
+
+# 单独构建
+npm run build:codex    # Codex MCP 服务器
+npm run build:gemini   # Gemini MCP 服务器
+npm run build:mcp      # OMC 工具服务器
+```
+
+无测试框架，验证通过手动运行 `claude plugin install .` 后测试技能。
+
+## 架构概览
+
+本项目是 **OMC 执行引擎 + Axiom 状态机** 的融合框架，作为 Claude Code 插件运行。
+
+**核心层次：**
+- `skills/` — 用户可调用的技能（每个子目录含 `SKILL.md` 定义），通过 `/smart-dev-flow:<name>` 触发
+- `agents/` — Agent 角色定义（`analyst.md`, `executor.md` 等），通过 `Task()` 内联调用
+- `hooks/` — Claude Code 钩子（`pre-tool-use.cjs`, `post-tool-use.cjs`），负责状态同步和门控
+- `scripts/` — MCP 服务器（`mcp-omc-tools-server.mjs`, `mcp-codex-server.mjs`, `mcp-gemini-server.mjs`）和辅助脚本
+- `.agent/` — Axiom 运行时：`memory/`（状态/知识/决策）、`skills/`（Axiom 内置技能）、`rules/`（路由规则）
+
+**状态流转（`.agent/memory/active_context.md` 中的 `task_status`）：**
+```
+IDLE → DRAFTING → CONFIRMING → REVIEWING → CONFIRMING → DECOMPOSING → IMPLEMENTING → REFLECTING → IDLE
+```
+
+**双写机制：** `post-tool-use.cjs` 监听 Write/Edit 操作，将 `.agent/memory/` 变更自动同步到 `.omc/project-memory.json`。
+
+**MCP 服务器（`.mcp.json`）：**
+- `t` — OMC 工具服务器（状态读写、notepad、project-memory）
+- `x` — Codex 代理服务器
+- `g` — Gemini 代理服务器
+
 # smart-dev-flow 开发准则
 
 ## 记忆优先原则（强制）
