@@ -46,10 +46,9 @@ description: Axiom Phase 1.5 专家评审 - 5专家并行评审
 ## active_context.md 写入格式
 
 ```
-task_status: CONFIRMING
+task_status: REVIEWING
 current_phase: Phase 1.5 - Reviewing
 last_gate: Gate 2
-pending_confirmation: 评审完成，综合评分 {N}，建议{通过/需修改}，请确认后进入拆解
 last_updated: {timestamp}
 ```
 
