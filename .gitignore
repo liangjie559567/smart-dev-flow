@@ -4,3 +4,4 @@ __pycache__/
 .agent/memory/watchdog_status.lock
 .agent/memory/evolution/reports/
 node_modules/
+.worktrees/
