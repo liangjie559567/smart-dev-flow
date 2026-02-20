@@ -27,7 +27,9 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
 
 ## PRD 写入格式
 
-写入 `.agent/memory/project_decisions.md`：
+同时写入两个文件：
+
+**1. `.agent/memory/project_decisions.md`（追加）：**
 
 ```markdown
 ## PRD - {需求标题}
@@ -36,13 +38,23 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
 ### 目标
 {功能描述}
 
+### 用户故事
+- 作为 {用户角色}，我希望 {功能}，以便 {价值}
+
 ### 验收标准
-- {标准1}
-- {标准2}
+- [ ] {标准1}
+- [ ] {标准2}
 
 ### 技术约束
-{技术栈偏好}
+{技术栈偏好或"无特殊约束"}
+
+### 排除范围
+{明确不做的内容，或"无"}
 ```
+
+**2. `.agent/memory/prd-{session_name}-{timestamp}.md`（新建）：**
+
+内容与上方相同，作为独立 PRD 文件存档。
 
 ## active_context 写入格式
 

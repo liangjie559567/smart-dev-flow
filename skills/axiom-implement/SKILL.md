@@ -28,7 +28,11 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
      ```bash
      python scripts/evolve.py on-task-completed --task-id "T{N}" --description "{描述}"
      ```
-   - 更新 `completed_tasks`，继续下一个子任务
+   - 更新 `completed_tasks`，输出进度：
+     ```
+     ✅ T{N} 完成 | {bar} {pct}% ({done}/{total})
+     ```
+   - 继续下一个子任务
 6. **子任务失败**：
    - `fail_count += 1`
    - 若 `fail_count >= 3`：更新 `task_status: BLOCKED`，`blocked_reason: 连续失败{N}次，需要人工介入`，终止流程

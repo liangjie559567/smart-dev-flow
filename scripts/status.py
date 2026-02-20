@@ -1,42 +1,97 @@
 import re, json, sys
 from pathlib import Path
+from datetime import datetime
 
 sys.stdout.reconfigure(encoding='utf-8')
-
 root = Path(__file__).parent.parent
+mem = root / '.agent/memory'
 
 def parse_frontmatter(text):
     m = re.match(r'^---\s*\n(.*?)\n---', text, re.DOTALL)
-    if not m:
-        return {}
+    if not m: return {}
     return dict(re.findall(r'^(\w+):\s*"?([^"\n]*)"?', m.group(1), re.MULTILINE))
 
-ctx_text = (root / '.agent/memory/active_context.md').read_text(encoding='utf-8-sig')
-dec_text = (root / '.agent/memory/project_decisions.md').read_text(encoding='utf-8-sig')
+def read_file(p):
+    try: return Path(p).read_text(encoding='utf-8-sig')
+    except: return ''
 
-ctx = parse_frontmatter(ctx_text)
-dec_summary = dec_text[:300]
+def count_lines_matching(text, pattern):
+    return sum(1 for l in text.splitlines() if re.search(pattern, l))
 
-axiom_status = 'N/A'
-pm_path = root / '.omc/project-memory.json'
-if pm_path.exists():
-    data = json.loads(pm_path.read_text(encoding='utf-8-sig'))
-    axiom_status = data.get('axiom_status', 'N/A')
+# 核心状态
+ctx = parse_frontmatter(read_file(mem / 'active_context.md'))
+status = ctx.get('task_status', 'N/A')
+session = ctx.get('session_name', '—')
+phase = ctx.get('current_phase', '—')
+task = ctx.get('current_task', '—')
+updated = ctx.get('last_updated', '—')
+provider = ctx.get('active_provider', 'claude_code')
 
-print(f"""# Axiom 状态报告
+# 任务进度
+completed = [t.strip() for t in ctx.get('completed_tasks', '').split(',') if t.strip()]
+total_raw = ctx.get('total_tasks', '0')
+try: total = int(total_raw)
+except: total = 0
+done = len(completed)
+pct = int(done / total * 100) if total > 0 else 0
+bar = '█' * (pct // 10) + '░' * (10 - pct // 10)
 
-## 当前上下文
+# 知识库统计
+kb_text = read_file(mem / 'evolution/knowledge_base.md')
+kb_count = count_lines_matching(kb_text, r'^##\s+K-\d+')
+pat_text = read_file(mem / 'evolution/pattern_library.md')
+pat_count = count_lines_matching(pat_text, r'^##\s+P-\d+')
+lq_text = read_file(mem / 'evolution/learning_queue.md')
+lq_count = count_lines_matching(lq_text, r'^\s*-\s+\[')
+
+# 最近反思
+ref_text = read_file(mem / 'reflection_log.md')
+ref_entries = re.findall(r'###\s+(.+?)\n.*?Key Learning[：:]\s*(.+?)(?:\n|$)', ref_text, re.DOTALL)
+ref_rows = '\n'.join(f'| {d.strip()} | {l.strip()[:60]} |' for d, l in ref_entries[-5:]) or '| — | — |'
+
+# 守卫状态
+git_pre = '✅' if (root / '.git/hooks/pre-commit').exists() else '❌'
+git_post = '✅' if (root / '.git/hooks/post-commit').exists() else '❌'
+
+# OMC project-memory
+omc_status = 'N/A'
+pm = root / '.omc/project-memory.json'
+if pm.exists():
+    try: omc_status = json.loads(pm.read_text('utf-8')).get('axiom_status', 'N/A')
+    except: pass
+
+print(f"""# 📊 Axiom — System Dashboard
+
+## 🎯 系统状态
 | 字段 | 值 |
 |------|-----|
-| task_status | {ctx.get('task_status', 'N/A')} |
-| current_phase | {ctx.get('current_phase') or '—'} |
-| last_gate | {ctx.get('last_gate') or '—'} |
-| omc_team_phase | {ctx.get('omc_team_phase') or '—'} |
-| last_updated | {ctx.get('last_updated') or '—'} |
+| Status | {status} |
+| Session | {session} |
+| Phase | {phase} |
+| Current Task | {task} |
+| Provider | {provider} |
+| Last Updated | {updated} |
+| OMC Status | {omc_status} |
 
-## Project Memory - axiom_status
-{axiom_status}
+## 📋 任务进度
+**{bar} {pct}%** ({done}/{total if total > 0 else '?'} tasks)
+已完成：{', '.join(completed) if completed else '—'}
 
-## Project Decisions 摘要
-{dec_summary}
+## 🧬 进化统计
+| 指标 | 数量 |
+|------|------|
+| 📚 知识条目 | {kb_count} |
+| 🔄 活跃模式 | {pat_count} |
+| 📥 学习队列 | {lq_count} |
+
+## 💭 最近反思
+| 日期 | 关键学习 |
+|------|---------|
+{ref_rows}
+
+## 🛡️ 守卫状态
+| 守卫 | 状态 |
+|------|------|
+| Pre-commit | {git_pre} |
+| Post-commit | {git_post} |
 """)

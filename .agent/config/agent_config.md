@@ -14,7 +14,7 @@ updated: 2026-02-09
 ## 1. Active Provider (当前激活)
 
 ```yaml
-ACTIVE_PROVIDER: gemini
+ACTIVE_PROVIDER: claude_code
 ```
 
 > 可选值: `gemini_cli` | `claude_code` | `codex` | `opencode` | `gemini` | `claude` | `copilot`
