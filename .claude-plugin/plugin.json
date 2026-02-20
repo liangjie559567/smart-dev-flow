@@ -9,7 +9,10 @@
     { "name": "axiom-decompose", "path": "skills/axiom-decompose/SKILL.md" },
     { "name": "axiom-implement", "path": "skills/axiom-implement/SKILL.md" },
     { "name": "axiom-reflect", "path": "skills/axiom-reflect/SKILL.md" },
-    { "name": "axiom-status", "path": "skills/axiom-status/SKILL.md" }
+    { "name": "axiom-status", "path": "skills/axiom-status/SKILL.md" },
+    { "name": "axiom-start", "path": "skills/axiom-start/SKILL.md" },
+    { "name": "axiom-suspend", "path": "skills/axiom-suspend/SKILL.md" },
+    { "name": "axiom-analyze-error", "path": "skills/axiom-analyze-error/SKILL.md" }
   ],
   "hooks": {
     "PreToolUse": "hooks/pre-tool-use.cjs",

@@ -26,6 +26,10 @@ if (cmd === 'status') {
     process.stderr.write(e.message + '\n');
     process.exit(1);
   }
+} else if (cmd === 'start') {
+  run('python scripts/status.py');
+} else if (cmd === 'suspend') {
+  run('python scripts/suspend.py');
 } else {
-  console.log('Usage: smart-dev-flow <status|evolve|reset>');
+  console.log('Usage: smart-dev-flow <status|evolve|reset|start|suspend>');
 }
