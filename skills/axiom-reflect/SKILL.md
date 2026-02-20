@@ -54,6 +54,12 @@ python scripts/evolve.py evolve
 更新 `.agent/memory/active_context.md`：
 ```
 task_status: IDLE
+current_phase:
+current_task:
+completed_tasks:
+fail_count: 0
+blocked_reason:
+last_updated: {timestamp}
 ```
 
 ## 自动触发

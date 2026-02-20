@@ -13,8 +13,7 @@ description: 导出当前任务的 PRD、Manifest、反思日志为 Markdown 报
 1. 读取以下文件：
    - `.agent/memory/active_context.md` — 任务状态
    - `.agent/memory/project_decisions.md` — PRD
-   - `.agent/memory/reflection_log.md` — 反思日志（最近3条）
-   - `.agent/memory/evolution/knowledge_base.md` — 知识库摘要
+   - `.agent/memory/evolution/knowledge_base.md` — 知识库（含反思记录）
 
 2. 生成导出报告，写入 `.agent/memory/export-{session_name}-{timestamp}.md`：
 

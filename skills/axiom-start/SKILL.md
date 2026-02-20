@@ -11,7 +11,18 @@ description: 零触感启动 - 读取上下文并建议下一步
 
 ## 执行步骤
 
-1. 读取 `.agent/memory/active_context.md`，若文件不存在则提示"未找到上下文，请运行 /dev-flow <需求> 开始新任务"。
+1. 读取 `.agent/memory/active_context.md`：
+   - 若文件不存在，自动创建并写入初始内容：
+     ```
+     task_status: IDLE
+     current_phase:
+     current_task:
+     completed_tasks:
+     fail_count: 0
+     blocked_reason:
+     last_updated: {timestamp}
+     ```
+     然后提示"系统已初始化，请描述你的需求"。
 
 2. 根据 `task_status` 输出对应提示：
    - `IDLE` → "系统就绪，请描述你的需求"

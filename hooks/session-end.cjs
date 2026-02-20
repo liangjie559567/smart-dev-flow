@@ -12,9 +12,11 @@ async function main() {
   let ctx = fs.readFileSync(ctxFile, 'utf8');
   const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
 
-  // 更新 last_updated
+  // 更新或追加 last_updated
   if (/last_updated:/.test(ctx)) {
     ctx = ctx.replace(/last_updated:\s*[^\n]*/, `last_updated: "${now}"`);
+  } else {
+    ctx = ctx.trimEnd() + `\nlast_updated: "${now}"\n`;
   }
   fs.writeFileSync(ctxFile, ctx);
   process.exit(0);

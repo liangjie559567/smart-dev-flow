@@ -7,7 +7,10 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
 
 ## 流程
 
-1. 执行 `.agent/workflows/1-drafting.md`
+1. 读取 `.agent/memory/active_context.md`，检查 `task_status`：
+   - 若状态非 `IDLE`，提示用户："当前有进行中的任务（状态：{task_status}），继续起草将覆盖现有上下文。确认继续？"
+   - 用户确认后继续；取消则终止
+2. 执行 `.agent/workflows/1-drafting.md`
 2. 向用户收集需求信息（见"需求收集"）
 3. 调用 OMC `analyst`（opus）澄清需求、定义验收标准
 4. 调用 OMC `planner`（opus）生成任务大纲
