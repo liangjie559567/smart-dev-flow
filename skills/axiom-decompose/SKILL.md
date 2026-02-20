@@ -45,10 +45,9 @@ description: Axiom Phase 2 任务拆解 - Manifest 生成
 ## active_context.md 写入格式
 
 ```
-task_status: CONFIRMING
+task_status: DECOMPOSING
 current_phase: Phase 2 - Decomposing
 last_gate: Gate 3
-pending_confirmation: Manifest 已生成 {N} 个任务，请确认后开始实现
 manifest_path: .agent/memory/manifest.md
 last_updated: {timestamp}
 ```
