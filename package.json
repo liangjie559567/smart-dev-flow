@@ -8,6 +8,8 @@
     "skills",
     "hooks",
     "bridge",
+    "scripts",
+    "omc-dist",
     ".agent",
     ".claude-plugin",
     "CLAUDE.md",
