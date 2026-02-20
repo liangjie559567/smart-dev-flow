@@ -41,7 +41,7 @@ git status                    # 当前工作区状态
 
 1. 执行修复方案
 2. 重新运行验证
-3. 验证通过后调用：
+3. 验证通过后，若 `scripts/evolve.py` 存在则调用：
    ```bash
    python scripts/evolve.py on-error-fixed --error-type "{类型}" --root-cause "{根因}" --solution "{方案}"
    ```
@@ -63,7 +63,7 @@ git status                    # 当前工作区状态
    ```
 2. 停止执行，等待人工介入
 
-## 每次修复后必须调用
+## 每次修复后（若 scripts/evolve.py 存在）
 
 ```bash
 python scripts/evolve.py on-error-fixed --error-type "{类型}" --root-cause "{根因}" --solution "{方案}"
