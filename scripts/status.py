@@ -23,10 +23,6 @@ def resolve_phase(task_status: str, raw_phase: str) -> Tuple[str, int]:
             return result
     return ('未知阶段', 0)
 
-sys.stdout.reconfigure(encoding='utf-8')
-root = Path(__file__).parent.parent
-mem = root / '.agent/memory'
-
 def parse_frontmatter(text):
     m = re.match(r'^---\s*\n(.*?)\n---', text, re.DOTALL)
     if not m: return {}
@@ -39,51 +35,56 @@ def read_file(p):
 def count_lines_matching(text, pattern):
     return sum(1 for l in text.splitlines() if re.search(pattern, l))
 
-# 核心状态
-ctx = parse_frontmatter(read_file(mem / 'active_context.md'))
-status = ctx.get('task_status', 'N/A')
-session = ctx.get('session_name', '—')
-phase = ctx.get('current_phase', '—')
-task = ctx.get('current_task', '—')
-updated = ctx.get('last_updated', '—')
-provider = ctx.get('active_provider', 'claude_code')
+if __name__ == '__main__':
+    sys.stdout.reconfigure(encoding='utf-8')
+    root = Path(__file__).parent.parent
+    mem = root / '.agent/memory'
 
-# 任务进度（从 manifest.md checkbox 统计）
-manifest_path = ctx.get('manifest_path', '') or str(mem / 'manifest.md')
-manifest_text = read_file(manifest_path)
-total = len(re.findall(r'^\s*-\s+\[[ xX]\]', manifest_text, re.MULTILINE))
-done = len(re.findall(r'^\s*-\s+\[[xX]\]', manifest_text, re.MULTILINE))
-pct = int(done / total * 100) if total > 0 else 0
-bar = '█' * (pct // 10) + '░' * (10 - pct // 10)
+    # 核心状态
+    ctx = parse_frontmatter(read_file(mem / 'active_context.md'))
+    status = ctx.get('task_status', 'N/A')
+    session = ctx.get('session_name', '—')
+    phase = ctx.get('current_phase', '—')
+    task = ctx.get('current_task', '—')
+    updated = ctx.get('last_updated', '—')
+    provider = ctx.get('active_provider', 'claude_code')
 
-# 知识库统计
-kb_text = read_file(mem / 'evolution/knowledge_base.md')
-kb_count = count_lines_matching(kb_text, r'^##\s+K-\d+')
-pat_text = read_file(mem / 'evolution/pattern_library.md')
-pat_count = count_lines_matching(pat_text, r'^##\s+P-\d+')
-lq_text = read_file(mem / 'evolution/learning_queue.md')
-lq_count = count_lines_matching(lq_text, r'^\s*-\s+\[')
+    # 任务进度（从 manifest.md checkbox 统计）
+    manifest_path = ctx.get('manifest_path', '') or str(mem / 'manifest.md')
+    manifest_text = read_file(manifest_path)
+    total = len(re.findall(r'^\s*-\s+\[[ xX]\]', manifest_text, re.MULTILINE))
+    done = len(re.findall(r'^\s*-\s+\[[xX]\]', manifest_text, re.MULTILINE))
+    pct = int(done / total * 100) if total > 0 else 0
+    bar = '█' * (pct // 10) + '░' * (10 - pct // 10)
 
-# 最近反思
-ref_text = read_file(mem / 'reflection_log.md')
-ref_entries = re.findall(r'###\s+(.+?)\n.*?Key Learning[：:]\s*(.+?)(?:\n|$)', ref_text, re.DOTALL)
-ref_rows = '\n'.join(f'| {d.strip()} | {l.strip()[:60]} |' for d, l in ref_entries[-5:]) or '| — | — |'
+    # 知识库统计
+    kb_text = read_file(mem / 'evolution/knowledge_base.md')
+    kb_count = count_lines_matching(kb_text, r'^##\s+K-\d+')
+    pat_text = read_file(mem / 'evolution/pattern_library.md')
+    pat_count = count_lines_matching(pat_text, r'^##\s+P-\d+')
+    lq_text = read_file(mem / 'evolution/learning_queue.md')
+    lq_count = count_lines_matching(lq_text, r'^\s*-\s+\[')
 
-# 守卫状态
-git_pre = '✅' if (root / '.git/hooks/pre-commit').exists() else '❌'
-git_post = '✅' if (root / '.git/hooks/post-commit').exists() else '❌'
+    # 最近反思
+    ref_text = read_file(mem / 'reflection_log.md')
+    ref_entries = re.findall(r'###\s+(.+?)\n.*?Key Learning[：:]\s*(.+?)(?:\n|$)', ref_text, re.DOTALL)
+    ref_rows = '\n'.join(f'| {d.strip()} | {l.strip()[:60]} |' for d, l in ref_entries[-5:]) or '| — | — |'
 
-# 阶段进度
-phase_name, phase_pct = resolve_phase(status, phase)
+    # 守卫状态
+    git_pre = '✅' if (root / '.git/hooks/pre-commit').exists() else '❌'
+    git_post = '✅' if (root / '.git/hooks/post-commit').exists() else '❌'
 
-# OMC project-memory
-omc_status = 'N/A'
-pm = root / '.omc/project-memory.json'
-if pm.exists():
-    try: omc_status = json.loads(pm.read_text('utf-8')).get('axiom_status', 'N/A')
-    except: pass
+    # 阶段进度
+    phase_name, phase_pct = resolve_phase(status, phase)
 
-print(f"""# 📊 Axiom — System Dashboard
+    # OMC project-memory
+    omc_status = 'N/A'
+    pm = root / '.omc/project-memory.json'
+    if pm.exists():
+        try: omc_status = json.loads(pm.read_text('utf-8')).get('axiom_status', 'N/A')
+        except: pass
+
+    print(f"""# 📊 Axiom — System Dashboard
 
 ## 🎯 系统状态
 | 字段 | 值 |
