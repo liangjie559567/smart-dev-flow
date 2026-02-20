@@ -1,6 +1,6 @@
 {
   "name": "smart-dev-flow",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "智能开发助手 - OMC + Axiom 融合",
   "skills": [
     {
@@ -57,6 +57,8 @@
     }
   ],
   "hooks": {
+    "SessionStart": "hooks/session-start.cjs",
+    "UserPromptSubmit": "hooks/user-prompt-submit.cjs",
     "PreToolUse": "hooks/pre-tool-use.cjs",
     "PostToolUse": "hooks/post-tool-use.cjs"
   }
