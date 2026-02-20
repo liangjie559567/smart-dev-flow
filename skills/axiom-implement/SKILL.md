@@ -23,8 +23,13 @@ description: Axiom Phase 3 实现 - OMC Team 流水线 + 双重验证
 3. 启动 OMC Team `team-exec` 阶段，按以下规则分配每个子任务：
    - 预估 > 2小时 或 涉及多文件架构改动 → `deep-executor`（opus）
    - 否则 → `executor`（sonnet）
+   - **TDD 模式**（可选，在需求收集时选择）：executor 收到指令后必须先写失败测试，再实现，再验证通过
+   - **并行执行**：Manifest 中无依赖关系的子任务自动并行分配给多个 executor，有依赖的串行执行
 4. 每个子任务完成后双重验证：
-   - OMC `verifier`（sonnet）：代码正确性
+   - OMC `verifier` 验证规则：
+     - 改动 < 5 文件 且 < 100 行 → `verifier`（haiku）
+     - 标准改动 → `verifier`（sonnet）
+     - 改动 > 20 文件 或 涉及安全/架构 → `verifier`（opus）
    - Axiom 编译门禁（`.agent/workflows/4-implementing.md`）
 5. **子任务成功**：
    - `fail_count` 重置为 0（当前子任务连续失败计数，切换子任务时同样重置）

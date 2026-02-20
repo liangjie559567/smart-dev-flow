@@ -19,6 +19,18 @@ async function main() {
   const sessionName = (ctx.match(/session_name:\s*"?([^"\n]+)"?/) || [])[1] || '';
   const phase = (ctx.match(/current_phase:\s*"?([^"\n]+)"?/) || [])[1] || '';
 
+  // 注入 project-memory
+  const memFile = path.join(cwd, '.omc/project-memory.json');
+  if (fs.existsSync(memFile)) {
+    try {
+      const mem = JSON.parse(fs.readFileSync(memFile, 'utf8'));
+      const parts = [];
+      if (mem.techStack) parts.push(`技术栈: ${Array.isArray(mem.techStack) ? mem.techStack.join(', ') : mem.techStack}`);
+      if (mem.notes && mem.notes.length) parts.push(`最近学习: ${mem.notes.slice(0, 3).join(' | ')}`);
+      if (parts.length) console.log(`[smart-dev-flow] 项目记忆已加载 | ${parts.join(' | ')}`);
+    } catch {}
+  }
+
   if (status === 'IDLE') process.exit(0);
 
   const lines = [

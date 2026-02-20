@@ -23,11 +23,14 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 
 ## IDLE 时的引导
 
-依次询问用户以下三项（可一次性回答）：
+依次询问用户以下四项（可一次性回答）：
 
 1. **需求描述**：你想构建什么功能或解决什么问题？
 2. **技术栈偏好**：有指定语言/框架/工具吗？（无则留空）
 3. **优先级**：功能完整性 / 开发速度 / 代码质量，哪个最重要？
+4. **执行模式**：
+   - **标准模式**（默认）— 每个阶段需要确认，适合复杂需求
+   - **自动驾驶模式** — 跳过所有确认门禁，调用 OMC autopilot 端到端执行
 
 收到回答后：
 1. 将 `task_status` 更新为 `DRAFTING`
@@ -61,6 +64,20 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `/rollback` | 调用 `axiom-rollback`（回滚检查点） |
 | `/knowledge [词]` | 调用 `axiom-knowledge`（查询知识库） |
 | `/patterns [词]` | 调用 `axiom-patterns`（查询模式库） |
+| `/ralph` | 调用 OMC `ralph`（持久执行，任务必须完全完成才停止） |
+| `/git` | 调用 OMC `git-master` agent（原子提交、rebase、历史管理） |
+
+## OMC Team Phase 映射
+
+Axiom 各阶段与 OMC Team 流水线的对应关系：
+
+| Axiom 阶段 | OMC Team Phase | 主要 Agent |
+|-----------|---------------|-----------|
+| axiom-draft | team-prd | analyst, product-manager |
+| axiom-review | team-prd | analyst, critic |
+| axiom-decompose | team-plan | planner, architect |
+| axiom-implement | team-exec → team-verify | executor/deep-executor, verifier |
+| axiom-reflect | team-verify | verifier, writer |
 
 ## active_context.md 字段规范
 

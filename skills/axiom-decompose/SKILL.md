@@ -23,10 +23,11 @@ description: Axiom Phase 2 任务拆解 - Manifest 生成
 ### 完整拆解流程
 
 1. 调用 OMC `architect`（opus）设计系统边界和接口
-2. 调用 OMC `planner`（opus）生成任务 Manifest
-3. 将 Manifest 写入 `.agent/memory/manifest.md`
-4. 更新 `active_context.md`
-5. 展示 Manifest，等待用户确认
+2. **可选 `--consensus` 模式**：同时启动 `planner`（opus）+ `critic`（opus）对方案进行挑战，三方迭代直到达成共识（默认关闭，用户可在需求收集时选择）
+3. 调用 OMC `planner`（opus）生成任务 Manifest
+4. 将 Manifest 写入 `.agent/memory/manifest.md`
+5. 更新 `active_context.md`
+6. 展示 Manifest，等待用户确认
 
 ## Manifest 文件格式
 

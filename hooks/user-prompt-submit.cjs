@@ -18,6 +18,8 @@ const KEYWORDS = {
   '/meta':           '检测到 /meta，建议运行 /axiom-meta 查看系统配置。',
 };
 
+const THINK_KEYWORDS = ['think', 'ultrathink', '深度思考', '仔细想想'];
+
 async function main() {
   const input = await readStdin();
   const hook = JSON.parse(input);
@@ -30,6 +32,12 @@ async function main() {
       console.log(`[smart-dev-flow] ${msg}`);
       process.exit(0);
     }
+  }
+
+  // think-mode 检测
+  const lower = prompt.toLowerCase();
+  if (THINK_KEYWORDS.some(k => lower.includes(k))) {
+    console.log('[smart-dev-flow] 🧠 检测到深度思考请求，已启用扩展推理模式。');
   }
 
   process.exit(0);
