@@ -52,8 +52,10 @@ def main():
     # 任务进度（从 manifest.md checkbox 统计）
     manifest_path = ctx.get('manifest_path', '') or str(mem / 'manifest.md')
     manifest_text = read_file(manifest_path)
-    total = len(re.findall(r'^\s*-\s+\[[ xX]\]', manifest_text, re.MULTILINE))
-    done = len(re.findall(r'^\s*-\s+\[[xX]\]', manifest_text, re.MULTILINE))
+    task_section = re.split(r'^##\s+', manifest_text, flags=re.MULTILINE)
+    task_block = next((s for s in task_section if s.startswith('任务列表')), '')
+    total = len(re.findall(r'^\s*-\s+\[[ xX]\]', task_block, re.MULTILINE))
+    done = len(re.findall(r'^\s*-\s+\[[xX]\]', task_block, re.MULTILINE))
     pct = int(done / total * 100) if total > 0 else 0
     bar = '█' * (pct // 10) + '░' * (10 - pct // 10)
 
