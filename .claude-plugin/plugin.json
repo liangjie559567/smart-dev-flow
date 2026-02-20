@@ -1,6 +1,6 @@
 {
   "name": "smart-dev-flow",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "智能开发助手 - OMC + Axiom 融合",
   "skills": [
     {
@@ -73,10 +73,10 @@
     }
   ],
   "hooks": {
-    "SessionStart": "hooks/session-start.cjs",
-    "UserPromptSubmit": "hooks/user-prompt-submit.cjs",
+    "SessionStart": ["hooks/session-start.cjs", "hooks/rules-injector.cjs"],
+    "UserPromptSubmit": ["hooks/user-prompt-submit.cjs", "hooks/think-mode.cjs"],
     "PreToolUse": "hooks/pre-tool-use.cjs",
-    "PostToolUse": ["hooks/post-tool-use.cjs", "hooks/preemptive-compaction.cjs", "hooks/background-notification.cjs"],
+    "PostToolUse": ["hooks/post-tool-use.cjs", "hooks/preemptive-compaction.cjs", "hooks/background-notification.cjs", "hooks/recovery.cjs"],
     "PreCompact": "hooks/pre-compact.cjs",
     "SessionEnd": "hooks/session-end.cjs",
     "Stop": "hooks/stop.cjs",

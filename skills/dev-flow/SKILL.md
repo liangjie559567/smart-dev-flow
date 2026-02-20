@@ -69,6 +69,10 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `/code-review` | 调用 OMC `code-reviewer`（opus）对当前代码库进行全面审查 |
 | `/security-review` | 调用 OMC `security-reviewer`（sonnet）进行安全专项审查 |
 | `/deepinit` | 调用 OMC `deepinit`，分层扫描代码库生成 AGENTS.md 知识图谱 |
+| `/plan [需求]` | 调用 OMC `plan`，战略规划（支持 `--consensus` 多 agent 共识模式） |
+| `/ralplan [需求]` | 调用 OMC `ralplan`，Planner+Architect+Critic 三方共识规划 |
+| `/doctor` | 调用 OMC `omc-doctor`，诊断并修复环境配置问题 |
+| `/research [主题]` | 调用 OMC `external-context`，并行 document-specialist 网页搜索 |
 
 ## OMC Team Phase 映射
 

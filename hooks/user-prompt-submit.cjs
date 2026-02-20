@@ -19,6 +19,10 @@ const KEYWORDS = {
   '/code-review':    '检测到 /code-review，调用 OMC code-reviewer（opus）进行全面代码审查。',
   '/security-review':'检测到 /security-review，调用 OMC security-reviewer（sonnet）进行安全审查。',
   '/deepinit':       '检测到 /deepinit，调用 OMC deepinit 生成代码库知识图谱（AGENTS.md）。',
+  '/plan':           '检测到 /plan，调用 OMC plan 进行战略规划（支持 --consensus 模式）。',
+  '/ralplan':        '检测到 /ralplan，调用 OMC ralplan 启动三方共识规划（Planner+Architect+Critic）。',
+  '/doctor':         '检测到 /doctor，调用 OMC omc-doctor 诊断并修复环境配置。',
+  '/research':       '检测到 /research，调用 OMC external-context 启动并行网页研究。',
 };
 
 const THINK_KEYWORDS = ['think', 'ultrathink', '深度思考', '仔细想想'];
@@ -35,12 +39,6 @@ async function main() {
       console.log(`[smart-dev-flow] ${msg}`);
       process.exit(0);
     }
-  }
-
-  // think-mode 检测
-  const lower = prompt.toLowerCase();
-  if (THINK_KEYWORDS.some(k => lower.includes(k))) {
-    console.log('[smart-dev-flow] 🧠 检测到深度思考请求，已启用扩展推理模式。');
   }
 
   process.exit(0);

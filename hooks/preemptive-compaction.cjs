@@ -36,7 +36,12 @@ async function main() {
   saveState(state);
 
   if (ratio >= THRESHOLD) {
-    console.log(`[smart-dev-flow] ⚠️ 上下文已使用约 ${Math.round(ratio * 100)}%，建议运行 /compact 压缩上下文。`);
+    const pct = Math.round(ratio * 100);
+    const bar = '█'.repeat(Math.floor(pct / 10)) + '░'.repeat(10 - Math.floor(pct / 10));
+    process.stdout.write(`[smart-dev-flow] ┌─ HUD: Context Monitor ─────────────┐\n`);
+    process.stdout.write(`[smart-dev-flow] │ 上下文用量  [${bar}] ${pct}%  │\n`);
+    process.stdout.write(`[smart-dev-flow] │ ⚠️  建议立即运行 /compact 压缩上下文  │\n`);
+    process.stdout.write(`[smart-dev-flow] └────────────────────────────────────┘\n`);
     state.tokens = 0;
     saveState(state);
   }
