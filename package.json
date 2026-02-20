@@ -1,9 +1,10 @@
 {
   "name": "smart-dev-flow",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "智能开发助手流程 - oh-my-claudecode + Axiom 深度融合",
   "type": "module",
   "files": [
+    "agents",
     "skills",
     "hooks",
     "bridge",

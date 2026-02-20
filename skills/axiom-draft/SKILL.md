@@ -12,8 +12,20 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
    - 用户确认后继续；取消则终止
 2. 执行 `.agent/workflows/1-drafting.md`
 3. 向用户收集需求信息（见"需求收集"）
-4. 调用 OMC `analyst`（opus）澄清需求、定义验收标准
-5. 调用 OMC `planner`（opus）生成任务大纲
+4. 派发 analyst agent 澄清需求、定义验收标准：
+   ```
+   Task(
+     subagent_type="general-purpose",
+     prompt="你是需求分析师（Analyst）。你的任务是将产品需求转化为可实现的验收标准，识别需求缺口。\n\n分析以下需求，提取验收标准和隐含约束：\n{需求描述}\n\n输出：\n- 用户故事（作为...，我希望...，以便...）\n- 验收标准列表（可测试的 pass/fail 标准）\n- 技术约束\n- 排除范围\n- 未解决的疑问"
+   )
+   ```
+5. 派发 planner agent 生成任务大纲：
+   ```
+   Task(
+     subagent_type="general-purpose",
+     prompt="你是规划师（Planner）。你的任务是基于需求分析生成清晰可执行的工作计划。\n\n基于以下 PRD 生成任务大纲：\n{analyst输出}\n\n输出：有序任务列表，每项含：\n- 任务描述\n- 依赖关系\n- 预估复杂度（低/中/高）\n- 验收标准"
+   )
+   ```
 6. 将结果按"PRD 写入格式"写入 `.agent/memory/project_decisions.md`
 7. 按"active_context 写入格式"更新 `active_context.md`
 8. 向用户展示 PRD 草稿，执行"确认流程"

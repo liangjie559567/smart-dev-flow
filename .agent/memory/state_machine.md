@@ -79,32 +79,5 @@ session_id: "..."
 task_status: DRAFTING
 current_phase: "Phase 1"
 last_gate: "Gate 1 Pass"
-omc_team_phase: "team-exec"
-omc_session_id: ""
-last_updated: ""
 ---
 ```
-
-## 5. OMC 阶段映射（融合扩展）
-
-| Axiom 状态 | OMC Team 阶段 | OMC Agents | 质量门控 |
-|-----------|--------------|-----------|---------|
-| `DRAFTING` | `team-plan` | `analyst`, `planner` | Axiom Gate 1 |
-| `REVIEWING` | `team-prd` | `quality-reviewer`, `security-reviewer` | Axiom Gate 2 |
-| `DECOMPOSING` | `team-plan` | `architect`, `planner` | Axiom Gate 3 |
-| `IMPLEMENTING` | `team-exec` | `executor` × N | Axiom 编译门禁 + OMC `verifier` |
-| `BLOCKED` | `team-fix` | `debugger` (OMC) + `/analyze-error` (Axiom) 并联 | 人工介入 |
-| `REFLECTING` | — | Axiom `/reflect` + `/evolve` → OMC project-memory 同步 | — |
-
-## 6. 新增状态：REFLECTING
-
-```
-IMPLEMENTING → REFLECTING: ALL_DONE（任务完成后自动触发）
-REFLECTING → IDLE: EVOLVE_DONE（知识沉淀完成）
-```
-
-触发器：
-| 触发器 | 源状态 | 目标状态 | 触发条件 |
-|-------|-------|---------|---------|
-| `ALL_DONE` | IMPLEMENTING | REFLECTING | 研发报告生成完毕 |
-| `EVOLVE_DONE` | REFLECTING | IDLE | `/reflect` + `/evolve` 执行完毕 |

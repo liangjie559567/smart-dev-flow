@@ -36,9 +36,18 @@
 
 ## Agent 调用
 
-使用 `oh-my-claudecode:` 前缀调用 OMC agents：
-- 分析/规划: `analyst`, `planner`, `architect`
+使用 Claude Code 原生 `Task(subagent_type="general-purpose")` 派发 agent，将 `agents/` 目录中的角色定义内联到 prompt 中：
+
+```
+Task(
+  subagent_type="general-purpose",
+  prompt="你是{角色名}。{agents/{role}.md 中的角色定义}\n\n任务：{具体任务}"
+)
+```
+
+可用角色（`agents/` 目录）：
+- 分析/规划: `analyst`, `planner`, `architect`, `critic`
 - 实现: `executor`, `deep-executor`
-- 审查: `quality-reviewer`, `security-reviewer`, `code-reviewer`
+- 审查: `code-reviewer`, `quality-reviewer`, `security-reviewer`
 - 调试: `debugger`
 - 验证: `verifier`

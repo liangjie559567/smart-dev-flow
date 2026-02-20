@@ -8,12 +8,14 @@ description: Axiom Phase 1.5 专家评审 - 5专家并行评审
 ## 流程
 
 1. 读取 `.agent/memory/project_decisions.md` 中最新 PRD 草稿
-2. **并行**调用5个 OMC 专家 agent：
-   - `ux-researcher`（sonnet）：用户体验、可用性、交互设计
-   - `product-manager`（sonnet）：产品价值、用户故事完整性、优先级
-   - `analyst`（opus）：领域逻辑、需求完整性、边界条件
-   - `quality-reviewer`（sonnet）：技术可行性、架构合理性
-   - `security-reviewer`（sonnet）：安全边界、信任模型、风险
+2. **并行**调用5个专家 agent：
+   ```
+   Task(subagent_type="general-purpose", prompt="你是UX研究员。评审以下PRD的用户体验、可用性和交互设计。\n{PRD内容}\n输出：评分(0-100) + 关键意见（3条以内）")
+   Task(subagent_type="general-purpose", prompt="你是产品经理。评审以下PRD的产品价值、用户故事完整性和优先级。\n{PRD内容}\n输出：评分(0-100) + 关键意见（3条以内）")
+   Task(subagent_type="general-purpose", prompt="你是需求分析师。评审以下PRD的领域逻辑、需求完整性和边界条件。\n{PRD内容}\n输出：评分(0-100) + 关键意见（3条以内）")
+   Task(subagent_type="general-purpose", prompt="你是技术主管。评审以下PRD的技术可行性和架构合理性。\n{PRD内容}\n输出：评分(0-100) + 关键意见（3条以内）")
+   Task(subagent_type="general-purpose", prompt="你是安全评审员。评审以下PRD的安全边界、信任模型和风险（OWASP Top 10）。\n{PRD内容}\n输出：评分(0-100) + 关键意见（3条以内）")
+   ```
 3. 按优先级解决冲突：**安全 > 技术 > 战略 > 逻辑 > 体验**
 4. 汇总评审结果，追加写入 `.agent/memory/project_decisions.md`
 5. 更新 `active_context.md`，展示报告等待确认

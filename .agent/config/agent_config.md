@@ -14,7 +14,7 @@ updated: 2026-02-09
 ## 1. Active Provider (当前激活)
 
 ```yaml
-ACTIVE_PROVIDER: claude_code
+ACTIVE_PROVIDER: gemini
 ```
 
 > 可选值: `gemini_cli` | `claude_code` | `codex` | `opencode` | `gemini` | `claude` | `copilot`
@@ -332,56 +332,3 @@ cp .agent/adapters/copilot/copilot-instructions.md ~/.copilot/copilot-instructio
 | 反思引擎 | ✅ | ✅ | ✅ | ✅ |
 
 > ⚠️ = 功能可用但有限制，详见各适配器文档
-
-
----
-
-## 6. OMC Integration（oh-my-claudecode 融合配置）
-
-```yaml
-omc_integration:
-  enabled: true
-  skills_dir: "skills/"
-  hooks_dir: "hooks/"
-  bridge_dir: "bridge/"
-  omc_state_dir: ".omc/state/"
-  agents:
-    drafting: ["analyst", "planner"]
-    reviewing: ["quality-reviewer", "security-reviewer"]
-    decomposing: ["architect", "planner"]
-    implementing: ["executor", "deep-executor"]
-    blocked: ["debugger"]
-    reflecting: ["verifier"]
-```
-
-## 7. Memory Dual-Write（记忆双写配置）
-
-```yaml
-memory:
-  primary: ".agent/memory/"
-  secondary: ".omc/"
-  sync_on:
-    - task_complete
-    - reflect
-    - evolve
-  field_mapping:
-    project_decisions: ".omc/project-memory.json#notes"
-    user_preferences: ".omc/project-memory.json#conventions"
-    task_status: ".omc/state/team-state.json#current_phase"
-    knowledge_base: ".omc/project-memory.json#techStack"
-```
-
-## 8. Project Type（通用项目配置）
-
-原 Axiom 默认为 Flutter/Dart 项目。smart-dev-flow 支持通用项目类型。
-
-```yaml
-project:
-  type: "generic"
-  commands:
-    run: ""
-    test: ""
-    analyze: ""
-    build: ""
-  # 各项目可在 active_context.md 中覆盖上述命令
-```
