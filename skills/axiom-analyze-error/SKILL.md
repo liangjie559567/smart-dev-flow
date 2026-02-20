@@ -29,13 +29,13 @@ git status                    # 当前工作区状态
 1. **错误类型检测**：
    - 若错误信息包含编译/类型/构建关键词（`error TS`、`SyntaxError`、`build failed`、`cannot find module`、`type error` 等）→ 直接路由到 `build-fixer` agent：
      ```
-     Task(subagent_type="oh-my-claudecode:build-fixer", model="sonnet", prompt="修复以下构建错误：{错误信息}")
+     Task(subagent_type="smart-dev-flow:build-fixer", model="sonnet", prompt="修复以下构建错误：{错误信息}")
      ```
    - 否则继续常规分析
 
 2. **OMC debugger**（sonnet）：代码级根因分析
    ```
-   Task(subagent_type="oh-my-claudecode:debugger", model="sonnet", prompt="分析以下错误的根因，给出置信度（0-100）和修复方案：{错误信息}")
+   Task(subagent_type="smart-dev-flow:debugger", model="sonnet", prompt="分析以下错误的根因，给出置信度（0-100）和修复方案：{错误信息}")
    ```
 
 2. **Axiom 流程分析**：读取并执行 `.agent/workflows/analyze-error.md`

@@ -6,7 +6,7 @@ argument-hint: "<command> [args]"
 
 # Skill Management CLI
 
-Meta-skill for managing oh-my-claudecode skills via CLI-like commands.
+Meta-skill for managing smart-dev-flow skills via CLI-like commands.
 
 ## Subcommands
 
@@ -84,7 +84,7 @@ argument-hint: "<args>"
 ## Examples
 
 ```
-/oh-my-claudecode:<name> example-arg
+/smart-dev-flow:<name> example-arg
 ```
 
 ## Notes
@@ -701,9 +701,9 @@ How to work with this integration correctly:
 
 When invoked with an argument, skip the interactive wizard:
 
-- `/oh-my-claudecode:skill list` - Show detailed skill inventory
-- `/oh-my-claudecode:skill add` - Start skill creation (invoke learner)
-- `/oh-my-claudecode:skill scan` - Scan both skill directories
+- `/smart-dev-flow:skill list` - Show detailed skill inventory
+- `/smart-dev-flow:skill add` - Start skill creation (invoke learner)
+- `/smart-dev-flow:skill scan` - Scan both skill directories
 
 ### Interactive Mode
 
@@ -749,16 +749,16 @@ Good skills are:
 
 ## Related Skills
 
-- `/oh-my-claudecode:learner` - Extract a skill from current conversation
-- `/oh-my-claudecode:note` - Save quick notes (less formal than skills)
-- `/oh-my-claudecode:deepinit` - Generate AGENTS.md codebase hierarchy
+- `/smart-dev-flow:learner` - Extract a skill from current conversation
+- `/smart-dev-flow:note` - Save quick notes (less formal than skills)
+- `/smart-dev-flow:deepinit` - Generate AGENTS.md codebase hierarchy
 
 ---
 
 ## Example Session
 
 ```
-> /oh-my-claudecode:skill list
+> /smart-dev-flow:skill list
 
 Checking skill directories...
 ✓ User skills directory exists: ~/.claude/skills/omc-learned/
@@ -801,7 +801,7 @@ What would you like to do?
 
 ## Tips for Users
 
-- Run `/oh-my-claudecode:skill list` periodically to review your skill library
+- Run `/smart-dev-flow:skill list` periodically to review your skill library
 - After solving a tricky bug, immediately run learner to capture it
 - Use project-level skills for codebase-specific knowledge
 - Use user-level skills for general patterns that apply everywhere
@@ -822,9 +822,9 @@ What would you like to do?
 
 ## Related Skills
 
-- `/oh-my-claudecode:learner` - Extract a skill from current conversation
-- `/oh-my-claudecode:note` - Save quick notes (less formal than skills)
-- `/oh-my-claudecode:deepinit` - Generate AGENTS.md codebase hierarchy
+- `/smart-dev-flow:learner` - Extract a skill from current conversation
+- `/smart-dev-flow:note` - Save quick notes (less formal than skills)
+- `/smart-dev-flow:deepinit` - Generate AGENTS.md codebase hierarchy
 
 ---
 

@@ -41,7 +41,7 @@ node -e "const p=require('path'),f=require('fs'),d=process.env.CLAUDE_CONFIG_DIR
 
 **Step 2:** Verify the plugin is installed:
 ```bash
-node -e "const p=require('path'),f=require('fs'),d=process.env.CLAUDE_CONFIG_DIR||p.join(require('os').homedir(),'.claude'),b=p.join(d,'plugins','cache','omc','oh-my-claudecode');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));if(v.length===0){console.log('Plugin not installed - run: /plugin install oh-my-claudecode');process.exit()}const l=v[v.length-1],h=p.join(b,l,'dist','hud','index.js');console.log('Version:',l);console.log(f.existsSync(h)?'READY':'NOT_FOUND - try reinstalling: /plugin install oh-my-claudecode')}catch{console.log('Plugin not installed - run: /plugin install oh-my-claudecode')}"
+node -e "const p=require('path'),f=require('fs'),d=process.env.CLAUDE_CONFIG_DIR||p.join(require('os').homedir(),'.claude'),b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));if(v.length===0){console.log('Plugin not installed - run: /plugin install smart-dev-flow');process.exit()}const l=v[v.length-1],h=p.join(b,l,'dist','hud','index.js');console.log('Version:',l);console.log(f.existsSync(h)?'READY':'NOT_FOUND - try reinstalling: /plugin install smart-dev-flow')}catch{console.log('Plugin not installed - run: /plugin install smart-dev-flow')}"
 ```
 
 **Step 3:** If omc-hud.mjs is MISSING or argument is `setup`, create the HUD directory and script:
@@ -87,8 +87,8 @@ async function main() {
   const home = homedir();
   let pluginCacheDir = null;
 
-  // 1. Try plugin cache first (marketplace: omc, plugin: oh-my-claudecode)
-  const pluginCacheBase = join(home, ".claude/plugins/cache/omc/oh-my-claudecode");
+  // 1. Try plugin cache first (marketplace: omc, plugin: smart-dev-flow)
+  const pluginCacheBase = join(home, ".claude/plugins/cache/smart-dev-flow/smart-dev-flow");
   if (existsSync(pluginCacheBase)) {
     try {
       const versions = readdirSync(pluginCacheBase);
@@ -108,8 +108,8 @@ async function main() {
   const devPaths = [
     join(home, "Workspace/oh-my-claude-sisyphus/dist/hud/index.js"),
     join(home, "workspace/oh-my-claude-sisyphus/dist/hud/index.js"),
-    join(home, "Workspace/oh-my-claudecode/dist/hud/index.js"),
-    join(home, "workspace/oh-my-claudecode/dist/hud/index.js"),
+    join(home, "Workspace/smart-dev-flow/dist/hud/index.js"),
+    join(home, "workspace/smart-dev-flow/dist/hud/index.js"),
   ];
 
   for (const devPath of devPaths) {
@@ -194,7 +194,7 @@ Shows all relevant elements:
 ### Full
 Shows everything including multi-line agent details:
 ```
-[OMC] repo:oh-my-claudecode branch:main | ralph:3/10 | US-002 (2/5) | ultrawork | ctx:[████░░]67% | agents:3 | bg:3/5 | todos:2/5
+[OMC] repo:smart-dev-flow branch:main | ralph:3/10 | US-002 (2/5) | ultrawork | ctx:[████░░]67% | agents:3 | bg:3/5 | todos:2/5
 ├─ O architect    2m   analyzing architecture patterns...
 ├─ e explore     45s   searching for test files
 └─ s executor     1m   implementing validation logic

@@ -19,15 +19,15 @@ External Context decomposes a query into parallel web search facets, each handle
 ## Usage
 
 ```
-/oh-my-claudecode:external-context <topic or question>
+/smart-dev-flow:external-context <topic or question>
 ```
 
 ### Examples
 
 ```
-/oh-my-claudecode:external-context What are the best practices for JWT token rotation in Node.js?
-/oh-my-claudecode:external-context Compare Prisma vs Drizzle ORM for PostgreSQL
-/oh-my-claudecode:external-context Latest React Server Components patterns and conventions
+/smart-dev-flow:external-context What are the best practices for JWT token rotation in Node.js?
+/smart-dev-flow:external-context Compare Prisma vs Drizzle ORM for PostgreSQL
+/smart-dev-flow:external-context Latest React Server Components patterns and conventions
 ```
 
 ## Protocol
@@ -54,9 +54,9 @@ Given a query, decompose into 2-5 independent search facets:
 Fire independent facets in parallel via Task tool:
 
 ```
-Task(subagent_type="oh-my-claudecode:document-specialist", model="sonnet", prompt="Search for: <facet 1 description>. Use WebSearch and WebFetch to find official documentation and examples. Cite all sources with URLs.")
+Task(subagent_type="smart-dev-flow:document-specialist", model="sonnet", prompt="Search for: <facet 1 description>. Use WebSearch and WebFetch to find official documentation and examples. Cite all sources with URLs.")
 
-Task(subagent_type="oh-my-claudecode:document-specialist", model="sonnet", prompt="Search for: <facet 2 description>. Use WebSearch and WebFetch to find official documentation and examples. Cite all sources with URLs.")
+Task(subagent_type="smart-dev-flow:document-specialist", model="sonnet", prompt="Search for: <facet 2 description>. Use WebSearch and WebFetch to find official documentation and examples. Cite all sources with URLs.")
 ```
 
 ### Synthesis

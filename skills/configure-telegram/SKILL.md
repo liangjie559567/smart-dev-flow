@@ -216,8 +216,8 @@ You can also set these via environment variables:
   OMC_TELEGRAM_BOT_TOKEN=123456789:ABCdefGHI...
   OMC_TELEGRAM_CHAT_ID=123456789
 
-To reconfigure: /oh-my-claudecode:configure-telegram
-To configure Discord: /oh-my-claudecode:configure-discord
+To reconfigure: /smart-dev-flow:configure-telegram
+To configure Discord: /smart-dev-flow:configure-discord
 ```
 
 ## Environment Variable Alternative

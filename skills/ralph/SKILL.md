@@ -55,7 +55,7 @@ Complex tasks often fail silently: partial implementations get declared "done", 
    - Standard changes: STANDARD tier (architect-medium / Sonnet)
    - >20 files or security/architectural changes: THOROUGH tier (architect / Opus)
    - Ralph floor: always at least STANDARD, even for small changes
-7. **On approval**: Run `/oh-my-claudecode:cancel` to cleanly exit and clean up all state files
+7. **On approval**: Run `/smart-dev-flow:cancel` to cleanly exit and clean up all state files
 8. **On rejection**: Fix the issues raised, then re-verify at the same tier
 </Steps>
 
@@ -71,9 +71,9 @@ Complex tasks often fail silently: partial implementations get declared "done", 
 <Good>
 Correct parallel delegation:
 ```
-Task(subagent_type="oh-my-claudecode:executor-low", model="haiku", prompt="Add type export for UserConfig")
-Task(subagent_type="oh-my-claudecode:executor", model="sonnet", prompt="Implement the caching layer for API responses")
-Task(subagent_type="oh-my-claudecode:executor-high", model="opus", prompt="Refactor auth module to support OAuth2 flow")
+Task(subagent_type="smart-dev-flow:executor-low", model="haiku", prompt="Add type export for UserConfig")
+Task(subagent_type="smart-dev-flow:executor", model="sonnet", prompt="Implement the caching layer for API responses")
+Task(subagent_type="smart-dev-flow:executor-high", model="opus", prompt="Refactor auth module to support OAuth2 flow")
 ```
 Why good: Three independent tasks fired simultaneously at appropriate tiers.
 </Good>
@@ -85,7 +85,7 @@ Correct verification before completion:
 2. Run: npm run build      → Output: "Build succeeded"
 3. Run: lsp_diagnostics    → Output: 0 errors
 4. Spawn architect-medium  → Verdict: "APPROVED"
-5. Run /oh-my-claudecode:cancel
+5. Run /smart-dev-flow:cancel
 ```
 Why good: Fresh evidence at each step, architect verification, then clean exit.
 </Good>
@@ -109,7 +109,7 @@ Why bad: These are independent tasks that should run in parallel, not sequential
 
 <Escalation_And_Stop_Conditions>
 - Stop and report when a fundamental blocker requires user input (missing credentials, unclear requirements, external service down)
-- Stop when the user says "stop", "cancel", or "abort" -- run `/oh-my-claudecode:cancel`
+- Stop when the user says "stop", "cancel", or "abort" -- run `/smart-dev-flow:cancel`
 - Continue working when the hook system sends "The boulder never stops" -- this means the iteration continues
 - If architect rejects verification, fix the issues and re-verify (do not stop)
 - If the same issue recurs across 3+ iterations, report it as a potential fundamental problem
@@ -122,7 +122,7 @@ Why bad: These are independent tasks that should run in parallel, not sequential
 - [ ] Fresh build output shows success
 - [ ] lsp_diagnostics shows 0 errors on affected files
 - [ ] Architect verification passed (STANDARD tier minimum)
-- [ ] `/oh-my-claudecode:cancel` run for clean state cleanup
+- [ ] `/smart-dev-flow:cancel` run for clean state cleanup
 </Final_Checklist>
 
 <Advanced>

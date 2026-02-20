@@ -1,19 +1,19 @@
 ---
 name: release
-description: Automated release workflow for oh-my-claudecode
+description: Automated release workflow for smart-dev-flow
 ---
 
 # Release Skill
 
-Automate the release process for oh-my-claudecode.
+Automate the release process for smart-dev-flow.
 
 ## Usage
 
 ```
-/oh-my-claudecode:release <version>
+/smart-dev-flow:release <version>
 ```
 
-Example: `/oh-my-claudecode:release 2.4.0` or `/oh-my-claudecode:release patch` or `/oh-my-claudecode:release minor`
+Example: `/smart-dev-flow:release 2.4.0` or `/smart-dev-flow:release patch` or `/smart-dev-flow:release minor`
 
 ## Release Checklist
 

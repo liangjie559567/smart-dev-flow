@@ -1,6 +1,6 @@
 ---
 name: omc-setup
-description: Setup and configure oh-my-claudecode (the ONLY command you need to learn)
+description: Setup and configure smart-dev-flow (the ONLY command you need to learn)
 ---
 
 # OMC Setup
@@ -179,7 +179,7 @@ Check for flags in the user's invocation:
 
 Use the AskUserQuestion tool to prompt the user:
 
-**Question:** "Where should I configure oh-my-claudecode?"
+**Question:** "Where should I configure smart-dev-flow?"
 
 **Options:**
 1. **Local (this project)** - Creates `.claude/CLAUDE.md` in current project directory. Best for project-specific configurations.
@@ -203,7 +203,7 @@ mkdir -p .claude && echo ".claude directory ready"
 TARGET_PATH=".claude/CLAUDE.md"
 
 # Extract old version before download
-OLD_VERSION=$(grep -m1 "^# oh-my-claudecode" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "none")
+OLD_VERSION=$(grep -m1 "^# smart-dev-flow" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "none")
 
 # Backup existing
 if [ -f "$TARGET_PATH" ]; then
@@ -273,7 +273,7 @@ else
 fi
 
 # Extract new version and report
-NEW_VERSION=$(grep -m1 "^# oh-my-claudecode" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+NEW_VERSION=$(grep -m1 "^# smart-dev-flow" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 if [ "$OLD_VERSION" = "none" ]; then
   echo "Installed CLAUDE.md: $NEW_VERSION"
 elif [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
@@ -296,7 +296,7 @@ https://raw.githubusercontent.com/Yeachan-Heo/oh-my-claudecode/main/docs/CLAUDE.
 ### Verify Plugin Installation
 
 ```bash
-grep -q "oh-my-claudecode" ~/.claude/settings.json && echo "Plugin verified" || echo "Plugin NOT found - run: claude /install-plugin oh-my-claudecode"
+grep -q "smart-dev-flow" ~/.claude/settings.json && echo "Plugin verified" || echo "Plugin NOT found - run: claude /install-plugin smart-dev-flow"
 ```
 
 ### Confirm Local Configuration Success
@@ -342,7 +342,7 @@ Do not continue to HUD setup or other steps.
 TARGET_PATH="$HOME/.claude/CLAUDE.md"
 
 # Extract old version before download
-OLD_VERSION=$(grep -m1 "^# oh-my-claudecode" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "none")
+OLD_VERSION=$(grep -m1 "^# smart-dev-flow" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "none")
 
 # Backup existing
 if [ -f "$TARGET_PATH" ]; then
@@ -412,7 +412,7 @@ else
 fi
 
 # Extract new version and report
-NEW_VERSION=$(grep -m1 "^# oh-my-claudecode" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+NEW_VERSION=$(grep -m1 "^# smart-dev-flow" "$TARGET_PATH" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 if [ "$OLD_VERSION" = "none" ]; then
   echo "Installed CLAUDE.md: $NEW_VERSION"
 elif [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
@@ -444,7 +444,7 @@ Check `~/.claude/settings.json` for manual hook entries. If the "hooks" key exis
 ### Verify Plugin Installation
 
 ```bash
-grep -q "oh-my-claudecode" ~/.claude/settings.json && echo "Plugin verified" || echo "Plugin NOT found - run: claude /install-plugin oh-my-claudecode"
+grep -q "smart-dev-flow" ~/.claude/settings.json && echo "Plugin verified" || echo "Plugin NOT found - run: claude /install-plugin smart-dev-flow"
 ```
 
 ### Confirm Global Configuration Success
@@ -512,7 +512,7 @@ Clear old cached plugin versions to avoid conflicts:
 
 ```bash
 # Clear stale plugin cache versions (cross-platform)
-node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','omc','oh-my-claudecode');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));if(v.length<=1){console.log('Cache is clean');process.exit()}v.slice(0,-1).forEach(x=>{f.rmSync(p.join(b,x),{recursive:true,force:true})});console.log('Cleared',v.length-1,'stale cache version(s)')}catch{console.log('No cache directory found (normal for new installs)')}"
+node -e "const p=require('path'),f=require('fs'),h=require('os').homedir(),d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude'),b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');try{const v=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));if(v.length<=1){console.log('Cache is clean');process.exit()}v.slice(0,-1).forEach(x=>{f.rmSync(p.join(b,x),{recursive:true,force:true})});console.log('Cleared',v.length-1,'stale cache version(s)')}catch{console.log('No cache directory found (normal for new installs)')}"
 ```
 
 ## Step 3.6: Check for Updates
@@ -526,17 +526,17 @@ const p=require('path'),f=require('fs'),h=require('os').homedir();
 const d=process.env.CLAUDE_CONFIG_DIR||p.join(h,'.claude');
 let v='';
 // Try cache directory first
-const b=p.join(d,'plugins','cache','omc','oh-my-claudecode');
+const b=p.join(d,'plugins','cache','smart-dev-flow','smart-dev-flow');
 try{const vs=f.readdirSync(b).filter(x=>/^\d/.test(x)).sort((a,c)=>a.localeCompare(c,void 0,{numeric:true}));if(vs.length)v=vs[vs.length-1]}catch{}
 // Try .omc-version.json second
 if(v==='')try{const j=JSON.parse(f.readFileSync('.omc-version.json','utf-8'));v=j.version||''}catch{}
 // Try CLAUDE.md header third
-if(v==='')for(const c of['.claude/CLAUDE.md',p.join(d,'CLAUDE.md')]){try{const m=f.readFileSync(c,'utf-8').match(/^# oh-my-claudecode.*?(v?\d+\.\d+\.\d+)/m);if(m){v=m[1].replace(/^v/,'');break}}catch{}}
+if(v==='')for(const c of['.claude/CLAUDE.md',p.join(d,'CLAUDE.md')]){try{const m=f.readFileSync(c,'utf-8').match(/^# smart-dev-flow.*?(v?\d+\.\d+\.\d+)/m);if(m){v=m[1].replace(/^v/,'');break}}catch{}}
 console.log('Installed:',v||'(not found)');
 "
 
 # Check npm for latest version
-LATEST_VERSION=$(npm view oh-my-claude-sisyphus version 2>/dev/null)
+LATEST_VERSION=$(npm view smart-dev-flow version 2>/dev/null)
 
 if [ -n "$INSTALLED_VERSION" ] && [ -n "$LATEST_VERSION" ]; then
   # Simple version comparison (assumes semantic versioning)
@@ -546,7 +546,7 @@ if [ -n "$INSTALLED_VERSION" ] && [ -n "$LATEST_VERSION" ]; then
     echo "  Installed: v$INSTALLED_VERSION"
     echo "  Latest:    v$LATEST_VERSION"
     echo ""
-    echo "To update, run: claude /install-plugin oh-my-claudecode"
+    echo "To update, run: claude /install-plugin smart-dev-flow"
   else
     echo "You're on the latest version: v$INSTALLED_VERSION"
   fi
@@ -669,7 +669,7 @@ echo "Task tool set to: USER_CHOICE"
 ## Step 4: Verify Plugin Installation
 
 ```bash
-grep -q "oh-my-claudecode" ~/.claude/settings.json && echo "Plugin verified" || echo "Plugin NOT found - run: claude /install-plugin oh-my-claudecode"
+grep -q "smart-dev-flow" ~/.claude/settings.json && echo "Plugin verified" || echo "Plugin NOT found - run: claude /install-plugin smart-dev-flow"
 ```
 
 ## Step 5: Offer MCP Server Configuration
@@ -995,7 +995,7 @@ gh auth status &>/dev/null
 
 Use the AskUserQuestion tool to prompt the user:
 
-**Question:** "If you're enjoying oh-my-claudecode, would you like to support the project by starring it on GitHub?"
+**Question:** "If you're enjoying smart-dev-flow, would you like to support the project by starring it on GitHub?"
 
 **Options:**
 1. **Yes, star it!** - Star the repository
@@ -1014,7 +1014,7 @@ gh api -X PUT /user/starred/Yeachan-Heo/oh-my-claudecode 2>/dev/null && echo "Th
 
 ```bash
 echo ""
-echo "If you enjoy oh-my-claudecode, consider starring the repo:"
+echo "If you enjoy smart-dev-flow, consider starring the repo:"
 echo "  https://github.com/Yeachan-Heo/oh-my-claudecode"
 echo ""
 ```
@@ -1034,9 +1034,9 @@ mkdir -p "$(dirname "$CONFIG_FILE")"
 # Get current OMC version from CLAUDE.md
 OMC_VERSION=""
 if [ -f ".claude/CLAUDE.md" ]; then
-  OMC_VERSION=$(grep -m1 "^# oh-my-claudecode" .claude/CLAUDE.md 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+  OMC_VERSION=$(grep -m1 "^# smart-dev-flow" .claude/CLAUDE.md 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 elif [ -f "$HOME/.claude/CLAUDE.md" ]; then
-  OMC_VERSION=$(grep -m1 "^# oh-my-claudecode" "$HOME/.claude/CLAUDE.md" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+  OMC_VERSION=$(grep -m1 "^# smart-dev-flow" "$HOME/.claude/CLAUDE.md" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 fi
 
 if [ -f "$CONFIG_FILE" ]; then
@@ -1055,7 +1055,7 @@ echo "Note: Future updates will only refresh CLAUDE.md, not the full setup wizar
 
 ## Keeping Up to Date
 
-After installing oh-my-claudecode updates (via npm or plugin update):
+After installing smart-dev-flow updates (via npm or plugin update):
 
 **Automatic**: Just run `/smart-dev-flow:omc-setup` - it will detect you've already configured and offer a quick "Update CLAUDE.md only" option that skips the full wizard.
 
@@ -1071,7 +1071,7 @@ This ensures you have the newest features and agent configurations without the t
 When user runs `/smart-dev-flow:omc-setup --help` or just `--help`, display:
 
 ```
-OMC Setup - Configure oh-my-claudecode
+OMC Setup - Configure smart-dev-flow
 
 USAGE:
   /smart-dev-flow:omc-setup           Run initial setup wizard (or update if already configured)

@@ -10,13 +10,13 @@ Routes to the git-master agent for git operations.
 ## Usage
 
 ```
-/oh-my-claudecode:git-master <git task>
+/smart-dev-flow:git-master <git task>
 ```
 
 ## Routing
 
 ```
-Task(subagent_type="oh-my-claudecode:git-master", model="sonnet", prompt="{{ARGUMENTS}}")
+Task(subagent_type="smart-dev-flow:git-master", model="sonnet", prompt="{{ARGUMENTS}}")
 ```
 
 ## Capabilities

@@ -89,9 +89,9 @@ Claude reads both output files and:
 
 ## Fallback
 
-If **Codex MCP unavailable** → use `Task(subagent_type="oh-my-claudecode:executor", model="sonnet")` for backend tasks.
+If **Codex MCP unavailable** → use `Task(subagent_type="smart-dev-flow:executor", model="sonnet")` for backend tasks.
 
-If **Gemini MCP unavailable** → use `Task(subagent_type="oh-my-claudecode:designer", model="sonnet")` for frontend tasks.
+If **Gemini MCP unavailable** → use `Task(subagent_type="smart-dev-flow:designer", model="sonnet")` for frontend tasks.
 
 If **both unavailable** → use Claude directly with the standard agent catalog.
 
@@ -131,7 +131,7 @@ CCG composes with other OMC modes:
 
 ## Cancellation
 
-Stop active CCG work: say `cancelomc` or run `/oh-my-claudecode:cancel`.
+Stop active CCG work: say `cancelomc` or run `/smart-dev-flow:cancel`.
 
 ## State
 

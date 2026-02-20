@@ -10,9 +10,9 @@ Spawn N coordinated agents working on a shared task list using Claude Code's nat
 ## Usage
 
 ```
-/oh-my-claudecode:team N:agent-type "task description"
-/oh-my-claudecode:team "task description"
-/oh-my-claudecode:team ralph "task description"
+/smart-dev-flow:team N:agent-type "task description"
+/smart-dev-flow:team "task description"
+/smart-dev-flow:team ralph "task description"
 ```
 
 ### Parameters
@@ -140,7 +140,7 @@ Continue `team-exec -> team-verify -> team-fix` until:
 ### Resume and Cancel Semantics
 
 - **Resume:** restart from the last non-terminal stage using staged state + live task status.
-- **Cancel:** `/oh-my-claudecode:cancel` requests teammate shutdown, waits for responses (best effort), marks phase `cancelled` with `active=false`, captures cancellation metadata, then deletes team resources and clears/preserves Team state per policy.
+- **Cancel:** `/smart-dev-flow:cancel` requests teammate shutdown, waits for responses (best effort), marks phase `cancelled` with `active=false`, captures cancellation metadata, then deletes team resources and clears/preserves Team state per policy.
 - Terminal states are `complete`, `failed`, and `cancelled`.
 
 ## Workflow
@@ -283,7 +283,7 @@ Spawn N teammates using `Task` with `team_name` and `name` parameters. Each team
 
 ```json
 {
-  "subagent_type": "oh-my-claudecode:executor",
+  "subagent_type": "smart-dev-flow:executor",
   "team_name": "fix-ts-errors",
   "name": "worker-1",
   "prompt": "<worker-preamble + assigned tasks>"
@@ -667,7 +667,7 @@ When the user invokes `/team ralph`, says "team ralph", or combines both keyword
 ### Activation
 
 Team+Ralph activates when:
-1. User invokes `/team ralph "task"` or `/oh-my-claudecode:team ralph "task"`
+1. User invokes `/team ralph "task"` or `/smart-dev-flow:team ralph "task"`
 2. Keyword detector finds both `team` and `ralph` in the prompt
 3. Hook detects `MAGIC KEYWORD: RALPH` alongside team context
 
@@ -695,7 +695,7 @@ state_write(mode="ralph", active=true, iteration=1, max_iterations=10, current_p
 1. Ralph outer loop starts (iteration 1)
 2. Team pipeline runs: `team-plan -> team-prd -> team-exec -> team-verify`
 3. If `team-verify` passes: Ralph runs architect verification (STANDARD tier minimum)
-4. If architect approves: both modes complete, run `/oh-my-claudecode:cancel`
+4. If architect approves: both modes complete, run `/smart-dev-flow:cancel`
 5. If `team-verify` fails OR architect rejects: team enters `team-fix`, then loops back to `team-exec -> team-verify`
 6. If fix loop exceeds `max_fix_loops`: Ralph increments iteration and retries the full pipeline
 7. If Ralph exceeds `max_iterations`: terminal `failed` state
@@ -742,7 +742,7 @@ This prevents duplicate teams and allows graceful recovery from lead failures.
 
 ## Cancellation
 
-The `/oh-my-claudecode:cancel` skill handles team cleanup:
+The `/smart-dev-flow:cancel` skill handles team cleanup:
 
 1. Read team state via `state_read(mode="team")` to get `team_name` and `linked_ralph`
 2. Send `shutdown_request` to all active teammates (from `config.json` members)
@@ -798,7 +798,7 @@ On successful completion:
    ```
    state_clear(mode="ralph")
    ```
-3. Or run `/oh-my-claudecode:cancel` which handles all cleanup automatically.
+3. Or run `/smart-dev-flow:cancel` which handles all cleanup automatically.
 
 **IMPORTANT:** Call `TeamDelete` only AFTER all teammates have been shut down. `TeamDelete` will fail if active members (besides the lead) still exist in the config.
 
