@@ -48,11 +48,8 @@ git status                    # 当前工作区状态
 
 #### 出口 B：回滚（置信度 40–79%）
 
-1. 恢复到上一个检查点
-2. 更新 `.agent/memory/active_context.md`：
-   ```
-   task_status: IMPLEMENTING
-   ```
+1. 调用 `axiom-rollback` 执行 git 回滚
+2. 回滚完成后状态由 `axiom-rollback` 自动重置为 `IDLE`
 
 #### 出口 C：阻塞升级（置信度 < 40% 或 fail_count ≥ 3）
 
