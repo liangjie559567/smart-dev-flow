@@ -18,7 +18,6 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review` |
 | `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose` |
 | `IMPLEMENTING` | 继续 Phase 3，调用 `axiom-implement` |
-| `CONFIRMING` | 调用 `axiom-draft`（继续 PRD 确认流程） |
 | `BLOCKED` | 展示 `blocked_reason`，提供恢复选项 |
 | `REFLECTING` | 调用 `axiom-reflect` |
 
@@ -55,7 +54,7 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 |------|------|
 | `/status` | 调用 `axiom-status` |
 | `/reflect` | 调用 `axiom-reflect` |
-| `/reset` | 将 `task_status` 重置为 `IDLE`，清空 `pending_confirmation`、`blocked_reason`、`fail_count` |
+| `/reset` | 将 `task_status` 重置为 `IDLE`，清空 `blocked_reason`、`fail_count` |
 | `/start` | 调用 `axiom-start`（零触感启动） |
 | `/suspend` | 调用 `axiom-suspend`（会话挂起） |
 | `/analyze-error` | 调用 `axiom-analyze-error`（错误分析） |
