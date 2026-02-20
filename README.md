@@ -1,52 +1,67 @@
 # smart-dev-flow
 
-**oh-my-claudecode + Axiom 深度融合的智能开发助手流程**
+OMC 执行引擎 + Axiom 状态/记忆/学习引擎深度融合的智能开发助手流程。
 
-## 快速开始
+## 安装
+
+**前置要求**：Node.js 20+、Python 3.8+
 
 ```bash
-# 1. 克隆仓库
 git clone https://github.com/your-org/smart-dev-flow
 cd smart-dev-flow
 
-# 2. 安装
-./setup.sh   # Linux/macOS
-# 或
-./setup.ps1  # Windows
-
-# 3. 在你的项目中使用
-/plugin marketplace add https://github.com/your-org/smart-dev-flow
-/plugin install smart-dev-flow
+./setup.sh        # Linux/macOS
+.\setup.ps1       # Windows
 ```
 
-## 使用
+## 快速开始
 
-```
-/dev-flow: 构建用户认证系统
-```
+在 Claude Code 中注册插件：
 
-## 核心流程
-
-```
-用户需求
-  ↓
-[Axiom Phase 1] 起草 PRD  ← OMC analyst + planner
-  ↓ Gate 1
-[Axiom Phase 1.5] 专家评审  ← OMC quality-reviewer + security-reviewer
-  ↓ Gate 2
-[Axiom Phase 2] 任务拆解  ← OMC architect + planner
-  ↓ Gate 3
-[Axiom Phase 3] 并行实现  ← OMC Team (executor × N)
-  ↓ 双重验证
-[Axiom /reflect] 知识沉淀  ← OMC project-memory 双写
+```bash
+claude plugin install .
 ```
 
-## 支持的 AI Provider
+使用：
 
-Claude · Gemini · Codex · OpenCode · Copilot
+```
+/dev-flow: 描述你的需求
+```
 
-## 要求
+## 技能列表
 
-- Claude Code CLI
-- Python 3.8+（进化引擎）
-- Node.js 20+
+| 技能 | 描述 |
+|------|------|
+| `prd-draft` | 根据需求自动起草 PRD 文档 |
+| `expert-review` | 多维度专家评审（质量/安全/性能） |
+| `task-decompose` | 将 PRD 拆解为可并行执行的子任务 |
+| `parallel-impl` | 多 Agent 并行实现所有子任务 |
+| `dual-verify` | 双重验证：自动测试 + AI 审查 |
+| `reflect` | 执行后知识沉淀，写入项目记忆 |
+| `status` | 查看当前状态机阶段与任务进度 |
+
+## 工作流程
+
+```
+IDLE → DRAFTING → CONFIRMING → REVIEWING → CONFIRMING
+                                                 ↓
+IDLE ← REFLECTING ← IMPLEMENTING ← CONFIRMING ← DECOMPOSING
+```
+
+每个 `CONFIRMING` 节点为人工确认门控，可继续或退回修改。
+
+## 快捷命令
+
+- `/status` — 查看当前阶段、任务列表与进度
+- `/reflect` — 手动触发知识沉淀（写入项目记忆）
+- `/reset` — 重置状态机至 IDLE
+
+## 目录结构
+
+```
+smart-dev-flow/
+├── skills/     # 各阶段技能实现（prd-draft、reflect 等）
+├── hooks/      # 状态机钩子（门控逻辑、阶段转换）
+├── scripts/    # setup.sh / setup.ps1 安装脚本
+└── .agent/     # Axiom 状态文件、项目记忆、学习日志
+```

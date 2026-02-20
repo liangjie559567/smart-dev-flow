@@ -8,8 +8,55 @@ description: Axiom Phase 1 起草 - 需求澄清与 PRD 生成
 ## 流程
 
 1. 执行 `.agent/workflows/1-drafting.md`
-2. 调用 OMC `analyst`（opus）澄清需求、定义验收标准
-3. 调用 OMC `planner`（opus）生成任务大纲
-4. 将结果写入 `.agent/memory/project_decisions.md`
-5. 更新 `active_context.md`：`task_status: CONFIRMING`，`last_gate: Gate 1`
-6. 向用户展示 PRD 草稿，等待确认进入评审
+2. 向用户收集需求信息（见"需求收集"）
+3. 调用 OMC `analyst`（opus）澄清需求、定义验收标准
+4. 调用 OMC `planner`（opus）生成任务大纲
+5. 将结果按"PRD 写入格式"写入 `.agent/memory/project_decisions.md`
+6. 按"active_context 写入格式"更新 `active_context.md`
+7. 向用户展示 PRD 草稿，执行"确认流程"
+
+## 需求收集
+
+向用户询问以下信息：
+
+| 字段 | 是否必填 | 说明 |
+|------|----------|------|
+| 功能描述 | 必填 | 要实现什么功能 |
+| 技术栈偏好 | 可选 | 语言、框架等偏好 |
+| 验收标准 | 可选 | 未提供时由 analyst 自动推断 |
+
+## PRD 写入格式
+
+写入 `.agent/memory/project_decisions.md`：
+
+```markdown
+## PRD - {需求标题}
+生成时间：{timestamp}
+
+### 目标
+{功能描述}
+
+### 验收标准
+- {标准1}
+- {标准2}
+
+### 技术约束
+{技术栈偏好}
+```
+
+## active_context 写入格式
+
+```
+task_status: CONFIRMING
+current_phase: Phase 1 - Drafting
+last_gate: Gate 1
+pending_confirmation: PRD 草稿已生成，请确认后进入评审
+last_updated: {timestamp}
+```
+
+## 确认流程
+
+展示 PRD 草稿后等待用户回复：
+
+- **"确认"** → 更新 `task_status: REVIEWING`，调用 `axiom-review`
+- **"取消"** → 清空本次收集内容，重新执行需求收集

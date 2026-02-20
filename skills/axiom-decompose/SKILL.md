@@ -10,6 +10,46 @@ description: Axiom Phase 2 任务拆解 - Manifest 生成
 1. 执行 `.agent/workflows/3-decomposing.md`
 2. 调用 OMC `architect`（opus）设计系统边界和接口
 3. 调用 OMC `planner`（opus）生成任务 Manifest
-4. 将 Manifest 写入 `.agent/memory/`
-5. 更新 `active_context.md`：`task_status: CONFIRMING`，`last_gate: Gate 3`
-6. 展示 Manifest，等待用户确认开始实现
+4. 将 Manifest 写入 `.agent/memory/manifest.md`
+5. 更新 `active_context.md`
+6. 展示 Manifest，等待用户确认
+
+## Manifest 文件格式
+
+写入路径：`.agent/memory/manifest.md`
+
+```markdown
+## Manifest - {需求标题}
+生成时间：{timestamp}
+
+### 任务列表
+| ID | 描述 | 优先级 | 依赖 | 预估复杂度 |
+|----|------|--------|------|-----------|
+| T1 | ... | P0 | - | 低/中/高 |
+| T2 | ... | P1 | T1 | 低/中/高 |
+
+### 系统边界
+{architect 输出的边界描述}
+
+### 接口规范
+{关键接口定义}
+```
+
+## active_context.md 写入格式
+
+```
+task_status: CONFIRMING
+current_phase: Phase 2 - Decomposing
+last_gate: Gate 3
+pending_confirmation: Manifest 已生成 {N} 个任务，请确认后开始实现
+manifest_path: .agent/memory/manifest.md
+last_updated: {timestamp}
+```
+
+## 确认流程
+
+展示 Manifest 后等待用户回复：
+
+- **"确认"** → 更新 `task_status: IMPLEMENTING`，调用 `axiom-implement`
+- **"修改"** → 重新拆解，重新生成 Manifest
+- **"取消"** → 更新 `task_status: REVIEWING`，回到 Phase 1
