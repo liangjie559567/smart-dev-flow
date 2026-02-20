@@ -21,7 +21,12 @@
   },
   "scripts": {
     "setup": "node scripts/setup.mjs",
-    "install-hooks": "python .agent/guards/install_hooks.py"
+    "install-hooks": "python .agent/guards/install_hooks.py",
+    "build": "node scripts/build-codex-server.mjs && node scripts/build-gemini-server.mjs && node scripts/build-mcp-server.mjs",
+    "build:codex": "node scripts/build-codex-server.mjs",
+    "build:gemini": "node scripts/build-gemini-server.mjs",
+    "build:mcp": "node scripts/build-mcp-server.mjs",
+    "test:axiom": "node scripts/mcp-axiom-server.mjs"
   },
   "dependencies": {},
   "engines": {
