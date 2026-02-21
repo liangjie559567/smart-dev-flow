@@ -227,6 +227,7 @@ AskUserQuestion({
   header: "Phase 1 → Phase 1.5",
   options: [
     { label: "✅ 进入 Phase 1.5 专家评审", description: "需求和架构已就绪，开始多专家评审" },
+    { label: "⏭️ 跳过评审，直接进入 Phase 2", description: "简单任务，无需专家评审" },
     { label: "📝 需要修改后再进入", description: "部分内容需要调整" },
     { label: "🔄 返工需求澄清", description: "重新澄清需求" }
   ]
@@ -242,6 +243,7 @@ AskUserQuestion({
      ```
      **MCP 不可用降级**：若 `phase_context_write` 调用失败，将上述数据写入 `.agent/memory/phase-context.json`（JSON 格式，key 为 phase0/phase1/kb_context），继续执行，不得阻塞流程。
   2. 更新 `task_status: REVIEWING`，调用 `axiom-review`
+- 用户选择"跳过评审" → 持久化阶段上下文（同上），更新 `task_status: DECOMPOSING`，调用 `axiom-decompose`
 - 用户选择"需要修改" → 重新执行对应阶段
 - 用户选择"返工" → 清空本次收集内容，重新执行需求收集
 

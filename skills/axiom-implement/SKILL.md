@@ -46,7 +46,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
    fail_count: 0
    last_updated: {timestamp}
    ```
-4. 按以下规则为每个子任务派发 agent（无依赖的子任务并行执行）：
+6. 按以下规则为每个子任务派发 agent（无依赖的子任务并行执行）：
 
    **执行前**：调用 `test-driven-development` 技能，强制先写失败测试再实现（Red→Green→Refactor）。
 

@@ -30,7 +30,7 @@ Skill("finishing-a-development-branch")
 ### Step 2: 生成反思报告
 1. 分析本次会话：
    - 任务完成率 = 已完成 / 总任务数
-   - 自动修复次数 = `auto_fix_attempts`
+   - 自动修复次数 = `fail_count`
    - 回滚次数 = (检查 History)
 2. 按照 `reflection_log.md` 模板生成报告
 
