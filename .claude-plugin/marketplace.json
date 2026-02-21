@@ -1,23 +1,23 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "smart-dev-flow",
+  "description": "OMC + Axiom 融合的 Claude Code 智能开发插件",
   "owner": {
     "name": "liangjie559567"
-  },
-  "metadata": {
-    "description": "OMC + Axiom 融合的 Claude Code 智能开发插件"
   },
   "plugins": [
     {
       "name": "smart-dev-flow",
-      "source": "./",
       "description": "智能开发助手 - OMC 执行引擎 + Axiom 状态机融合，完整开发流程（需求→架构→实现→验证）+ 70+ 技能 + 4 个 MCP 服务器",
       "version": "1.15.0",
       "author": {
         "name": "liangjie559567"
       },
-      "repository": "https://github.com/liangjie559567/smart-dev-flow",
-      "license": "MIT",
-      "keywords": ["dev-flow", "axiom", "omc", "multi-agent", "tdd"]
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/liangjie559567/smart-dev-flow",
+      "tags": ["dev-flow", "axiom", "omc", "multi-agent", "tdd"]
     }
-  ]
+  ],
+  "version": "1.15.0"
 }
