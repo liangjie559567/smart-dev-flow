@@ -3,5 +3,7 @@ __pycache__/
 *.pyc
 .agent/memory/watchdog_status.lock
 .agent/memory/evolution/reports/
+.agent/memory/evolution/pending_harvest.jsonl
+.tmp-test/
 node_modules/
 .worktrees/
