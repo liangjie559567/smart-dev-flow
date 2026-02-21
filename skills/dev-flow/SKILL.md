@@ -6,7 +6,35 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 
 # dev-flow - 智能开发助手
 
-## 流程
+## 完整开发流程（Phase 0-9）
+
+dev-flow 包含以下9个阶段，由各子技能负责执行：
+
+| 阶段 | 名称 | 子技能 | 说明 |
+|------|------|--------|------|
+| Phase 0 | 需求澄清 | `axiom-draft` | analyst 子代理分析需求，生成验收标准，输出需求文档 |
+| Phase 1 | 架构设计 | `axiom-draft` | architect + critic 子代理设计系统架构，输出设计文档 |
+| Phase 1.5 | 专家评审 | `axiom-review` | critic 主导5专家并行评审 PRD + 架构，可跳过 |
+| Phase 2 | 任务拆解 | `axiom-decompose` | planner 子代理生成任务 Manifest，输出计划文档 |
+| Phase 3 | 隔离开发 | `axiom-decompose` | 创建 feat/ 分支和 worktree，小变更可跳过 |
+| Phase 4 | TDD 实现 | `axiom-implement` | executor 子代理按 Red→Green→Refactor 实现，四层审查 |
+| Phase 5 | 系统调试 | `axiom-implement` | 连续失败≥3次自动触发，debugger 根因分析 |
+| Phase 6 | 代码审查 | `axiom-implement` | 质量/安全/接口/风格四视角并行审查 |
+| Phase 6.5 | 文档编写 | `axiom-implement` | writer 子代理生成 API 文档和 README |
+| Phase 7 | 完成验证 | `axiom-implement` | verifier 子代理逐条核对验收标准，运行测试/构建/lint |
+| Phase 8 | 分支合并 | `axiom-reflect` | 合并 feat/ 分支，验证主分支测试通过，可跳过 |
+| Phase 9 | 知识收割 | `axiom-reflect` | reflect + evolve，生成完成报告，重置状态为 IDLE |
+
+**阶段间状态流转**：
+```
+IDLE → [brainstorming] → DRAFTING → CONFIRMING → REVIEWING → CONFIRMING → DECOMPOSING → IMPLEMENTING → REFLECTING → IDLE
+```
+
+**硬门控**：每阶段完成后必须通过 AskUserQuestion 确认才能进入下一阶段。
+
+---
+
+## 状态路由
 
 1. 读取 `.agent/memory/active_context.md` 中的 `task_status`
 2. 根据状态路由：
