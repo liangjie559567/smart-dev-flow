@@ -1,0 +1,26 @@
+{
+  "name": "smart-dev-flow",
+  "owner": {
+    "name": "liangjie559567"
+  },
+  "metadata": {
+    "description": "OMC + Axiom 融合的 Claude Code 智能开发插件"
+  },
+  "plugins": [
+    {
+      "name": "smart-dev-flow",
+      "source": {
+        "source": "github",
+        "repo": "liangjie559567/smart-dev-flow"
+      },
+      "description": "智能开发助手 - 完整开发流程（需求→架构→实现→验证）+ 70+ 技能",
+      "version": "1.15.0",
+      "author": {
+        "name": "liangjie559567"
+      },
+      "repository": "https://github.com/liangjie559567/smart-dev-flow",
+      "license": "MIT",
+      "keywords": ["dev-flow", "axiom", "omc", "multi-agent", "tdd"]
+    }
+  ]
+}
