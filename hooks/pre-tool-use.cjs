@@ -68,6 +68,28 @@ async function main() {
     }
   }
 
+  // DNA BUG 预防：Write/Edit 前检查已知坑
+  if (['Write', 'Edit'].includes(toolName)) {
+    try {
+      const { readDna, extractRelevant } = require('./dna-manager.cjs');
+      const filePath = hook.tool_input?.file_path || '';
+      const ext = filePath.split('.').pop() || '';
+      const keywords = [ext, ...filePath.split(/[\\/]/).slice(-2)].filter(Boolean);
+      const dna = readDna(process.cwd());
+      const warnings = extractRelevant(dna, keywords);
+      if (warnings.length > 0) {
+        console.log(JSON.stringify({
+          continue: true,
+          hookSpecificOutput: {
+            hookEventName: 'PreToolUse',
+            additionalContext: `⚠️ DNA 已知坑（${filePath}）：\n${warnings.map(w => `- ${w}`).join('\n')}`
+          }
+        }));
+        process.exit(0);
+      }
+    } catch {}
+  }
+
   if (status === 'BLOCKED') {
     const isDebug = hook.tool_input?.prompt?.includes('debugger') ||
                     hook.tool_input?.prompt?.includes('analyze-error');
