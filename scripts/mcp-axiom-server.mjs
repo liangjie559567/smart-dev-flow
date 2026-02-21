@@ -105,6 +105,52 @@ const TOOLS = [
     },
   },
   {
+    name: 'axiom_status',
+    description: '生成 Axiom 系统仪表盘：任务进度、进化统计、工作流指标、守卫状态。',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'context_read',
+    description: '读取 active_context.md 的 frontmatter 和 body，获取当前任务状态。',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'context_update_state',
+    description: '更新 active_context.md 中的 task_status（状态机转换）。',
+    inputSchema: {
+      type: 'object',
+      properties: { new_state: { type: 'string', description: 'IDLE|DRAFTING|CONFIRMING|REVIEWING|DECOMPOSING|IMPLEMENTING|BLOCKED' } },
+      required: ['new_state'],
+    },
+  },
+  {
+    name: 'context_record_error',
+    description: '将错误模式记录到 project_decisions.md 的已知问题表，供后续查询复用。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        error_type: { type: 'string' },
+        root_cause: { type: 'string' },
+        fix_solution: { type: 'string' },
+        scope: { type: 'string' },
+      },
+      required: ['error_type', 'root_cause', 'fix_solution', 'scope'],
+    },
+  },
+  {
+    name: 'context_update_progress',
+    description: '在 active_context.md 任务队列中更新任务进度（DONE/PENDING/BLOCKED）。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        task_id: { type: 'string' },
+        status: { type: 'string', description: 'DONE|PENDING|BLOCKED' },
+        summary: { type: 'string' },
+      },
+      required: ['task_id', 'status', 'summary'],
+    },
+  },
+  {
     name: 'axiom_write_manifest',
     description: '将任务清单写入 .agent/memory/manifest.md。由 axiom-decompose 技能在 planner 子代理输出后调用，确保任务清单落地。',
     inputSchema: {

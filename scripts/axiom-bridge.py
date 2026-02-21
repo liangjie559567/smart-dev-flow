@@ -75,6 +75,35 @@ def dispatch(tool, args):
         evo = EvolutionOrchestrator(base_dir=BASE_DIR)
         return evo.reflect(**args)
 
+    elif tool == "axiom_status":
+        from status_dashboard import StatusDashboard
+        base = os.path.dirname(BASE_DIR)  # .agent/memory -> .agent
+        d = StatusDashboard(base_dir=base)
+        return d.generate()
+
+    elif tool == "context_read":
+        from context_manager import ContextManager
+        cm = ContextManager(base_dir=os.path.dirname(os.path.dirname(BASE_DIR)))
+        data = cm.read_context()
+        return {"frontmatter": data.frontmatter, "body": data.body}
+
+    elif tool == "context_update_state":
+        from context_manager import ContextManager
+        cm = ContextManager(base_dir=os.path.dirname(os.path.dirname(BASE_DIR)))
+        return cm.update_state(args["new_state"])
+
+    elif tool == "context_record_error":
+        from context_manager import ContextManager
+        cm = ContextManager(base_dir=os.path.dirname(os.path.dirname(BASE_DIR)))
+        cm.record_error(args["error_type"], args["root_cause"], args["fix_solution"], args["scope"])
+        return "ok"
+
+    elif tool == "context_update_progress":
+        from context_manager import ContextManager
+        cm = ContextManager(base_dir=os.path.dirname(os.path.dirname(BASE_DIR)))
+        cm.update_progress(args["task_id"], args["status"], args["summary"])
+        return "ok"
+
     else:
         raise ValueError(f"未知工具: {tool}")
 
