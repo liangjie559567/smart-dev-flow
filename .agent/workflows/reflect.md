@@ -7,7 +7,7 @@ description: Reflect Workflow - 反思工作流，总结经验并提取知识
 执行自动反思，总结本次会话的经验教训。
 
 ## Trigger
-- 用户输入 `/reflect` 或 "反思"
+- 用户输入 `/axiom-reflect` 或 "反思"
 - 由用户在 Phase 7 末尾 AskUserQuestion 确认后触发（dev-flow 将状态写入 REFLECTING 并调用本工作流）
 
 ## Steps

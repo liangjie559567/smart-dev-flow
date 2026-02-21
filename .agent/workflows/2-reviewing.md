@@ -8,6 +8,13 @@ description: Phase 1.5: 专家评审工作流（Axiom v4.2）
 
 主 Claude 禁止：直接评审 PRD、直接给出评分、直接分析需求缺陷
 
+## active_context.md 写入（评审进行中）
+```yaml
+task_status: REVIEWING
+current_phase: Phase 1.5 - Reviewing
+last_updated: {timestamp}
+```
+
 ## 步骤1：知识库查询（必须）
 ```
 axiom_get_knowledge query="PRD 评审 {功能关键词}" limit=5
@@ -58,6 +65,9 @@ Task(subagent_type="general-purpose", prompt="你是安全评审员。评审以�
 | analyst | 领域专家 | {N} | {意见} |
 | quality-reviewer | 技术主管 | {N} | {意见} |
 | security-reviewer | 安全评论家 | {N} | {意见} |
+
+### 冲突解决
+按优先级解决专家意见冲突：**安全 > 技术 > 战略 > 逻辑 > 体验**
 
 ### 综合结论
 - 综合评分：{0-100}
