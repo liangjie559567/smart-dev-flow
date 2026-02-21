@@ -188,6 +188,12 @@ async function main() {
 
   const parts = [];
 
+  // 监控：记录会话启动事件（仅当 .agent/memory/ 目录存在时）
+  const monitorLog = path.join(cwd, '.agent/memory/monitor.log');
+  if (fs.existsSync(path.dirname(monitorLog))) {
+    try { fs.appendFileSync(monitorLog, JSON.stringify({ ts: new Date().toISOString(), type: 'session_start', sessionId }) + '\n'); } catch {}
+  }
+
   // 1. superpowers 注入
   const skillContent = findUsingSuperpowers(cwd);
   if (skillContent) {
