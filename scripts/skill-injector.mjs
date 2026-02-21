@@ -243,13 +243,6 @@ function findMatchingSkills(prompt, directory, sessionId) {
       return findMatchingSkillsFallback(prompt, directory, sessionId);
     }
     return matches;
-
-    // Mark as injected via bridge
-    if (matches.length > 0) {
-      bridge.markSkillsInjected(sessionId, matches.map(s => s.path), directory);
-    }
-
-    return matches;
   }
 
   // Fallback (NON-RECURSIVE, in-memory cache)
