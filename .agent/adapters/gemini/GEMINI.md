@@ -1,5 +1,5 @@
 # Axiom — 全局规则 (GEMINI.md)
-# 版本: v4.3 (Lite) | 更新时间: 2026-02-14
+# 版本: v4.4 | 更新时间: 2026-02-21
 
 > 本文件是 Axiom 的系统级入口。
 > **原则**: 仅定义不可变规则，具体逻辑下沉至 `.agent/rules/`。
@@ -70,10 +70,10 @@
 
 ## 7. 门禁规则 (Gatekeeper Rules)
 - 执行前读取 `.agent/rules/gatekeepers.rule`。
-- 编码完成后执行 `flutter analyze` 与 `flutter test`。
+- 编码完成后执行 `npm test`（76 个测试）。
 
 ## 8. 进化引擎 (Evolution Engine)
 - 任务完成后同步学习素材到 `learning_queue.md`。
 - 会话结束时更新 `active_context.md` 与相关指标。
 
-_Axiom v4.3 — Lite Adapter_
+_Axiom v4.4 — Lite Adapter_

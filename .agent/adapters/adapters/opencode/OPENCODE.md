@@ -1,6 +1,6 @@
 # Axiom — OpenCode CLI 适配器
 # Provider: OpenCode CLI
-# Version: 4.3 | Updated: 2026-02-14
+# Version: 4.4 | Updated: 2026-02-21
 
 ## 0. 强制规则
 - 全程中文。
@@ -24,7 +24,7 @@
 - 失败重试上限 3 次，超限标记 BLOCKED。
 
 ## 4. 质量门禁
-- 代码变更后执行 `flutter analyze`、`flutter test`。
+- 代码变更后执行 `npm test`（76 个测试）。
 - 未通过门禁禁止宣告 DONE。
 
-_Axiom — OpenCode CLI Adapter_
+_Axiom v4.4 — OpenCode CLI Adapter_

@@ -1,6 +1,6 @@
 # Axiom — Copilot / GPT 适配器
 # Provider: Copilot / GPT (OpenAI)
-# Version: 4.2 (Hybrid) | Updated: 2026-02-12
+# Version: 4.4 | Updated: 2026-02-21
 
 > 本文件是 Copilot/GPT 用户的全局配置模板。
 > 安装: 将此文件复制到 `~/.copilot/copilot-instructions.md`
@@ -108,8 +108,8 @@
 
 ### 4.4 编译提交门禁 (CI Gate)
 - **触发**: 代码修改完成。
-- **动作**: 必须执行 `flutter analyze` + `flutter test`。
-- **通过条件**: 无错误时自动执行 `git commit`。
+- **动作**: 必须执行 `npm test`（76 个测试）。
+- **通过条件**: 全部通过后方可 `git commit`。
 
 ---
 
@@ -144,14 +144,16 @@
 ## 7. 项目目录约定 (Directory Convention)
 ```
 项目根目录/
-├── .agent/                    # Agent 配置 (如果存在则启用 Axiom)
-│   ├── memory/               # 记忆系统
+├── .agent/                    # Axiom 运行时
+│   ├── memory/               # 状态/知识/决策
 │   ├── rules/                # 路由规则
-│   ├── skills/               # 项目级技能
-│   └── workflows/            # 工作流定义
-├── lib/                       # Flutter 源码
-├── test/                      # 测试文件
-└── docs/prd/                  # PRD 文档输出目录
+│   ├── skills/               # Axiom 内置技能
+│   └── adapters/             # 各平台适配器
+├── skills/                    # 用户可调用技能
+├── agents/                    # Agent 角色定义
+├── hooks/                     # 钩子
+├── bridge/                    # MCP 服务器入口
+└── docs/                      # 需求/设计/计划文档
 ```
 
-_Axiom v4.2 — Copilot/GPT Adapter_
+_Axiom v4.4 — Copilot/GPT Adapter_

@@ -1,6 +1,6 @@
 # Axiom — Codex 适配器 (CLI Worker)
 # Provider: Codex (OpenAI via CLI)
-# Version: 4.2 (Hybrid) | Updated: 2026-02-12
+# Version: 4.4 | Updated: 2026-02-21
 
 > 本文件是 Codex CLI Worker 的核心配置。
 > 适用于 headless 模式下的自动化执行任务。
@@ -70,7 +70,7 @@
 
 ### 4.1 编译提交门禁 (CI Gate)
 - **触发**: 代码变更结束。
-- **动作**: `flutter analyze` + `flutter test`。
+- **动作**: `npm test`（76 个测试）。
 - **强制**: 失败则禁止 Commit，并触发重试。
 
 ### 4.2 范围门禁 (Scope Gate)
@@ -104,10 +104,11 @@
 ## 7. 项目目录约定 (Directory Convention)
 ```
 项目根目录/
-├── .agent/                    # 配置文件
-├── lib/                       # 源码
-├── test/                      # 测试
-└── docs/tasks/                # 任务定义 (Manifest)
+├── .agent/                    # Axiom 运行时
+├── skills/                    # 用户可调用技能
+├── agents/                    # Agent 角色定义
+├── bridge/                    # MCP 服务器入口
+└── docs/                      # 需求/设计/计划文档
 ```
 
-_Axiom v4.2 — Codex CLI Adapter_
+_Axiom v4.4 — Codex CLI Adapter_

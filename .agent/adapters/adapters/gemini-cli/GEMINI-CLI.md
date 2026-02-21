@@ -1,6 +1,6 @@
 # Axiom — Gemini CLI 适配器
 # Provider: Gemini CLI
-# Version: 4.3 | Updated: 2026-02-14
+# Version: 4.4 | Updated: 2026-02-21
 
 ## 0. 强制规则
 - 语言: 全程中文。
@@ -21,13 +21,11 @@
 - 运行命令: `run_command`
 
 ## 3. 推荐命令
-- 运行: `flutter run`
-- 分析: `flutter analyze`
-- 测试: `flutter test`
-- 构建: `flutter build`
+- 测试: `npm test`（76 个测试）
+- 构建: `npm run build`
 
 ## 4. 门禁
 - 新需求先走评审/PRD门禁。
-- 代码完成后必须通过 `flutter analyze` 与 `flutter test`。
+- 代码完成后必须通过 `npm test`（76 个测试）。
 
-_Axiom — Gemini CLI Adapter_
+_Axiom v4.4 — Gemini CLI Adapter_

@@ -1,6 +1,6 @@
 # Axiom — Claude 适配器
 # Provider: Claude (Anthropic)
-# Version: 4.2 (Hybrid) | Updated: 2026-02-12
+# Version: 4.4 | Updated: 2026-02-21
 
 > 本文件是 Claude 用户的全局配置模板。
 > 安装: 将此文件复制到 `~/.claude/CLAUDE.md`
@@ -69,23 +69,22 @@
 ## 3. Claude 专属能力映射
 | 操作 | Claude API |
 |------|-----------|
-| 读取文件 | `read_file` |
-| 编辑文件 | `replace_string_in_file` |
-| 创建文件 | `create_file` |
-| 运行命令 | `run_in_terminal` |
-| 搜索文件 | `grep_search` / `semantic_search` |
+| 读取文件 | `Read` |
+| 编辑文件 | `Edit` / `Write` |
+| 搜索 | `Grep` / `Glob` |
+| 运行命令 | `Bash` |
+| 子代理 | `Task(subagent_type="general-purpose")` |
+| MCP 工具 | `t`（OMC）、`x`（Codex）、`g`（Gemini）、`a`（Axiom） |
 
 ### Claude 注意事项
 - **上下文窗口**: 200K tokens，需注意大文件分段读取
-- **无 exec 模式**: Dispatcher 自动调度功能受限，建议使用对话模式执行工作流
-- **编辑精度**: `replace_string_in_file` 要求精确匹配旧字符串，建议多包含上下文行
 - **Tool Use**: Claude 原生支持 Tool Calling，工作流中可直接调用工具
+- **子代理**: 通过 `Task()` 派发专业 agent，角色定义内联到 prompt
 
 ### Claude 最佳实践
-1. 使用 `grep_search` 先定位代码再用 `read_file` 读取
-2. 编辑文件时提供 3-5 行上下文确保唯一匹配
-3. 复杂任务拆分为小步骤，每步验证后再继续
-4. 利用 `semantic_search` 进行模糊搜索
+1. 先 `Grep`/`Glob` 定位再 `Read` 读取
+2. 复杂任务拆分为原子步骤，逐步验证
+3. 改动后执行 `npm test`（76 个测试）
 
 ---
 
@@ -108,8 +107,8 @@
 
 ### 4.4 编译提交门禁 (CI Gate)
 - **触发**: 代码修改完成。
-- **动作**: 必须执行 `flutter analyze` + `flutter test`。
-- **通过条件**: 无错误时自动执行 `git commit`。
+- **动作**: 必须执行 `npm test`（76 个测试）。
+- **通过条件**: 全部通过后方可 `git commit`。
 
 ---
 
@@ -144,14 +143,16 @@
 ## 7. 项目目录约定 (Directory Convention)
 ```
 项目根目录/
-├── .agent/                    # Agent 配置 (如果存在则启用 Axiom)
-│   ├── memory/               # 记忆系统
+├── .agent/                    # Axiom 运行时
+│   ├── memory/               # 状态/知识/决策
 │   ├── rules/                # 路由规则
-│   ├── skills/               # 项目级技能
-│   └── workflows/            # 工作流定义
-├── lib/                       # Flutter 源码
-├── test/                      # 测试文件
-└── docs/prd/                  # PRD 文档输出目录
+│   ├── skills/               # Axiom 内置技能
+│   └── adapters/             # 各平台适配器
+├── skills/                    # 用户可调用技能（/smart-dev-flow:<name>）
+├── agents/                    # Agent 角色定义
+├── hooks/                     # Claude Code 钩子
+├── bridge/                    # MCP 服务器入口
+└── docs/                      # 需求/设计/计划文档
 ```
 
-_Axiom v4.2 — Claude Adapter (Hybrid)_
+_Axiom v4.4 — Claude Adapter_
