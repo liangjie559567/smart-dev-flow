@@ -43,6 +43,7 @@ dev-flow
 | `team` | `team`、`coordinated team` | 多 Agent 协作 |
 | `ralph` | `ralph`、`don't stop` | 持久化执行直到完成 |
 | `ultrawork` | `ultrawork`、`ulw` | 最大并行度执行 |
+| `ultraqa` | `ultraqa` | 实现后密集 QA 循环直到质量达标 |
 | `systematic-debugging` | `debug`、`analyze` | 系统化调试 |
 | `code-review` | `review code` | 代码审查 |
 | `security-review` | `security review` | 安全审查 |
@@ -73,8 +74,10 @@ IDLE ← REFLECTING ← IMPLEMENTING ← CONFIRMING ← DECOMPOSING
 smart-dev-flow/
 ├── skills/          # 70+ 技能定义（SKILL.md）
 ├── hooks/           # Claude Code 钩子（状态同步、门控）
-│   ├── session-start.cjs
-│   └── post-tool-use.cjs
+│   ├── pre-tool-use.cjs    # 状态机门禁（CONFIRMING/REFLECTING 拦截、熔断）
+│   ├── post-tool-use.cjs   # 进化引擎（.agent/memory → .omc 双写同步）
+│   ├── user-prompt-submit.cjs  # 上下文注入
+│   └── dna-manager.cjs     # DNA 已知坑管理
 ├── scripts/         # MCP 服务器
 │   └── mcp-axiom-server.mjs
 ├── agents/          # Agent 角色定义
@@ -84,7 +87,7 @@ smart-dev-flow/
 ## 测试
 
 ```bash
-npm test              # 运行全部测试（47个）
+npm test              # 运行全部测试（76个）
 npm run test:unit     # 单元测试
 npm run test:integration  # 集成测试
 ```
