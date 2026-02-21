@@ -25,9 +25,19 @@ async function main() {
   if (!['Write', 'Edit'].includes(toolName)) process.exit(0);
 
   const filePath = toolInput.file_path || '';
+  const cwd = process.cwd();
+
+  // 源码文件写入时自动沉淀知识（越用越强）
+  if (!filePath.includes('.agent/memory/') && !filePath.includes('.omc/') && !filePath.includes('.claude/')) {
+    const ext = path.extname(filePath);
+    const srcExts = ['.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.py', '.go', '.rs', '.java', '.md'];
+    if (srcExts.includes(ext)) {
+      autoHarvestKnowledge(cwd, filePath, toolName, toolInput);
+    }
+  }
+
   if (!filePath.includes('.agent/memory/')) process.exit(0);
 
-  const cwd = process.cwd();
   appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'hook_write', tool: toolName, file: path.basename(filePath) });
 
   // active_context.md 变更时记录状态转换，并自动补全 manifest_path
@@ -164,6 +174,22 @@ function autoEvolve(cwd, ctxContent) {
   try {
     execSync(`python scripts/evolve.py reflect --session-name "${sessionName}" --duration 0 --went-well "" --could-improve "" --learnings "" --action-items "" --auto-fix-count 0 --rollback-count 0`, { cwd, stdio: 'ignore' });
     execSync(`python scripts/evolve.py evolve`, { cwd, stdio: 'ignore' });
+  } catch {}
+}
+
+function autoHarvestKnowledge(cwd, filePath, toolName, toolInput) {
+  const kbFile = path.join(cwd, '.agent/memory/evolution/knowledge_base.md');
+  if (!fs.existsSync(path.dirname(kbFile))) return;
+  try {
+    const rel = path.relative(cwd, filePath).replace(/\\/g, '/');
+    const ext = path.extname(filePath).slice(1);
+    // 从 Edit 操作提取变更摘要
+    const summary = toolName === 'Edit'
+      ? `修改 ${rel}：${(toolInput.old_string || '').slice(0, 60).replace(/\n/g, ' ')} → ${(toolInput.new_string || '').slice(0, 60).replace(/\n/g, ' ')}`
+      : `新建/覆写 ${rel}`;
+    const ts = new Date().toISOString().slice(0, 10);
+    const entry = `\n## K-auto-${Date.now()}\n**标题**: 代码变更: ${rel}\n**摘要**: ${summary}\n**来源**: auto_harvest\n**语言**: ${ext}\n**日期**: ${ts}\n`;
+    fs.appendFileSync(kbFile, entry);
   } catch {}
 }
 

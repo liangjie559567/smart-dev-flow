@@ -37,6 +37,21 @@ function semverCompare(a, b) {
   return 0;
 }
 
+function getRecentKnowledge(cwd, limit = 5) {
+  const kbFile = path.join(cwd, '.agent/memory/evolution/knowledge_base.md');
+  if (!fs.existsSync(kbFile)) return '';
+  try {
+    const content = fs.readFileSync(kbFile, 'utf8');
+    // 提取所有 ## K- 条目
+    const entries = content.match(/## K-[^\n]+\n(?:[^#]+)/g) || [];
+    return entries.slice(-limit).map(e => {
+      const title = (e.match(/\*\*标题\*\*:\s*([^\n]+)/) || [])[1] || '';
+      const summary = (e.match(/\*\*摘要\*\*:\s*([^\n]+)/) || [])[1] || '';
+      return `- ${title}${summary ? ': ' + summary.slice(0, 80) : ''}`;
+    }).filter(Boolean).join('\n');
+  } catch { return ''; }
+}
+
 function findLocalSkill(cwd, skillName) {
   const p = path.join(cwd, 'skills', skillName, 'SKILL.md');
   if (fs.existsSync(p)) return stripFrontmatter(fs.readFileSync(p, 'utf8'));
@@ -262,6 +277,10 @@ async function main() {
       axiomLines.push(`⚠️ 检查点：每个主要任务完成后调用 context-manager.create_checkpoint 创建 git tag 检查点。`);
       axiomLines.push(`运行 /smart-dev-flow:dev-flow 查看详情，或继续当前阶段技能。`);
     }
+    // 自动注入最近知识条目（越用越强）
+    const recentKb = getRecentKnowledge(cwd, 5);
+    if (recentKb) axiomLines.push(`\n📚 知识库（最近经验）：\n${recentKb}`);
+
     if (axiomLines.length) parts.push(axiomLines.join('\n'));
   }
 
