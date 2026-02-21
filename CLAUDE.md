@@ -231,10 +231,10 @@ Verify before claiming completion. The goal is evidence-backed confidence, not c
 <skills>
 Skills are user-invocable commands (`/smart-dev-flow:<name>`). When you detect trigger patterns, invoke the corresponding skill.
 
-**CRITICAL SKILL PRIORITY OVERRIDE**: When working in this project (smart-dev-flow), ALWAYS use `Skill("smart-dev-flow:dev-flow")` for any dev-flow invocation. NEVER use `superpowers:dev-flow`. The `smart-dev-flow:dev-flow` skill is the authoritative dev-flow for this project and takes absolute precedence over any other plugin's dev-flow skill.
+**CRITICAL SKILL PRIORITY OVERRIDE**: When working in this project (smart-dev-flow), ALWAYS use `Skill("smart-dev-flow:axiom-dev-flow")` for any dev-flow invocation. NEVER use `superpowers:dev-flow` or `Skill("dev-flow")`.
 
 Axiom Flow:
-- `dev-flow` ("dev-flow", "axiom dev", "axiom-flow", "开始开发", "smart-dev-flow"): 完整 Axiom 开发流程 → **必须调用 `Skill("smart-dev-flow:dev-flow")`，禁止调用 `superpowers:dev-flow`**
+- `axiom-dev-flow` ("dev-flow", "axiom dev", "axiom-flow", "开始开发", "smart-dev-flow"): 完整 Axiom 开发流程 → **必须调用 `Skill("smart-dev-flow:axiom-dev-flow")`，禁止调用 `superpowers:dev-flow`**
 - `axiom-draft` ("draft", "起草需求"): Phase 1 需求起草
 - `axiom-review` ("review prd"): Phase 1.5 专家评审
 - `axiom-decompose` ("decompose", "拆解任务"): Phase 2 任务拆解
