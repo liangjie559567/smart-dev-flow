@@ -1,7 +1,7 @@
 ---
 description: 统一配置模板 — 多模型后端抽象层
 version: 1.0
-updated: 2026-02-09
+updated: 2026-02-21
 ---
 
 # Agent Config — 多模型配置中心
@@ -41,11 +41,9 @@ gemini:
   
   # 项目命令
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
-  
+    test: "npm test"
+    build: "npm run build"
+
   # 特性开关
   features:
     json_output: true
@@ -62,19 +60,17 @@ claude:
   display_name: "Claude (Anthropic)"
   global_config_path: "~/.claude/CLAUDE.md"
   adapter_path: ".agent/adapters/claude/CLAUDE.md"
-  
+
   capabilities:
-    file_read: "read_file"
-    file_write: "replace_string_in_file"
-    file_create: "create_file"
-    run_command: "run_in_terminal"
-    search: "grep_search"
-  
+    file_read: "Read"
+    file_write: "Edit"
+    file_create: "Write"
+    run_command: "Bash"
+    search: "Grep / Glob"
+
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
+    test: "npm test"
+    build: "npm run build"
   
   features:
     json_output: false
@@ -100,11 +96,9 @@ copilot:
     search: "semantic_search"
   
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
-  
+    test: "npm test"
+    build: "npm run build"
+
   features:
     json_output: false
     streaming: true
@@ -129,10 +123,8 @@ codex:
     search: "grep/glob"
 
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
+    test: "npm test"
+    build: "npm run build"
 
   features:
     json_output: true
@@ -158,10 +150,8 @@ opencode:
     search: "grep/glob"
 
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
+    test: "npm test"
+    build: "npm run build"
 
   features:
     json_output: false
@@ -187,10 +177,8 @@ gemini_cli:
     search: "find_by_name"
 
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
+    test: "npm test"
+    build: "npm run build"
 
   features:
     json_output: true
@@ -209,17 +197,15 @@ claude_code:
   adapter_path: ".agent/adapters/claude-code/CLAUDE-CODE.md"
 
   capabilities:
-    file_read: "read_file"
-    file_write: "replace_string_in_file"
-    file_create: "create_file"
-    run_command: "run_in_terminal"
-    search: "grep_search"
+    file_read: "Read"
+    file_write: "Edit"
+    file_create: "Write"
+    run_command: "Bash"
+    search: "Grep / Glob"
 
   commands:
-    run: "flutter run"
-    test: "flutter test"
-    analyze: "flutter analyze"
-    build: "flutter build"
+    test: "npm test"
+    build: "npm run build"
 
   features:
     json_output: false
@@ -237,9 +223,9 @@ claude_code:
 shared:
   # 项目信息
   project:
-    name: "Axiom"
-    type: "flutter"
-    language: "dart"
+    name: "smart-dev-flow"
+    type: "node"
+    language: "javascript"
     
   # Axiom 路径
   paths:

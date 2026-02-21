@@ -12,4 +12,4 @@ Agent 开窗后的第一反应，用于偷偷读取上下文。
    - **IF PENDING**: Output "Detected unfinished task [Task-ID]. Resume?"
    - **IF IDLE**: Output "System ready. What's next?"
 3. **Environment Check**:
-   - **Run**: `flutter doctor` (若当前项目是 Flutter；仅在异常时提示)。
+   - **Run**: `node --version` (确认 Node.js 20+ 可用；仅在异常时提示)。

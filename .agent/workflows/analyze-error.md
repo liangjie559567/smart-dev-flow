@@ -7,8 +7,8 @@ description: Panic Button - 错误智能分析与修复
 当 `feature-flow` 遇到熔断（3次修复失败）或用户直接抛出报错时触发。
 
 ## Phase 1: Log Collection (日志收集)
-1. **收集构建日志**: 读取 `flutter run` / `flutter analyze` 的完整输出。
-2. **收集测试日志**: 读取 `flutter test` 的失败详情。
+1. **收集构建日志**: 读取 `npm run build` 的完整输出。
+2. **收集测试日志**: 读取 `npm test` 的失败详情。
 3. **收集 Git 状态**: `git diff HEAD~1` 查看最近的代码变更。
 
 ## Phase 2: Diff Analysis (差异分析)

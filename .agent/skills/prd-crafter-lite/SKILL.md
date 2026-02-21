@@ -39,7 +39,7 @@ description: 纯净版工程级 PRD 专家 (v4.0)。专注于生成高质量文�
 > Format: [ ] Task-ID: Description (Verify: Test/Screenshot)
 
 - [ ] Task-001: [P0] 核心数据层实现
-    *   Verify: `flutter test test/repository/xxx_test.dart`
+    *   Verify: `npm test`
 - [ ] Task-002: [P1] 业务逻辑层实现
     *   Verify: Unit Test covering edge cases.
 - [ ] Task-003: [P1] UI 界面实现
