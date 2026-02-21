@@ -52,7 +52,7 @@ async function main() {
 
   // IMPLEMENTING 阶段：主 Claude 禁止直接写代码，必须通过 Task() 子代理
   if (status === 'IMPLEMENTING' && ['Write', 'Edit'].includes(toolName)) {
-    const filePath = hook.tool_input?.file_path || '';
+    const filePath = (hook.tool_input?.file_path || '').replace(/\\/g, '/');
     // 允许写入状态文件和记忆文件，禁止写入源代码
     const isMemory = filePath.includes('.agent/memory/') || filePath.includes('.omc/') || filePath.includes('.claude/');
     const isConfig = filePath.endsWith('.json') || filePath.endsWith('.md') || filePath.endsWith('.cjs') || filePath.endsWith('.mjs');
