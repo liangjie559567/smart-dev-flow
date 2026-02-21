@@ -24,9 +24,9 @@ description: Meta Command - 对 Axiom 系统本身进行修改的入口
 | README | `README.md` (系统说明部分) |
 
 **禁止修改**:
-- `lib/` (业务代码)
-- `test/` (业务测试)
-- `pubspec.yaml` (项目依赖)
+- `src/` (业务代码)
+- `tests/` (业务测试)
+- `package.json` (项目依赖)
 
 ## Steps
 
