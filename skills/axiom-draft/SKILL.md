@@ -43,6 +43,7 @@ description: Axiom Phase 1 起草 - 需求澄清、PRD 生成、架构设计（�
 1. 读取 `.agent/memory/active_context.md`，检查 `task_status`：
    - 若状态非 `IDLE`，提示用户："当前有进行中的任务（状态：{task_status}），继续起草将覆盖现有上下文。确认继续？"
    - 用户确认后继续；取消则终止
+   - **注意**：本技能通常由 `dev-flow` 在完成 `brainstorming` 硬门控后调用。若直接调用本技能（`/axiom-draft`），将跳过 brainstorming 设计审批阶段，仅在用户明确知晓的情况下允许。
 2. 执行 `.agent/workflows/1-drafting.md`
 3. **知识库查询（必须）**：
    ```
@@ -288,6 +289,8 @@ AskUserQuestion({
 内容与上方相同，作为独立 PRD 文件存档。
 
 ## active_context 写入格式
+
+> **注意**：`task_status: DRAFTING` 通常由 `dev-flow` 在调用本技能前写入。本技能仅在直接调用（`/axiom-draft`）时自行写入，避免重复写入。
 
 ```
 task_status: DRAFTING

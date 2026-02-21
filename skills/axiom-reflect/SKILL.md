@@ -156,8 +156,8 @@ blocked_reason:
 last_updated: {timestamp}
 ```
 
-## 自动触发
+## 触发方式
 
-`axiom-implement` 技能在所有任务完成后自动调用本技能。
+由用户在 Phase 7 末尾 AskUserQuestion 确认后触发（选择"进入 Phase 8 合并分支"或"跳过 Phase 8"时，dev-flow 将状态写入 `REFLECTING` 并调用本技能）。
 
 也可手动触发：`/axiom-reflect`

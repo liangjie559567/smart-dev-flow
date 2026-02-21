@@ -15,11 +15,11 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 |------|------|
 | `IDLE` | 智能需求收集，调用 `axiom-draft` |
 | `DRAFTING` | 继续 Phase 1，调用 `axiom-draft`（含 PRD 确认流程） |
-| `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review` |
-| `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose`；完成后调用 `using-git-worktrees` 创建隔离工作区 |
+| `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review`（完成后流转到 `DECOMPOSING`） |
+| `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose`（内部含 Phase 3 隔离工作区创建） |
 | `IMPLEMENTING` | 继续 Phase 3，若 `execution_mode` 未设置则先触发**执行引擎选择**，再根据选择调用对应执行引擎 |
 | `BLOCKED` | 展示 `blocked_reason`，提供恢复选项 |
-| `REFLECTING` | 调用 `finishing-a-development-branch`（分支收尾），再调用 `axiom-reflect` |
+| `REFLECTING` | 调用 `axiom-reflect`（内部含分支收尾 + 知识收割） |
 
 ## IDLE 时的引导
 
@@ -54,7 +54,7 @@ AskUserQuestion({
 
 ## Phase 3 完成后：执行引擎选择（硬门控）
 
-`using-git-worktrees` 完成（worktree 创建就绪）后，进入 `IMPLEMENTING` 状态时若 `execution_mode` 未设置，**必须**通过 `AskUserQuestion` 向用户确认执行引擎，不得跳过。
+执行引擎选择由 `axiom-decompose` 在 Phase 2/3 完成后负责触发（含 AskUserQuestion 和写入 `execution_mode`）。`dev-flow` 在进入 `IMPLEMENTING` 状态时，若 `execution_mode` 仍未设置（如用户直接跳转到该状态），**必须**补充触发执行引擎选择，不得跳过。
 
 ### 推荐逻辑
 
@@ -187,6 +187,8 @@ ToolSearch("mcp")  // 发现所有 MCP 工具（优先）
 ```
 
 ### 各阶段 MCP 路由
+
+> **说明**：各子技能（axiom-draft 等）内部默认使用 `Task()` 子代理执行核心工作。MCP 工具为**可选优化路径**，在 MCP 可用时可替代对应 Claude agent 以提升速度。各子技能内部不会自动调用 MCP，需由主 Claude 在调用子技能前判断是否使用 MCP 预处理。
 
 | 阶段 | 优先 MCP 工具 | agent_role | 降级方案 |
 |------|-------------|-----------|---------|

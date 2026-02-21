@@ -252,7 +252,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
        summary="{测试数量} | {覆盖率} | {遇到的陷阱} | {可复用测试模式}"
      ```
 
-   - 更新 `active_context.md`：
+   - 更新 `active_context.md`（预写入 REFLECTING，Phase 7 验证通过后生效）：
      ```
      task_status: REFLECTING
      current_phase: Phase 3 - Done
