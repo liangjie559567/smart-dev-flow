@@ -1,7 +1,7 @@
 ---
 description: 知识图谱索引 - 管理所有知识条目的元信息
 version: 1.0
-last_updated: 2026-02-09
+last_updated: 2026-02-21
 ---
 
 # Knowledge Base (知识图谱索引)
@@ -37,15 +37,15 @@ last_updated: 2026-02-09
 | k-023 | Project Structure Convention | architecture | 0.85 | 2026-02-09 | active |
 | k-024 | CI/CD Pipeline Best Practices | workflow | 0.8 | 2026-02-09 | active |
 | k-025 | Documentation Standards | workflow | 0.8 | 2026-02-09 | active |
-| k-026 | Codex CLI Best Practices (Windows) | tooling | 0.95 | 2026-02-12 | active |
 | k-027 | Axiom MCP Bridge Pattern | tooling | 0.9 | 2026-02-21 | active |
 | k-028 | 需求澄清: 任务进度看板 CLI | workflow | 0.9 | 2026-02-21 | active |
+| k-031 | 测试知识 | architecture | 0.7 | 2026-02-21 | active |
 
 ## 2. 分类统计 (Category Stats)
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| architecture | 15 | 架构相关知识 |
+| architecture | 16 | 架构相关知识 |
 | debugging | 1 | 调试技巧 |
 | pattern | 3 | 代码模式 |
 | workflow | 5 | 工作流相关 |
@@ -56,8 +56,8 @@ last_updated: 2026-02-09
 
 > 使用频率: (tag: count)
 
-- flutter: 10
-- dart: 5
+- node: 10
+- javascript: 5
 - memory: 2
 - automation: 2
 - config: 1
@@ -132,6 +132,7 @@ last_updated: 2026-02-09
 - CLI: 1
 - 看板: 1
 - 需求分析: 1
+
 ## 4. 知识质量管理
 
 ### 4.1 Confidence 分数说明

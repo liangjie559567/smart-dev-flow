@@ -16,9 +16,9 @@ last_updated: 2026-02-13
 - **Evidence-Based Gates**: 所有门禁必须基于可验证的产物 (Artifacts/Logs)。
 
 ## 3. 编码规范
-- **Lint**: flutter_lints
-- **Formatting**: dart format
-- **Naming**: `snake_case` for docs/scripts, `PascalCase` for classes.
+- **Lint**: eslint
+- **Formatting**: prettier
+- **Naming**: `camelCase` for variables/functions, `PascalCase` for classes, `kebab-case` for files.
 
 ## 4. 核心依赖
 | 库名 | 用途 |
