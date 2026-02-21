@@ -72,4 +72,22 @@ describe('dna-manager: appendToDna', () => {
     appendToDna(tmpDir, '踩过的坑', '- [2026-02-21] 自动创建');
     expect(existsSync(join(tmpDir, '.agent', 'memory', 'project-dna.md'))).toBe(true);
   });
+
+  it('重复内容不重复写入', () => {
+    writeFileSync(join(tmpDir, '.agent', 'memory', 'project-dna.md'), '## 踩过的坑\n- [2026-02-21] Windows 路径用 path.join\n');
+    const { appendToDna } = require(DNA_MGR);
+    appendToDna(tmpDir, '踩过的坑', '- [2026-02-22] Windows 路径必须用 path.join');
+    const content = readFileSync(join(tmpDir, '.agent', 'memory', 'project-dna.md'), 'utf8');
+    const matches = content.match(/path\.join/g);
+    expect(matches).toHaveLength(1);
+  });
+
+  it('不同内容正常追加', () => {
+    writeFileSync(join(tmpDir, '.agent', 'memory', 'project-dna.md'), '## 踩过的坑\n- [2026-02-21] Windows 路径用 path.join\n');
+    const { appendToDna } = require(DNA_MGR);
+    appendToDna(tmpDir, '踩过的坑', '- [2026-02-22] CRLF 换行符问题');
+    const content = readFileSync(join(tmpDir, '.agent', 'memory', 'project-dna.md'), 'utf8');
+    expect(content).toContain('path.join');
+    expect(content).toContain('CRLF');
+  });
 });

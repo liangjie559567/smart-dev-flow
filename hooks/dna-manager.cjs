@@ -39,6 +39,20 @@ function appendToDna(cwd, section, entry) {
   let content = tryRead(filePath) || DEFAULT_TEMPLATE;
   const marker = `## ${section}`;
   const idx = content.indexOf(marker);
+
+  // 去重：提取 entry 核心词，若 section 内已有高度相似行则跳过
+  if (idx !== -1) {
+    const nextSection = content.indexOf('\n## ', idx + marker.length);
+    const sectionBody = nextSection === -1 ? content.slice(idx) : content.slice(idx, nextSection);
+    const entryWords = entry.toLowerCase().replace(/[\[\]()（）\d\-:：]/g, ' ').split(/\s+/).filter(w => w.length > 3);
+    const isDuplicate = sectionBody.split('\n').some(line => {
+      if (!line.trim() || line.startsWith('#')) return false;
+      const matches = entryWords.filter(w => line.toLowerCase().includes(w)).length;
+      return matches >= Math.max(2, Math.floor(entryWords.length * 0.6));
+    });
+    if (isDuplicate) return;
+  }
+
   if (idx === -1) {
     content += `\n${marker}\n${entry}\n`;
   } else {
