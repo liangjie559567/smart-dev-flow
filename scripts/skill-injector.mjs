@@ -62,14 +62,21 @@ function parseSkillFrontmatterFallback(content) {
   const yamlContent = match[1];
   const body = match[2].trim();
 
-  // Simple YAML parsing for triggers
+  // Simple YAML parsing for triggers (支持多行和内联数组两种格式)
   const triggers = [];
-  const triggerMatch = yamlContent.match(/triggers:\s*\n((?:\s+-\s*.+\n?)*)/);
-  if (triggerMatch) {
-    const lines = triggerMatch[1].split('\n');
-    for (const line of lines) {
-      const itemMatch = line.match(/^\s+-\s*["']?([^"'\n]+)["']?\s*$/);
-      if (itemMatch) triggers.push(itemMatch[1].trim().toLowerCase());
+  const inlineMatch = yamlContent.match(/triggers:\s*\[([^\]]+)\]/);
+  if (inlineMatch) {
+    for (const t of inlineMatch[1].split(',')) {
+      const v = t.trim().replace(/^["']|["']$/g, '');
+      if (v) triggers.push(v.toLowerCase());
+    }
+  } else {
+    const triggerMatch = yamlContent.match(/triggers:\s*\n((?:\s+-\s*.+\n?)*)/);
+    if (triggerMatch) {
+      for (const line of triggerMatch[1].split('\n')) {
+        const itemMatch = line.match(/^\s+-\s*["']?([^"'\n]+)["']?\s*$/);
+        if (itemMatch) triggers.push(itemMatch[1].trim().toLowerCase());
+      }
     }
   }
 
@@ -223,10 +230,19 @@ function findMatchingSkillsFallback(prompt, directory, sessionId) {
 // Find matching skills - delegates to bridge or fallback
 function findMatchingSkills(prompt, directory, sessionId) {
   if (bridge) {
-    // Use bridge (RECURSIVE discovery, persistent session cache)
+    const sdfSkillsDir = join(directory, SDF_SKILLS_SUBDIR);
     const matches = bridge.matchSkillsForInjection(prompt, directory, sessionId, {
       maxResults: MAX_SKILLS_PER_SESSION
     });
+    if (matches.length > 0) {
+      bridge.markSkillsInjected(sessionId, matches.map(s => s.path), directory);
+      return matches;
+    }
+    // bridge 未找到时，补充搜索项目本地 skills/ 目录
+    if (existsSync(sdfSkillsDir)) {
+      return findMatchingSkillsFallback(prompt, directory, sessionId);
+    }
+    return matches;
 
     // Mark as injected via bridge
     if (matches.length > 0) {
