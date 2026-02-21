@@ -1,15 +1,11 @@
 {
   "phase0": {
     "acceptance_criteria": [
-      "用户可登录",
-      "支持JWT"
+      "测试通过"
     ],
     "constraints": [
-      "Node.js 20+"
-    ],
-    "risks": [
-      "token泄露"
+      "Node 20+"
     ]
   },
-  "_updated": "2026-02-21T04:27:54.632Z"
+  "_updated": "2026-02-21T08:23:18.517Z"
 }

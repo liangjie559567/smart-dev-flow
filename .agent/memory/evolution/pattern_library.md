@@ -61,8 +61,8 @@ description: [Short Description]
 
 
 **Usage**:
-```dart
-final data = await repository.getWithCache('user_profile', () => api.fetchProfile());
+```javascript
+const data = await repository.getWithCache('user_profile', () => api.fetchProfile());
 ```
 
 ---

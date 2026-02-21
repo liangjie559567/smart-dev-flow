@@ -150,7 +150,7 @@ references: [source-id]
 [详细说明]
 
 ## Code Example (if applicable)
-\`\`\`dart
+\`\`\`javascript
 // code
 \`\`\`
 

@@ -1,0 +1,3 @@
+{"ts":"2026-02-21T08:13:49.852Z","type":"session_start","sessionId":"test-abc"}
+{"ts":"2026-02-21T09:38:58.431Z","type":"hook_write","tool":"Write","file":"test-knowledge.md"}
+{"ts":"2026-02-21T09:39:02.552Z","type":"hook_write","tool":"Write","file":"test-knowledge.md"}

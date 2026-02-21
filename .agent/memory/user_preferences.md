@@ -23,6 +23,6 @@ last_updated: 2026-02-08
 - **测试**: 原子任务完成后必须自测。
 
 ## 3. 工具偏好
-- **框架**: Flutter (强制)。
-- **状态管理**: (待填，如 Provider/Riverpod)。
-- **架构**: (待填，如 MVVM)。
+- **框架**: Node.js + Claude Code Plugin (强制)。
+- **状态管理**: Axiom 状态机 (IDLE/DRAFTING/REVIEWING/DECOMPOSING/IMPLEMENTING/CONFIRMING/BLOCKED/REFLECTING)。
+- **架构**: OMC 多智能体编排 + Axiom 状态机融合。

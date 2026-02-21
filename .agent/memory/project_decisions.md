@@ -1,13 +1,13 @@
 ﻿---
-project_name: Axiom v4.2
-last_updated: 2026-02-13
+project_name: smart-dev-flow v1.15.0
+last_updated: 2026-02-21
 ---
 
 # Project Decisions (长期记忆 - 架构决策)
 
 ## 1. 技术栈 (Framework Core)
-- **Language**: Dart (Flutter) for Core Logic & UI.
-- **Backend/Scripting**: Python (Evolution Engine) / PowerShell (Guards).
+- **Language**: JavaScript (Node.js) for Core Logic & MCP Servers.
+- **Backend/Scripting**: Node.js (MCP Servers) / CJS (Hooks).
 - **Architecture**: Manifest-Driven Agentic Pipeline.
 
 ## 2. 架构设计原则
@@ -32,7 +32,7 @@ last_updated: 2026-02-13
 | 2026-02-12 | Race Condition | 并行读写同一临时文件 | 实施 Unique Artifact Injection (k-028) |
 
 ## 6. Deprecated (废弃决策归档)
-- [Archived] "Test Flutter App" MVVM specific rules (Replaced by Generic Axiom rules).
+- [Archived] Flutter/MVVM specific rules (Replaced by OMC+Axiom rules).
 
 ## 8. 评审报告 - axiom-status 任务进度从 manifest.md 读取
 时间：2026-02-21T00:30:00.000Z

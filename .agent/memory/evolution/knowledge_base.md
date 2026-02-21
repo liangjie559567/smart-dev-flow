@@ -17,21 +17,21 @@ last_updated: 2026-02-21
 | k-003 | GitHub Automation Fallback Strategy (GitHub 自动化降级策略) | tooling | 0.8 | 2026-02-08 | active |
 | k-004 | Context Completeness Pattern (上下文完整性模式) | architecture | 0.95 | 2026-02-08 | active |
 | k-005 | Agent Native Orchestration (纯 Agent 编排) | architecture | 0.9 | 2026-02-09 | active |
-| k-006 | Flutter Widget Lifecycle | architecture | 0.9 | 2026-02-09 | active |
-| k-007 | Flutter State Management with Stacked | architecture | 0.9 | 2026-02-09 | active |
-| k-008 | Flutter Navigation Best Practices | architecture | 0.85 | 2026-02-09 | active |
-| k-009 | Flutter Performance Optimization | architecture | 0.85 | 2026-02-09 | active |
-| k-010 | Flutter Testing Strategy | architecture | 0.8 | 2026-02-09 | active |
-| k-011 | Flutter Error Handling Pattern | debugging | 0.85 | 2026-02-09 | active |
-| k-012 | Flutter Theme and Styling | architecture | 0.8 | 2026-02-09 | active |
-| k-013 | Flutter Responsive Layout | architecture | 0.8 | 2026-02-09 | active |
-| k-014 | Flutter Localization (i18n) | tooling | 0.75 | 2026-02-09 | active |
-| k-015 | Flutter Platform Channels | architecture | 0.75 | 2026-02-09 | active |
-| k-016 | Dart Null Safety Patterns | architecture | 0.95 | 2026-02-09 | active |
-| k-017 | Dart Async/Await Best Practices | architecture | 0.9 | 2026-02-09 | active |
-| k-018 | Dart Extension Methods | pattern | 0.85 | 2026-02-09 | active |
-| k-019 | Dart Freezed и Immutable Data | pattern | 0.85 | 2026-02-09 | active |
-| k-020 | Dart Collection Operations | pattern | 0.85 | 2026-02-09 | active |
+| k-006 | Flutter Widget Lifecycle | architecture | 0.9 | 2026-02-09 | archived |
+| k-007 | Flutter State Management with Stacked | architecture | 0.9 | 2026-02-09 | archived |
+| k-008 | Flutter Navigation Best Practices | architecture | 0.85 | 2026-02-09 | archived |
+| k-009 | Flutter Performance Optimization | architecture | 0.85 | 2026-02-09 | archived |
+| k-010 | Flutter Testing Strategy | architecture | 0.8 | 2026-02-09 | archived |
+| k-011 | Flutter Error Handling Pattern | debugging | 0.85 | 2026-02-09 | archived |
+| k-012 | Flutter Theme and Styling | architecture | 0.8 | 2026-02-09 | archived |
+| k-013 | Flutter Responsive Layout | architecture | 0.8 | 2026-02-09 | archived |
+| k-014 | Flutter Localization (i18n) | tooling | 0.75 | 2026-02-09 | archived |
+| k-015 | Flutter Platform Channels | architecture | 0.75 | 2026-02-09 | archived |
+| k-016 | Dart Null Safety Patterns | architecture | 0.95 | 2026-02-09 | archived |
+| k-017 | Dart Async/Await Best Practices | architecture | 0.9 | 2026-02-09 | archived |
+| k-018 | Dart Extension Methods | pattern | 0.85 | 2026-02-09 | archived |
+| k-019 | Dart Freezed & Immutable Data | pattern | 0.85 | 2026-02-09 | archived |
+| k-020 | Dart Collection Operations | pattern | 0.85 | 2026-02-09 | archived |
 | k-021 | Git Commit Conventions | workflow | 0.95 | 2026-02-09 | active |
 | k-022 | Code Review Checklist | workflow | 0.9 | 2026-02-09 | active |
 | k-023 | Project Structure Convention | architecture | 0.85 | 2026-02-09 | active |
@@ -72,46 +72,6 @@ last_updated: 2026-02-21
 - architecture: 1
 - orchestration: 1
 - anti-pattern: 1
-- widget: 1
-- lifecycle: 1
-- stacked: 1
-- state-management: 1
-- mvvm: 1
-- navigation: 1
-- routing: 1
-- performance: 1
-- optimization: 1
-- testing: 1
-- unit-test: 1
-- widget-test: 1
-- error-handling: 1
-- exception: 1
-- theme: 1
-- ui: 1
-- design-system: 1
-- responsive: 1
-- layout: 1
-- adaptive: 1
-- i18n: 1
-- localization: 1
-- l10n: 1
-- platform-channel: 1
-- native: 1
-- ios: 1
-- android: 1
-- null-safety: 1
-- type-system: 1
-- async: 1
-- future: 1
-- stream: 1
-- extension: 1
-- utility: 1
-- freezed: 1
-- immutable: 1
-- data-class: 1
-- collections: 1
-- list: 1
-- map: 1
 - git: 1
 - commit: 1
 - conventional-commits: 1
@@ -124,10 +84,9 @@ last_updated: 2026-02-21
 - ci-cd: 1
 - github-actions: 1
 - documentation: 1
-- dartdoc: 1
+- jsdoc: 1
 - readme: 1
 - mcp: 1
-- python: 1
 - nodejs: 1
 - CLI: 1
 - 看板: 1

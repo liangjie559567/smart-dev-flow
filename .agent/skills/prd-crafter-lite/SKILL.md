@@ -18,7 +18,7 @@ description: 纯净版工程级 PRD 专家 (v4.0)。专注于生成高质量文�
   4. **IF Clear**: Proceed to Generation.
 
 ## 1. Context-Aware Generation
-- **读取记忆**: 引用 `project_decisions.md` 中的 Tech Stack (如 Flutter/MVVM) 自动填充技术方案章节。
+- **读取记忆**: 引用 `project_decisions.md` 中的 Tech Stack (如 Node.js/OMC+Axiom) 自动填充技术方案章节。
 - **任务拆解**: 必须将功能拆解为 `T-001`, `T-002` 等原子任务，且每个任务必须定义 **验证条件 (Acceptance Criteria)**。
 
 ## 2. Universal Template (通用模版)
