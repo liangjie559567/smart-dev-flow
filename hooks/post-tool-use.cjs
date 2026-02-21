@@ -24,7 +24,7 @@ async function main() {
   // 只监听写入操作
   if (!['Write', 'Edit'].includes(toolName)) process.exit(0);
 
-  const filePath = toolInput.file_path || '';
+  const filePath = (toolInput.file_path || '').replace(/\\/g, '/');
   const cwd = process.cwd();
 
   // 源码文件写入时自动沉淀知识（越用越强）
