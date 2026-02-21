@@ -17,7 +17,7 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 | `DRAFTING` | 继续 Phase 1，调用 `axiom-draft`（含 PRD 确认流程） |
 | `REVIEWING` | 继续 Phase 1.5，调用 `axiom-review`（完成后流转到 `DECOMPOSING`） |
 | `DECOMPOSING` | 继续 Phase 2，调用 `axiom-decompose`（内部含 Phase 3 隔离工作区创建） |
-| `IMPLEMENTING` | 继续 Phase 3，若 `execution_mode` 未设置则先触发**执行引擎选择**，再根据选择调用对应执行引擎 |
+| `IMPLEMENTING` | 继续 Phase 4，若 `execution_mode` 未设置则先触发**执行引擎选择**，再根据选择调用对应执行引擎 |
 | `BLOCKED` | 展示 `blocked_reason`，提供恢复选项 |
 | `REFLECTING` | 调用 `axiom-reflect`（内部含分支收尾 + 知识收割） |
 
@@ -52,7 +52,7 @@ AskUserQuestion({
 3. 将 `task_status` 更新为 `DRAFTING`
 4. 携带收集到的信息调用 `axiom-draft`
 
-## Phase 3 完成后：执行引擎选择（硬门控）
+## Phase 2/3 完成后：执行引擎选择（硬门控）
 
 执行引擎选择由 `axiom-decompose` 在 Phase 2/3 完成后负责触发（含 AskUserQuestion 和写入 `execution_mode`）。`dev-flow` 在进入 `IMPLEMENTING` 状态时，若 `execution_mode` 仍未设置（如用户直接跳转到该状态），**必须**补充触发执行引擎选择，不得跳过。
 
@@ -73,7 +73,7 @@ AskUserQuestion({
 
 ```
 AskUserQuestion({
-  question: "Phase 3 隔离工作区已就绪，请选择执行引擎。\n\n【推荐：<引擎名>】\n推荐理由：<根据上表自动填写>",
+  question: "Phase 2/3 已完成，请选择执行引擎。\n\n【推荐：<引擎名>】\n推荐理由：<根据上表自动填写>",
   header: "选择执行引擎",
   options: [
     {

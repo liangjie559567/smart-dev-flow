@@ -1,6 +1,6 @@
 ---
 name: axiom-draft
-description: Axiom Phase 1 起草 - 需求澄清、PRD 生成、架构设计（含子代理强制调用铁律 + 知识库贯穿）
+description: Axiom Phase 0+1 起草 - 需求澄清、PRD 生成、架构设计（含子代理强制调用铁律 + 知识库贯穿）
 ---
 
 # axiom-draft

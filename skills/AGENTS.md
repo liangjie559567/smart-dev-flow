@@ -20,7 +20,7 @@ smart-dev-flow 技能库 — Axiom 状态机 + OMC 多智能体编排融合系�
 | `axiom-draft/SKILL.md` | "draft", "起草需求" | Phase 0+1 需求澄清+架构设计 |
 | `axiom-review/SKILL.md` | "review prd" | Phase 1.5 critic+5专家评审 |
 | `axiom-decompose/SKILL.md` | "decompose", "拆解任务" | Phase 2+3 任务拆解+隔离开发 |
-| `axiom-implement/SKILL.md` | "implement", "开始实现" | Phase 3-7 TDD+审查+验证 |
+| `axiom-implement/SKILL.md` | "implement", "开始实现" | Phase 4-7 TDD+审查+验证 |
 | `axiom-reflect/SKILL.md` | "reflect", "复盘" | Phase 8+9 合并+知识收割 |
 | `axiom-start/SKILL.md` | "/start" | 零触感启动，恢复上下文 |
 | `axiom-status/SKILL.md` | "/status" | 查询当前状态 |

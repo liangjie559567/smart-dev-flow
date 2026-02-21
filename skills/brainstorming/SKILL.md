@@ -26,7 +26,7 @@ triggers: ["brainstorming", "头脑风暴", "设计审批", "需求分析"]
 4. **展示设计** — 按复杂度分节展示，每节后询问是否正确
 5. **编写设计文档** — 保存到 `docs/plans/YYYY-MM-DD-<主题>-design.md` 并提交
 6. **更新 active_context.md** — 将 `task_status` 更新为 `DRAFTING`
-7. **过渡到实现** — 调用 `writing-plans` 技能创建实现计划
+7. **过渡到实现** — 调用 `axiom-draft` 技能进入需求起草阶段
 
 ## 流程
 
@@ -39,10 +39,10 @@ triggers: ["brainstorming", "头脑风暴", "设计审批", "需求分析"]
   ↓
 分节展示设计 → 用户批准？
   ├─ 否（修改）→ 重新展示
-  └─ 是 → 编写设计文档 → 调用 writing-plans
+  └─ 是 → 编写设计文档 → 调用 axiom-draft
 ```
 
-**终态是调用 writing-plans。** 不得调用其他实现技能。
+**终态是调用 axiom-draft。** 不得调用其他实现技能。
 
 ## 核心原则
 
@@ -55,8 +55,7 @@ triggers: ["brainstorming", "头脑风暴", "设计审批", "需求分析"]
 ## 与 Axiom 状态机集成
 
 - 设计批准后：将 `task_status` 更新为 `DRAFTING`，写入 `session_name`
-- 调用 `writing-plans` 生成实现计划
-- 计划完成后：调用 `axiom-draft` 进入 Phase 1
+- 调用 `axiom-draft` 进入 Phase 1
 
 ## 禁止行为
 

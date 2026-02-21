@@ -1,6 +1,6 @@
 ---
 name: axiom-implement
-description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 6.5 文档 + 知识库贯穿
+description: Axiom Phase 4 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 6.5 文档 + 知识库贯穿
 ---
 
 # axiom-implement
@@ -40,7 +40,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
 5. 更新 `active_context.md`：
    ```
    task_status: IMPLEMENTING
-   current_phase: Phase 3 - Implementing
+   current_phase: Phase 4 - Implementing
    current_task: T{N} - {描述}
    completed_tasks:
    fail_count: 0
@@ -255,7 +255,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
    - 更新 `active_context.md`（预写入 REFLECTING，Phase 7 验证通过后生效）：
      ```
      task_status: REFLECTING
-     current_phase: Phase 3 - Done
+     current_phase: Phase 4 - Done
      completed_tasks: T1,T2,T3
      fail_count: 0
      last_updated: {timestamp}

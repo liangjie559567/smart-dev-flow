@@ -73,7 +73,7 @@ Task(
 - **SMALL**（< 1天）→ 跳过拆解，更新 `active_context.md`：
   ```
   task_status: IMPLEMENTING
-  current_phase: Phase 3 - Implementing
+  current_phase: Phase 4 - Implementing
   last_gate: Gate 2 (skipped decompose)
   ```
   然后触发**执行引擎选择**（见下方）
