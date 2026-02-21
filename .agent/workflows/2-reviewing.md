@@ -67,7 +67,7 @@ Task(subagent_type="general-purpose", prompt="你是安全评审员。评审以�
 | security-reviewer | 安全评论家 | {N} | {意见} |
 
 ### 冲突解决
-按优先级解决专家意见冲突：**安全 > 技术 > 战略 > 逻辑 > 体验**
+{按优先级解决的冲突说明，无冲突则填"无"}
 
 ### 综合结论
 - 综合评分：{0-100}
@@ -87,6 +87,7 @@ axiom_harvest source_type=conversation
 ✅ Phase 1.5 专家评审完成
 - critic 评审：通过（无 Critical 问题）
 - 综合评分：{N}/100
+- 专家意见：{N} 条（已解决 {N} 条）
 - 必须修复：{N} 项
 ```
 

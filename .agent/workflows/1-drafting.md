@@ -56,7 +56,8 @@ Task(
   审查：完整性、可测试性、无歧义性，输出问题列表"
 )
 ```
-→ 发现问题 → 带问题列表重新调用 writer
+→ 发现 High/Critical 问题 → 带问题列表重新调用 analyst
+→ 发现 Medium/Low 问题 → 带问题列表重新调用 writer
 → 通过 → 进入 Phase 1
 
 ### 知识沉淀（必须）
@@ -139,8 +140,9 @@ axiom_harvest source_type=code_change
 
 ## 阶段完成总结（必须输出）
 ```
-✅ Phase 1 需求澄清与架构设计完成
+✅ Phase 0+1 需求澄清与架构设计完成
 - 验收标准：{N} 条（可测试）
+- 技术边界：包含 {X}，不包含 {Y}
 - 接口契约：{N} 个接口已定义
 - ADR：{N} 条架构决策
 - 需求文档：docs/requirements/YYYY-MM-DD-{feature}-requirements.md

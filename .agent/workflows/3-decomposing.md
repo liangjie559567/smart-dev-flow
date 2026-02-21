@@ -121,7 +121,7 @@ node scripts/create-worktree.mjs {feature-name}
 ## 步骤9：执行引擎选择（硬门控）
 ```
 AskUserQuestion({
-  question: "任务拆解完成，共 {N} 个任务。选择执行引擎：",
+  question: "任务拆解完成，共 {N} 个任务。选择执行引擎。\n\n【推荐：{引擎名}】\n推荐理由：{根据任务数量和复杂度自动填写}",
   header: "执行引擎选择",
   options: [
     { label: "标准模式", description: "任务数 ≤ 3，文件 < 10（推荐：简单任务）" },
