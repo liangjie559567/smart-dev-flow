@@ -68,6 +68,20 @@ async function main() {
     }
   }
 
+  // fail_count ≥ 3 自动熔断
+  const failMatch = content.match(/fail_count:\s*(\d+)/);
+  const failCount = failMatch ? parseInt(failMatch[1], 10) : 0;
+  if (failCount >= 3 && status !== 'BLOCKED') {
+    const fs2 = require('fs');
+    const newContent = content.replace(/task_status:\s*\w+/, 'task_status: BLOCKED');
+    fs2.writeFileSync(contextFile, newContent, 'utf8');
+    console.log(JSON.stringify({
+      decision: 'block',
+      reason: `[dev-flow 熔断] fail_count=${failCount} ≥ 3，任务已自动切换为 BLOCKED 状态。\n请使用 debugger 分析根因后手动重置 fail_count 和 task_status。`
+    }));
+    process.exit(0);
+  }
+
   if (status === 'BLOCKED') {
     const isDebug = hook.tool_input?.prompt?.includes('debugger') ||
                     hook.tool_input?.prompt?.includes('analyze-error');

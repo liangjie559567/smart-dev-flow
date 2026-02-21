@@ -63,7 +63,16 @@ Task(
    ```
 3. 按优先级解决冲突：**安全 > 技术 > 战略 > 逻辑 > 体验**
 4. 汇总评审结果，追加写入 `.agent/memory/project_decisions.md`
-5. 更新 `active_context.md`，展示报告等待确认
+5. 生成评审摘要文件 `docs/reviews/{feature}/summary.md`（关键决策 + 范围变更）：
+   ```markdown
+   ## 评审摘要 - {feature}
+   时间：{timestamp}
+   ### 关键决策
+   {按冲突仲裁层级 Safety > Tech > Strategic > Business > UX 排序的决策列表}
+   ### 范围变更
+   {评审导致的需求范围变更，无则填"无"}
+   ```
+6. 更新 `active_context.md`，展示报告等待确认
 
 ## 评审报告格式
 

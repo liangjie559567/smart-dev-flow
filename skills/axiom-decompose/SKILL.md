@@ -90,7 +90,15 @@ Task(
   【phase1上下文】architecture={phase1.architecture} interfaces={phase1.interfaces}
   【知识库经验】{kb_context}
   基于以下 PRD 设计系统边界和接口规范：{PRD内容}
-  输出：模块边界、接口定义（函数签名、数据结构、API 契约）、关键技术决策、依赖关系图"
+  输出：
+  1. 模块边界、接口定义（函数签名、数据结构、API 契约）、关键技术决策
+  2. **Mermaid DAG 依赖图**（必须输出，格式如下）：
+  ```mermaid
+  graph TD
+    T-001[模块A] --> T-002[模块B]
+    T-002 --> T-003[模块C]
+  ```
+  任务命名规范：T-xxx（> 1文件变更，< 1天工作量的原子任务）"
 )
 ```
 
