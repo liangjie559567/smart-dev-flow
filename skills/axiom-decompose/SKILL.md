@@ -107,7 +107,7 @@ Task(
 Task(
   subagent_type="general-purpose",
   model="opus",
-  prompt="你是批判性审查员（Critic）。
+  prompt="你是批判性审查专家（Critic）。
   挑战以下架构方案的假设和风险：{architect输出}
   输出：被挑战的假设、技术风险（概率×影响）、遗漏的边界条件、建议的替代方案"
 )
@@ -246,8 +246,8 @@ Phase 2/3 完成后，**必须**通过 AskUserQuestion 向用户确认执行引�
 
 ```
 AskUserQuestion({
-  question: "Phase 2 实现计划已完成，请选择执行引擎。\n\n【推荐：{引擎名}】\n推荐理由：{根据上表自动填写}",
-  header: "选择执行引擎",
+  question: "任务拆解完成，共 {N} 个任务。选择执行引擎。\n\n【推荐：{引擎名}】\n推荐理由：{根据任务数量和复杂度自动填写}",
+  header: "执行引擎选择",
   options: [
     { label: "标准模式（逐步确认）", description: "每个子任务完成后确认，调用 axiom-implement 逐步执行。" },
     { label: "ultrapilot（分区并行）", description: "文件所有权分区，最多 5 个 worker 并行执行，适合多组件系统，避免文件冲突。" },

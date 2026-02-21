@@ -56,8 +56,8 @@ Task(
   审查：完整性、可测试性、无歧义性，输出问题列表"
 )
 ```
-→ 发现 High/Critical 问题 → 带问题列表重新调用 analyst
-→ 发现 Medium/Low 问题 → 带问题列表重新调用 writer
+→ 发现 High/Critical 问题 → 带问题列表重新调用 analyst → analyst 完成后重新调用 writer → writer 完成后重新调用 quality-reviewer 审查，循环直到无 High/Critical
+→ 发现 Medium/Low 问题 → 带问题列表重新调用 writer → writer 完成后重新调用 quality-reviewer 审查，循环直到审查无问题
 → 通过 → 进入 Phase 1
 
 ⚠️ Phase 0 完成后禁止出现确认框。必须直接继续执行 Phase 1 架构设计。
@@ -132,7 +132,7 @@ Task(
   审查：准确性、完整性、与需求一致性，输出问题列表"
 )
 ```
-→ 发现问题 → 带问题列表重新调用 writer
+→ 发现问题 → 带问题列表重新调用 writer → writer 完成后重新调用 quality-reviewer 审查，循环直到审查无问题
 → 通过 → 进入门禁
 
 ### 知识沉淀（必须）
@@ -173,6 +173,14 @@ AskUserQuestion({
   ]
 })
 ```
+
+用户选择"进入 Phase 1.5"或"跳过评审"后，**必须先持久化阶段上下文**：
+```
+phase_context_write phase=phase0 data={acceptance_criteria, constraints, risks, requirements_doc}
+phase_context_write phase=phase1 data={architecture, interfaces, adr, design_doc}
+phase_context_write phase=kb_context data={本阶段所有知识库查询结果}
+```
+**MCP 不可用降级**：若 `phase_context_write` 调用失败，将上述数据写入 `.agent/memory/phase-context.json`（JSON 格式，key 为 phase0/phase1/kb_context），继续执行，不得阻塞流程。
 
 ## active_context.md 写入格式
 ```yaml

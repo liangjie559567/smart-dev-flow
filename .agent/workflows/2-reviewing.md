@@ -12,6 +12,7 @@ description: Phase 1.5: 专家评审工作流（Axiom v4.2）
 ```yaml
 task_status: REVIEWING
 current_phase: Phase 1.5 - Reviewing
+last_gate: Gate 2
 last_updated: {timestamp}
 ```
 
