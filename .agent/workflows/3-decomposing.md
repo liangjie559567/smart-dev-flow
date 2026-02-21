@@ -23,7 +23,7 @@ Task(
 )
 ```
 
-- SMALL → 跳过拆解，创建单任务 Manifest，直接进入 4-implementing.md
+- SMALL → 跳过拆解，更新 `active_context.md`（task_status: IMPLEMENTING），触发执行引擎选择（步骤9）
 - LARGE → 进入步骤2
 
 ## 步骤2：知识库查询（必须）
@@ -93,7 +93,7 @@ Task(
   审查：任务粒度、依赖完整性、验收标准可测试性，输出问题列表"
 )
 ```
-→ 发现问题 → 带问题列表重新调用 planner
+→ 发现问题 → 带问题列表重新调用 writer
 
 ## 步骤8：Phase 3 隔离开发（可选）
 

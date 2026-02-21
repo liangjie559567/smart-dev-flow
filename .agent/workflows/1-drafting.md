@@ -103,7 +103,7 @@ Task(
   输出：Critical/High/Medium/Low 分级问题列表"
 )
 ```
-→ 发现 Critical 问题 → 带问题列表重新调用 architect
+→ 发现 Critical/High 问题 → 带问题列表重新调用 architect
 
 ### 步骤4：调用 writer 生成设计文档（必须）
 ```
