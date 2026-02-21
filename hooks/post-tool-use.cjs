@@ -27,7 +27,19 @@ async function main() {
   const filePath = toolInput.file_path || '';
   if (!filePath.includes('.agent/memory/')) process.exit(0);
 
-  appendMonitorLog(process.cwd(), { ts: new Date().toISOString(), type: 'hook_write', tool: toolName, file: path.basename(filePath) });
+  const cwd = process.cwd();
+  appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'hook_write', tool: toolName, file: path.basename(filePath) });
+
+  // active_context.md 变更时记录状态转换
+  if (filePath.includes('active_context.md')) {
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const status = (content.match(/task_status:\s*(\w+)/) || [])[1];
+      const execMode = (content.match(/execution_mode:\s*"?([^"\n]+)"?/) || [])[1];
+      if (status) appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'state_change', task_status: status, execution_mode: execMode || '' });
+    } catch {}
+  }
+
   triggerEvolutionHook(hook);
   syncToOmcProjectMemory(filePath);
   process.exit(0);

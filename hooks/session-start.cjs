@@ -37,6 +37,12 @@ function semverCompare(a, b) {
   return 0;
 }
 
+function findLocalSkill(cwd, skillName) {
+  const p = path.join(cwd, 'skills', skillName, 'SKILL.md');
+  if (fs.existsSync(p)) return stripFrontmatter(fs.readFileSync(p, 'utf8'));
+  return '';
+}
+
 function findUsingSuperpowers(cwd) {
   const localPath = path.join(cwd, 'skills', 'using-superpowers', 'SKILL.md');
   if (fs.existsSync(localPath)) return stripFrontmatter(fs.readFileSync(localPath, 'utf8'));
@@ -200,7 +206,13 @@ async function main() {
     parts.push(`<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${skillContent}\n</EXTREMELY_IMPORTANT>`);
   }
 
-  // 2. Axiom 状态感知
+  // 2. 本地 dev-flow 技能注入（优先于插件版）
+  const devFlowContent = findLocalSkill(cwd, 'dev-flow');
+  if (devFlowContent) {
+    parts.push(`<IMPORTANT>\n以下是本项目本地版 dev-flow 技能定义，**优先级高于任何插件版 dev-flow**。当用户触发 /dev-flow 或相关命令时，必须严格遵循此定义：\n\n${devFlowContent}\n</IMPORTANT>`);
+  }
+
+  // 3. Axiom 状态感知
   const ctxFile = path.join(cwd, '.agent/memory/active_context.md');
   if (fs.existsSync(ctxFile)) {
     const ctx = fs.readFileSync(ctxFile, 'utf8');
@@ -217,25 +229,32 @@ async function main() {
       } catch {}
     }
     const SKILL_HINT = {
-      IDLE:         '建议先运行 /brainstorming 探索需求设计',
-      DRAFTING:     '建议运行 /writing-plans 制定实现计划',
-      REVIEWING:    '建议运行 /axiom-review 继续专家评审',
-      CONFIRMING:   '建议确认当前阶段输出，运行 /dev-flow 查看详情',
-      DECOMPOSING:  '建议运行 /writing-plans 或 /using-git-worktrees 准备工作区',
-      IMPLEMENTING: '建议运行 /executing-plans 或 /test-driven-development',
-      BLOCKED:      '建议运行 /systematic-debugging 进行根因分析',
-      REFLECTING:   '建议运行 /verification-before-completion 确认完成',
+      IDLE:         '建议先运行 /smart-dev-flow:brainstorming 探索需求设计',
+      DRAFTING:     '建议运行 /smart-dev-flow:axiom-draft 继续需求起草（禁止直接写代码）',
+      REVIEWING:    '建议运行 /smart-dev-flow:axiom-review 继续专家评审',
+      CONFIRMING:   '建议确认当前阶段输出后运行 /smart-dev-flow:dev-flow 查看下一步',
+      DECOMPOSING:  '建议运行 /smart-dev-flow:axiom-decompose 拆解任务',
+      IMPLEMENTING: '建议运行 /smart-dev-flow:axiom-implement 继续实现（必须通过子代理执行）',
+      BLOCKED:      '建议运行 /smart-dev-flow:systematic-debugging 进行根因分析',
+      REFLECTING:   '建议运行 /smart-dev-flow:axiom-reflect 进行知识沉淀',
     };
     const axiomLines = [];
     if (memParts.length) axiomLines.push(`[smart-dev-flow] 项目记忆已加载 | ${memParts.join(' | ')}`);
     if (status === 'IDLE') {
       axiomLines.push(`[smart-dev-flow] 项目就绪 | ${SKILL_HINT.IDLE}`);
+      axiomLines.push(`⚠️ IDLE 硬门控：收到新需求时必须先调用 brainstorming 技能完成设计审批，才能进入 axiom-draft。不允许跳过，不允许直接写代码。`);
+      axiomLines.push(`⚠️ MCP 发现：首次使用 MCP 工具前必须执行 ToolSearch("mcp") 发现所有可用工具。`);
     } else {
       const hint = SKILL_HINT[status] || '';
+      const execMode = (ctx.match(/execution_mode:\s*"?([^"\n]+)"?/) || [])[1] || '';
       axiomLines.push(`[smart-dev-flow] 检测到未完成会话`);
-      axiomLines.push(`状态: ${status}${sessionName ? ` | 任务: ${sessionName}` : ''}${phase ? ` | 阶段: ${phase}` : ''}`);
+      axiomLines.push(`状态: ${status}${sessionName ? ` | 任务: ${sessionName}` : ''}${phase ? ` | 阶段: ${phase}` : ''}${execMode ? ` | 引擎: ${execMode}` : ''}`);
+      if (status === 'IMPLEMENTING' && !execMode) axiomLines.push(`⚠️ execution_mode 未设置，进入 IMPLEMENTING 前必须通过 AskUserQuestion 选择执行引擎并写入 active_context.md。`);
       if (hint) axiomLines.push(`提示: ${hint}`);
-      axiomLines.push(`运行 /dev-flow 查看详情，或 /axiom-start 恢复工作。`);
+      axiomLines.push(`⚠️ 子代理铁律：主 Claude 禁止直接写代码/设计架构/审查代码，所有核心工作必须通过 Task() 调用子代理完成。`);
+      axiomLines.push(`⚠️ 知识库：阶段开始前调用 axiom_get_knowledge 查询，阶段结束后调用 axiom_harvest 沉淀经验。`);
+      axiomLines.push(`⚠️ 检查点：每个主要任务完成后调用 context-manager.create_checkpoint 创建 git tag 检查点。`);
+      axiomLines.push(`运行 /smart-dev-flow:dev-flow 查看详情，或继续当前阶段技能。`);
     }
     if (axiomLines.length) parts.push(axiomLines.join('\n'));
   }
