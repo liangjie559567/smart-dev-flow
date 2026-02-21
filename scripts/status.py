@@ -124,6 +124,38 @@ def main():
 当前阶段：{phase_name}
 完成进度：{phase_pct}%
 """)
+    print(render_monitor_section(root))
+
+def render_monitor_section(root: Path) -> str:
+    log_file = root / '.agent/memory/monitor.log'
+    if not log_file.exists():
+        return '## 🔍 监控日志\n_暂无日志_\n'
+    lines = log_file.read_text(encoding='utf-8').splitlines()
+    rows = []
+    for line in lines[-20:]:
+        try:
+            e = json.loads(line)
+            try:
+                ts = datetime.fromisoformat(e.get('ts', '')).strftime('%Y-%m-%d %H:%M:%S')
+            except (ValueError, TypeError):
+                ts = e.get('ts', '')[:19]
+            t = e.get('type', '')
+            detail = ''
+            if t == 'task_completed':
+                detail = e.get('content', '')[:40]
+            elif t == 'hook_write':
+                detail = f"{e.get('tool','')} → {e.get('file','')}"
+            elif t == 'session_start':
+                detail = e.get('sessionId', '')[:20]
+            detail = detail.replace('|', '\\|').replace('\n', ' ')
+            rows.append(f'| {ts} | {t} | {detail} |')
+        except (json.JSONDecodeError, KeyError, ValueError):
+            pass
+    if not rows:
+        return '## 🔍 监控日志\n_暂无日志_\n'
+    table = '| 时间 | 类型 | 详情 |\n|------|------|------|\n' + '\n'.join(rows)
+    return f'## 🔍 监控日志（最近 {len(rows)} 条）\n{table}\n'
+
 
 if __name__ == '__main__':
     main()

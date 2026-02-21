@@ -10,8 +10,13 @@ async function main() {
   const toolName = hook.tool_name || '';
   const toolInput = hook.tool_input || {};
 
-  // TodoWrite：只触发进化钩子，不做记忆同步
+  // TodoWrite：记录已完成任务，触发进化钩子
   if (toolName === 'TodoWrite') {
+    const cwd = process.cwd();
+    const todos = (hook.tool_input || {}).todos || [];
+    todos.filter(t => t.status === 'completed').forEach(t => {
+      appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'task_completed', id: t.id, content: t.content });
+    });
     triggerEvolutionHook(hook);
     process.exit(0);
   }
@@ -22,6 +27,7 @@ async function main() {
   const filePath = toolInput.file_path || '';
   if (!filePath.includes('.agent/memory/')) process.exit(0);
 
+  appendMonitorLog(process.cwd(), { ts: new Date().toISOString(), type: 'hook_write', tool: toolName, file: path.basename(filePath) });
   triggerEvolutionHook(hook);
   syncToOmcProjectMemory(filePath);
   process.exit(0);
@@ -92,6 +98,14 @@ function readStdin() {
     process.stdin.on('end', () => resolve(data || '{}'));
     setTimeout(() => resolve(data || '{}'), 3000);
   });
+}
+
+function appendMonitorLog(cwd, entry) {
+  const logFile = path.join(cwd, '.agent/memory/monitor.log');
+  if (!fs.existsSync(path.dirname(logFile))) return;
+  try {
+    fs.appendFileSync(logFile, JSON.stringify(entry) + '\n');
+  } catch {}
 }
 
 main().catch(() => process.exit(0));
