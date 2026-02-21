@@ -50,7 +50,7 @@ async function main() {
         const prevStatus = getPrevStatus(cwd);
         appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'state_change', task_status: status, execution_mode: execMode || '' });
         // G: IMPLEMENTING/REFLECTING → IDLE 时自动触发进化引擎
-        if (status === 'IDLE' && ['IMPLEMENTING', 'REFLECTING'].includes(prevStatus)) {
+        if (status === 'IDLE' && ['IMPLEMENTING', 'REFLECTING', 'REVIEWING', 'DECOMPOSING'].includes(prevStatus)) {
           autoEvolve(cwd, content);
         }
       }

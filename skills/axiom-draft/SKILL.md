@@ -240,6 +240,7 @@ AskUserQuestion({
      phase_context_write phase=phase1 data={architecture, interfaces, adr, design_doc}
      phase_context_write phase=kb_context data={本阶段所有知识库查询结果}
      ```
+     **MCP 不可用降级**：若 `phase_context_write` 调用失败，将上述数据写入 `.agent/memory/phase-context.json`（JSON 格式，key 为 phase0/phase1/kb_context），继续执行，不得阻塞流程。
   2. 更新 `task_status: REVIEWING`，调用 `axiom-review`
 - 用户选择"需要修改" → 重新执行对应阶段
 - 用户选择"返工" → 清空本次收集内容，重新执行需求收集

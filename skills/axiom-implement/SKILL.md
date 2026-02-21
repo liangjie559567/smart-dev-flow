@@ -30,14 +30,14 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
    → 获取 phase1.interfaces（接口契约）、phase2.tasks（任务清单）、kb_context
    ```
 3. 读取 `.agent/memory/manifest.md` 中的任务清单（与 phase2.tasks 互为补充）
-3. **知识库查询（必须）**：
+4. **知识库查询（必须）**：
    ```
    axiom_get_knowledge query="TDD {模块名称} 测试模式" limit=5
    axiom_search_by_tag tags=["TDD", "测试", "{技术栈}"] limit=3
    → 将查询结果保存为 kb_context
    ```
    **MCP 不可用降级**：若调用失败，读取 `.agent/memory/evolution/knowledge_base.md` 提取相关条目作为 kb_context，继续执行，不得阻塞流程。
-3. 更新 `active_context.md`：
+5. 更新 `active_context.md`：
    ```
    task_status: IMPLEMENTING
    current_phase: Phase 3 - Implementing

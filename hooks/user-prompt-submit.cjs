@@ -83,7 +83,7 @@ async function main() {
   }
 
   // DNA 注入：dev-flow 活跃状态时注入历史经验
-  const DEV_STATES = ['DRAFTING', 'DECOMPOSING', 'IMPLEMENTING'];
+  const DEV_STATES = ['DRAFTING', 'REVIEWING', 'DECOMPOSING', 'IMPLEMENTING'];
   const cwd = process.cwd();
   const ctxStatus = (() => {
     try {
