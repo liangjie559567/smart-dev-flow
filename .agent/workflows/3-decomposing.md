@@ -15,7 +15,7 @@ description: Phase 2: 任务拆解工作流（Axiom v4.2）
 Task(
   subagent_type="general-purpose",
   model="haiku",
-  prompt="你是需求分析师（Analyst）。
+  prompt="你是工作量评估专家。
   【需求文档】{requirements_doc}
   【设计文档】{design_doc}
   评估工作量：SMALL（<1天）或 LARGE（≥1天）
@@ -41,6 +41,7 @@ Task(
   prompt="你是系统架构师（Architect）。
   【需求文档】{requirements_doc}
   【设计文档】{design_doc}
+  【phase1上下文】architecture={phase1.architecture} interfaces={phase1.interfaces}
   【知识库经验】{kb_context}
   设计：系统边界、接口规范、任务 DAG（每任务 < 2小时）
   输出：Manifest 草稿（含 DAG 和任务列表）"
@@ -67,6 +68,7 @@ Task(
   model="opus",
   prompt="你是任务规划师（Planner）。
   【architect输出】{architect结果}
+  【phase1接口契约】{phase1.interfaces}
   生成完整任务 Manifest：每任务含 ID、描述、依赖、预估时间、验收标准
   保存到 .agent/memory/manifest.md"
 )
@@ -78,7 +80,7 @@ Task(
   subagent_type="general-purpose",
   model="haiku",
   prompt="你是技术文档撰写专家（Writer）。
-  【planner输出】{planner结果}
+  【phase2上下文】tasks={phase2.tasks} critical_path={phase2.critical_path}
   生成计划文档，保存到 docs/plans/YYYY-MM-DD-{feature}-plan.md"
 )
 ```
@@ -90,10 +92,18 @@ Task(
   model="sonnet",
   prompt="你是代码质量审查专家（Quality Reviewer）。
   【计划文档】{writer输出}
+  【设计文档路径】docs/design/YYYY-MM-DD-{feature}-design.md
   审查：任务粒度、依赖完整性、验收标准可测试性，输出问题列表"
 )
 ```
 → 发现问题 → 带问题列表重新调用 writer
+
+## 步骤7.5：持久化产物（必须）
+```
+axiom_write_manifest path=".agent/memory/manifest.md" content={planner输出}
+phase_context_write phase=2 tasks={phase2.tasks} critical_path={phase2.critical_path} test_strategy={phase2.test_strategy}
+context-manager.create_checkpoint → git tag checkpoint-phase2-{feature}
+```
 
 ## 步骤8：Phase 3 隔离开发（可选）
 
@@ -143,9 +153,11 @@ axiom_harvest source_type=workflow_run
 
 ## 阶段完成总结（必须输出）
 ```
-✅ Phase 2 任务拆解完成
+✅ Phase 2 实现计划完成
 - 任务数量：{N} 个
 - 关键路径：{N} 个任务
+- 并行任务：{可并行执行的任务组}
+- 测试策略：{TDD 覆盖方案}
 - 执行引擎：{选择的引擎}
 - 计划文档：docs/plans/YYYY-MM-DD-{feature}-plan.md
 - Manifest：.agent/memory/manifest.md

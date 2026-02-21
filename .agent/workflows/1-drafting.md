@@ -60,6 +60,8 @@ Task(
 → 发现 Medium/Low 问题 → 带问题列表重新调用 writer
 → 通过 → 进入 Phase 1
 
+⚠️ Phase 0 完成后禁止出现确认框。必须直接继续执行 Phase 1 架构设计。
+
 ### 知识沉淀（必须）
 ```
 axiom_harvest source_type=conversation
@@ -83,6 +85,7 @@ Task(
   model="opus",
   prompt="你是系统架构师（Architect）。
   【需求文档】{requirements_doc}
+  【phase0上下文】acceptance_criteria={phase0.acceptance_criteria} constraints={phase0.constraints}
   【知识库经验】{kb_context}
   设计：系统架构、模块边界、接口契约（含错误码）、ADR
   ⚠️ 接口契约强制规则（C-2）：每个接口必须包含完整的请求/响应 JSON 示例，列出所有字段名、类型和说明，禁止仅描述字段用途而不给出具体字段名
@@ -100,11 +103,12 @@ Task(
   - 读取 docs/design/YYYY-MM-DD-{feature}-design.md（若已存在）
   - 读取 docs/requirements/YYYY-MM-DD-{feature}-requirements.md
   【架构设计】{architect输出}
+  【phase0约束】{phase0.constraints}
   挑战所有假设，识别：循环依赖、性能瓶颈、安全边界、可扩展性问题（每条问题必须引用文件行号作为证据）
   输出：Critical/High/Medium/Low 分级问题列表"
 )
 ```
-→ 发现 Critical/High 问题 → 带问题列表重新调用 architect
+→ 发现 Critical/High 问题 → 带问题列表重新调用 architect → architect 完成后重新调用 critic 审查，循环直到无 Critical/High
 
 ### 步骤4：调用 writer 生成设计文档（必须）
 ```
@@ -125,7 +129,7 @@ Task(
   model="sonnet",
   prompt="你是代码质量审查专家（Quality Reviewer）。
   【设计文档】{writer输出}
-  审查：接口契约完整性、无循环依赖、错误码定义，输出问题列表"
+  审查：准确性、完整性、与需求一致性，输出问题列表"
 )
 ```
 → 发现问题 → 带问题列表重新调用 writer
@@ -159,7 +163,7 @@ axiom_harvest source_type=code_change
 ## 用户确认（必须）
 ```
 AskUserQuestion({
-  question: "Phase 1 需求澄清与架构设计已完成。如何继续？",
+  question: "Phase 0+1 需求澄清与架构设计已完成，如何继续？",
   header: "Phase 1 → Phase 1.5",
   options: [
     { label: "✅ 进入 Phase 1.5 专家评审", description: "需求和架构已就绪，开始多专家评审" },
