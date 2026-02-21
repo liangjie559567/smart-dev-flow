@@ -10,13 +10,19 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
 
-# 将 Axiom 项目路径加入 sys.path
+# 将 evolution 模块路径加入 sys.path
+# 优先使用内嵌路径（scripts/ 目录），回退到外部 AXIOM_PATH
 AXIOM_PATH = os.environ.get("AXIOM_PATH", "")
 BASE_DIR = os.environ.get("AXIOM_BASE_DIR", ".agent/memory")
 
+# 内嵌路径：本脚本所在的 scripts/ 目录即包含 evolution/ 包
+_scripts_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _scripts_dir)
+
+# 外部 Axiom 路径作为回退
 if AXIOM_PATH:
-    sys.path.insert(0, AXIOM_PATH)
-    sys.path.insert(0, os.path.join(AXIOM_PATH, '.agent'))
+    sys.path.append(AXIOM_PATH)
+    sys.path.append(os.path.join(AXIOM_PATH, '.agent'))
 
 def run():
     line = sys.stdin.readline()
