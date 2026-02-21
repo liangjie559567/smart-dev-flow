@@ -8,9 +8,5 @@
   },
   "repository": "https://github.com/liangjie559567/smart-dev-flow",
   "license": "MIT",
-  "keywords": ["dev-flow", "axiom", "omc", "multi-agent", "tdd"],
-  "agents": "./agents/",
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "keywords": ["dev-flow", "axiom", "omc", "multi-agent", "tdd"]
 }
