@@ -34,6 +34,68 @@ IDLE → [brainstorming] → DRAFTING → CONFIRMING → REVIEWING → CONFIRMIN
 
 ---
 
+## 阶段看板规范（每次状态路由前执行）
+
+**触发规则**：读取 `task_status` 后，若状态不是 `IDLE`，必须先输出看板再执行阶段动作。`IDLE` 状态不输出看板。
+
+**看板模板**：
+```
+┌─ <阶段名> · <阶段中文> [<task_status>] ─┐
+│ <各阶段状态行>                           │
+├─ 健康: fail=<N>  rollback=<N> ──────────┤
+│ 下一步: <预告文本>                       │
+└──────────────────────────────────────────┘
+```
+
+阶段状态行符号：`✅` 已完成、`▶` 进行中、`○` 待开始。
+
+### 状态→已完成阶段映射
+
+| task_status | ✅ 已完成 | ▶ 进行中 | ○ 待开始 |
+|-------------|----------|----------|----------|
+| `DRAFTING`（Phase 0） | — | Phase 0 需求澄清 | Phase 1-9 |
+| `DRAFTING`（Phase 1） | Phase 0 | Phase 1 架构设计 | Phase 1.5-9 |
+| `REVIEWING` | Phase 0, 1 | Phase 1.5 专家评审 | Phase 2-9 |
+| `DECOMPOSING` | Phase 0, 1, 1.5 | Phase 2 任务拆解 | Phase 3-9 |
+| `IMPLEMENTING` | Phase 0-3 | Phase 4 TDD 实现 | Phase 5-9 |
+| `REFLECTING` | Phase 0-7 | Phase 8-9 知识收割 | — |
+| `BLOCKED` | 同进入 BLOCKED 前的状态 | 标记阻塞阶段 | 剩余阶段 |
+
+### 状态→下一步预告映射
+
+| task_status | 下一步预告文本 |
+|-------------|---------------|
+| `DRAFTING` | PRD 确认 → CONFIRMING |
+| `REVIEWING` | 专家评审完成 → DECOMPOSING |
+| `DECOMPOSING` | 任务拆解完成 → 选择执行引擎 → IMPLEMENTING |
+| `IMPLEMENTING` | 实现完成 → REFLECTING |
+| `REFLECTING` | 知识收割完成 → IDLE |
+| `BLOCKED` | 等待用户介入，选择恢复方式 |
+
+### 特殊规则
+
+- **BLOCKED 状态**：健康指标行追加显示 `blocked_reason` 摘要（截取前 30 字符）
+- **REFLECTING→IDLE 终态**：输出终态看板，所有阶段标记 `✅`，下一步显示"全部完成 → IDLE"
+- **健康指标**：`fail` 读取 `fail_count`，`rollback` 读取 `rollback_count`，缺失时显示 0
+- **阶段行数**：显示所有已完成阶段 + 当前阶段 + 之后至少 2 个待开始阶段
+
+### 输出示例
+
+```
+┌─ Phase 2 · 任务拆解 [DECOMPOSING] ─┐
+│ ✅ Phase 0  需求澄清    完成        │
+│ ✅ Phase 1  架构设计    完成        │
+│ ✅ Phase 1.5 专家评审   完成        │
+│ ▶  Phase 2  任务拆解    进行中      │
+│ ○  Phase 3  隔离开发    待开始      │
+│ ○  Phase 4  TDD 实现   待开始      │
+├─ 健康: fail=0  rollback=0 ─────────┤
+│ 下一步: 任务拆解完成 → 选择执行引擎 → IMPLEMENTING │
+└────────────────────────────────────┘
+```
+
+---
+
 ## 状态路由
 
 1. 读取 `.agent/memory/active_context.md` 中的 `task_status`

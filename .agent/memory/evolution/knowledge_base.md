@@ -40,13 +40,18 @@ last_updated: 2026-02-21
 | k-027 | Axiom MCP Bridge Pattern | tooling | 0.9 | 2026-02-21 | active |
 | k-028 | 需求澄清: 任务进度看板 CLI | workflow | 0.9 | 2026-02-21 | active |
 | k-031 | 测试知识 | architecture | 0.7 | 2026-02-21 | active |
+| k-032 | PostToolUse Read 钩子过滤 | tooling | 0.95 | 2026-02-21 | active |
+| k-033 | Windows stdin 超时竞争修复 | debugging | 0.95 | 2026-02-21 | active |
+| k-034 | axiom-dev-flow 阶段看板规范 | workflow | 0.9 | 2026-02-21 | active |
+| k-035 | phase-board.cjs 看板渲染实现 | pattern | 0.9 | 2026-02-21 | active |
+| k-035 | phase-board.cjs 看板渲染实现 | pattern | 0.9 | 2026-02-21 | active |
 
 ## 2. 分类统计 (Category Stats)
 
 | Category | Count | Description |
 |----------|-------|-------------|
 | architecture | 16 | 架构相关知识 |
-| debugging | 1 | 调试技巧 |
+| debugging | 2 | 调试技巧 |
 | pattern | 3 | 代码模式 |
 | workflow | 5 | 工作流相关 |
 | tooling | 3 | 工具使用 |
