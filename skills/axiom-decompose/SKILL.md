@@ -239,6 +239,7 @@ Phase 2/3 完成后，**必须**通过 AskUserQuestion 向用户确认执行引�
 |---------|---------|
 | 任务数 ≤ 3，变更文件 < 10 | 标准模式 |
 | 任务数 4-8，有独立并行子任务 | ultrawork |
+| 任务数 4-8，需要完整流水线 | ultrapilot |
 | 任务数 > 8 或需要持续到完成 | ralph |
 | 跨模块、需要多角色协作 | team |
 | 实现完成后需要密集 QA 循环 | ultraqa |
@@ -250,6 +251,7 @@ AskUserQuestion({
   options: [
     { label: "标准模式（逐步确认）", description: "每个子任务完成后确认，调用 axiom-implement 逐步执行。" },
     { label: "ultrawork（并行加速）", description: "将独立任务分发给多个并行 agent 同时执行。" },
+    { label: "ultrapilot（完整流水线）", description: "plan→prd→exec→verify→fix 完整并行流水线。" },
     { label: "ralph（持久执行）", description: "自我循环直到所有任务完成，中途不停止。" },
     { label: "team（多 agent 流水线）", description: "team-plan → team-exec → team-verify → team-fix 完整流水线。" },
     { label: "ultraqa（密集QA循环）", description: "实现完成后进入密集测试-修复循环，直到质量达标。" }
@@ -263,9 +265,10 @@ AskUserQuestion({
 |------|------|
 | 标准模式 | 写入 `execution_mode: standard`，更新 `task_status: IMPLEMENTING`，调用 `axiom-implement` |
 | ultrawork | 写入 `execution_mode: ultrawork`，更新 `task_status: IMPLEMENTING`，调用 `Skill("ultrawork")`，传入 Phase 2 任务列表 |
+| ultrapilot | 写入 `execution_mode: ultrapilot`，更新 `task_status: IMPLEMENTING`，调用 `Skill("ultrapilot")`，传入 Phase 2 任务列表 |
 | ralph | 写入 `execution_mode: ralph`，更新 `task_status: IMPLEMENTING`，调用 `Skill("ralph")`，传入实现目标 |
 | team | 写入 `execution_mode: team`，更新 `task_status: IMPLEMENTING`，调用 `Skill("team")`，进入 team-plan 阶段 |
-| ultraqa | 写入 `execution_mode: ultraqa`，更新 `task_status: IMPLEMENTING`，调用 `Skill("ultraqa")`，进入密集 QA 循环 |
+| ultraqa | 写入 `execution_mode: ultraqa`，更新 `task_status: IMPLEMENTING`，先调用 `axiom-implement`（标准模式），完成后调用 `Skill("ultraqa")` 进入密集 QA 循环 |
 
 ## Manifest 文件格式
 
@@ -295,6 +298,6 @@ task_status: DECOMPOSING
 current_phase: Phase 2 - Decomposing
 last_gate: Gate 3
 manifest_path: .agent/memory/manifest.md
-execution_mode: {standard|ultrawork|ralph|team}
+execution_mode: {standard|ultrawork|ultrapilot|ralph|team|ultraqa}
 last_updated: {timestamp}
 ```

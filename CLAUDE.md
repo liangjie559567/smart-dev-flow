@@ -13,6 +13,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # 注册插件
 claude plugin install .
+
+# 构建 MCP 服务器（注册后必须执行，否则 MCP 工具不可用）
+npm run build
 ```
 
 前置要求：Node.js 20+、Python 3.8+

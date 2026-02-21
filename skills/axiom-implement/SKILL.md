@@ -260,7 +260,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
      fail_count: 0
      last_updated: {timestamp}
      ```
-   - 自动触发 `axiom-reflect`
+   - 继续执行 Phase 7 完成验证（不自动触发 axiom-reflect，由 Phase 7 末尾 AskUserQuestion 用户确认后决定）
 
 ## Phase 7：完成验证（全部任务完成后执行）
 
