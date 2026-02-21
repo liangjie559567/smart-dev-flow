@@ -178,18 +178,16 @@ function autoEvolve(cwd, ctxContent) {
 }
 
 function autoHarvestKnowledge(cwd, filePath, toolName, toolInput) {
-  const kbFile = path.join(cwd, '.agent/memory/evolution/knowledge_base.md');
-  if (!fs.existsSync(path.dirname(kbFile))) return;
+  const kbDir = path.join(cwd, '.agent/memory/evolution');
+  if (!fs.existsSync(kbDir)) return;
   try {
     const rel = path.relative(cwd, filePath).replace(/\\/g, '/');
     const ext = path.extname(filePath).slice(1);
-    // 从 Edit 操作提取变更摘要
     const summary = toolName === 'Edit'
-      ? `修改 ${rel}：${(toolInput.old_string || '').slice(0, 60).replace(/\n/g, ' ')} → ${(toolInput.new_string || '').slice(0, 60).replace(/\n/g, ' ')}`
+      ? `${(toolInput.old_string || '').slice(0, 60).replace(/\n/g, ' ')} → ${(toolInput.new_string || '').slice(0, 60).replace(/\n/g, ' ')}`
       : `新建/覆写 ${rel}`;
-    const ts = new Date().toISOString().slice(0, 10);
-    const entry = `\n## K-auto-${Date.now()}\n**标题**: 代码变更: ${rel}\n**摘要**: ${summary}\n**来源**: auto_harvest\n**语言**: ${ext}\n**日期**: ${ts}\n`;
-    fs.appendFileSync(kbFile, entry);
+    const entry = { ts: new Date().toISOString(), file: rel, op: toolName, summary, lang: ext };
+    fs.appendFileSync(path.join(kbDir, 'pending_harvest.jsonl'), JSON.stringify(entry) + '\n');
   } catch {}
 }
 

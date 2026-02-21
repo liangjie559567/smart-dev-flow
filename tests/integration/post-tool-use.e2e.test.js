@@ -100,25 +100,21 @@ describe('post-tool-use 集成：manifest.md 变更', () => {
 });
 
 describe('post-tool-use 集成：auto-harvest 学习循环', () => {
-  it('Write 源码文件时自动追加知识条目到 knowledge_base.md', () => {
-    const kbPath = join(tmpDir, '.agent', 'memory', 'evolution', 'knowledge_base.md');
-    writeFileSync(kbPath, '# Knowledge Base\n');
-
+  it('Write 源码文件时自动追加知识条目到 pending_harvest.jsonl', () => {
     const input = {
       tool_name: 'Write',
       tool_input: { file_path: join(tmpDir, 'src', 'login.ts').replace(/\\/g, '/') },
     };
     runHook(input, tmpDir);
 
-    const kb = readFileSync(kbPath, 'utf8');
-    expect(kb).toContain('## K-auto-');
-    expect(kb).toContain('login.ts');
+    const pendingPath = join(tmpDir, '.agent', 'memory', 'evolution', 'pending_harvest.jsonl');
+    expect(existsSync(pendingPath)).toBe(true);
+    const entry = JSON.parse(readFileSync(pendingPath, 'utf8').trim());
+    expect(entry.file).toContain('login.ts');
+    expect(entry.op).toBe('Write');
   });
 
   it('Edit 源码文件时摘要包含 old_string → new_string', () => {
-    const kbPath = join(tmpDir, '.agent', 'memory', 'evolution', 'knowledge_base.md');
-    writeFileSync(kbPath, '# Knowledge Base\n');
-
     const input = {
       tool_name: 'Edit',
       tool_input: {
@@ -129,9 +125,10 @@ describe('post-tool-use 集成：auto-harvest 学习循环', () => {
     };
     runHook(input, tmpDir);
 
-    const kb = readFileSync(kbPath, 'utf8');
-    expect(kb).toContain('function login()');
-    expect(kb).toContain('function signIn()');
+    const pendingPath = join(tmpDir, '.agent', 'memory', 'evolution', 'pending_harvest.jsonl');
+    const entry = JSON.parse(readFileSync(pendingPath, 'utf8').trim());
+    expect(entry.summary).toContain('function login()');
+    expect(entry.summary).toContain('function signIn()');
   });
 
   it('Write .agent/memory/ 文件时不触发 auto-harvest', () => {

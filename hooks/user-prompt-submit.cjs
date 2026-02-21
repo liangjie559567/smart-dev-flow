@@ -57,6 +57,30 @@ async function main() {
     }
   }
 
+  // 检测待合并知识队列
+  const pendingFile = path.join(process.cwd(), '.agent/memory/evolution/pending_harvest.jsonl');
+  if (fs.existsSync(pendingFile)) {
+    try {
+      const lines = fs.readFileSync(pendingFile, 'utf8').trim().split('\n').filter(Boolean);
+      const MERGE_THRESHOLD = 5;
+      const MERGE_INTERVAL_MS = 30 * 60 * 1000;
+      const stateFile = path.join(process.cwd(), '.agent/memory/evolution/harvest_state.json');
+      const state = (() => { try { return JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch { return {}; } })();
+      const elapsed = Date.now() - (state.lastMerge || 0);
+      if (lines.length >= MERGE_THRESHOLD || (lines.length > 0 && elapsed > MERGE_INTERVAL_MS)) {
+        const entries = lines.map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+        const summary = entries.map(e => `- [${e.op}] ${e.file}: ${e.summary}`).join('\n');
+        console.log(JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: 'UserPromptSubmit',
+            additionalContext: `📚 知识队列待合并（${entries.length} 条）：\n${summary}\n\n请对每条执行 ADD/UPDATE/NONE 判断后写入 .agent/memory/evolution/knowledge_base.md，完成后删除 .agent/memory/evolution/pending_harvest.jsonl 并写入 .agent/memory/evolution/harvest_state.json: {"lastMerge":${Date.now()}}`
+          }
+        }));
+        process.exit(0);
+      }
+    } catch {}
+  }
+
   process.exit(0);
 }
 
