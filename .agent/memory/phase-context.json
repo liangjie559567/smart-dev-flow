@@ -1,8 +1,15 @@
 {
-  "phase3": {
-    "branch": "feat/progress-cli",
-    "worktree": "C:\\Users\\ljyih\\Desktop\\progress-cli-worktree",
-    "skipped": false
+  "phase0": {
+    "acceptance_criteria": [
+      "用户可登录",
+      "支持JWT"
+    ],
+    "constraints": [
+      "Node.js 20+"
+    ],
+    "risks": [
+      "token泄露"
+    ]
   },
-  "_updated": "2026-02-20T17:51:36.277Z"
+  "_updated": "2026-02-21T04:27:54.632Z"
 }

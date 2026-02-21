@@ -14,18 +14,29 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
 
 ## 流程
 
-1. **读取阶段上下文（必须）**：
+1. **前置检查：测试框架可用性（H-1 硬门控）**：
+   ```bash
+   # 检查 package.json 是否存在且包含测试命令
+   cat package.json | grep -E '"test"|"vitest"|"jest"'
+   # 尝试运行测试命令（dry-run）
+   npm test -- --passWithNoTests 2>&1 | head -5
+   ```
+   - 若 `package.json` 不存在 → **强制暂停**，要求先执行项目初始化（`npx create-next-app` 等），不得继续
+   - 若测试命令不可用 → **强制暂停**，要求安装测试框架，不得静默跳过
+
+2. **读取阶段上下文（必须）**：
    ```
    phase_context_read phase=all
    → 获取 phase1.interfaces（接口契约）、phase2.tasks（任务清单）、kb_context
    ```
-2. 读取 `.agent/memory/manifest.md` 中的任务清单（与 phase2.tasks 互为补充）
+3. 读取 `.agent/memory/manifest.md` 中的任务清单（与 phase2.tasks 互为补充）
 3. **知识库查询（必须）**：
    ```
    axiom_get_knowledge query="TDD {模块名称} 测试模式" limit=5
    axiom_search_by_tag tags=["TDD", "测试", "{技术栈}"] limit=3
    → 将查询结果保存为 kb_context
    ```
+   **MCP 不可用降级**：若调用失败，读取 `.agent/memory/evolution/knowledge_base.md` 提取相关条目作为 kb_context，继续执行，不得阻塞流程。
 3. 更新 `active_context.md`：
    ```
    task_status: IMPLEMENTING
@@ -48,6 +59,9 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
        【phase1接口契约】{phase1.interfaces}
        【知识库经验】{kb_context}
        参考：.agent/memory/manifest.md
+       ⚠️ 初始化类任务强制规则（C-1）：若任务描述含「初始化」「创建项目」「setup」「scaffold」等关键词，
+         必须先执行 shell 命令（如 npx create-next-app、npm init、pip install 等），
+         再写代码文件。禁止跳过 shell 命令直接写文件。
        要求：先探索代码库理解现有模式，先写失败测试，再写最小实现，再重构
        输出：变更文件列表 + 测试结果 + 构建结果"
      )
@@ -61,77 +75,59 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
        【phase1接口契约】{phase1.interfaces}
        【知识库经验】{kb_context}
        参考：.agent/memory/manifest.md
+       ⚠️ 初始化类任务强制规则（C-1）：若任务描述含「初始化」「创建项目」「setup」「scaffold」等关键词，
+         必须先执行 shell 命令（如 npx create-next-app、npm init、pip install 等），
+         再写代码文件。禁止跳过 shell 命令直接写文件。
        要求：最小化改动，先写失败测试，再写实现
        输出：变更文件列表 + 测试结果"
      )
      ```
 
-   **每个 executor 子代理完成后，主 Claude 执行四层检查（必须全部通过）**：
+   **每个 executor 子代理完成后，主 Claude 执行四层检查（H-3：强制并行执行，禁止串行）**：
 
-   **第一层：质量检查**
+   **四层并行审查（同时调用，收集所有问题后统一修复）**：
    ```
-   Task(
-     subagent_type="general-purpose",
-     model="sonnet",
+   # 并行调用四个审查子代理
+   Task(质量检查, model="sonnet",
      prompt="你是代码质量审查专家（Quality Reviewer）。
      【实现代码】{executor输出的代码}
      【phase1接口契约】{phase1.interfaces}
-     审查逻辑缺陷、可维护性、TDD覆盖完整性，输出 Critical/High/Medium/Low 分级问题列表"
-   )
-   ```
-   → 存在 Critical/High → 带问题列表重新调用 executor，禁止继续
+     审查逻辑缺陷、可维护性、TDD覆盖完整性，输出 Critical/High/Medium/Low 分级问题列表")
 
-   **第二层：安全检查**
-   ```
-   Task(
-     subagent_type="general-purpose",
-     model="sonnet",
+   Task(安全检查, model="sonnet",
      prompt="你是安全审查专家（Security Reviewer）。
      【实现代码】{executor输出的代码}
-     审查 OWASP Top 10、注入攻击、认证/鉴权、敏感数据暴露、信任边界，输出分级问题列表"
-   )
-   ```
-   → 存在 Critical/High → 带问题列表重新调用 executor，禁止继续
+     审查 OWASP Top 10、注入攻击、认证/鉴权、敏感数据暴露、信任边界，输出分级问题列表")
 
-   **第三层：接口契约检查**
-   ```
-   Task(
-     subagent_type="general-purpose",
-     model="sonnet",
+   Task(接口契约检查, model="sonnet",
      prompt="你是 API 审查专家（API Reviewer）。
      【实现代码】{executor输出的代码}
      【原始接口契约】{phase1.interfaces}
-     验证实现是否与接口契约一致，输出不一致问题列表"
-   )
-   ```
-   → 存在不一致 → 带问题列表重新调用 executor，禁止继续
+     验证实现是否与接口契约一致，输出不一致问题列表")
 
-   **第四层：风格检查**
-   ```
-   Task(
-     subagent_type="general-purpose",
-     model="haiku",
+   Task(风格检查, model="haiku",
      prompt="你是代码风格审查专家（Style Reviewer）。
      【实现代码】{executor输出的代码}
-     审查命名、格式、惯用法，输出问题列表"
-   )
+     审查命名、格式、惯用法，输出问题列表")
    ```
-   → 存在 Critical/High → 带问题列表重新调用 executor，禁止继续
+   → 等待四个子代理全部返回 → 汇总所有问题
+   → 若存在任意 Critical/High → 带完整问题列表统一重新调用 executor（禁止分批修复）→ **executor 完成后必须重新并行调用四层审查**，循环直到四层审查全部无 Critical/High 为止
+   → 四层审查全部通过（无 Critical/High）→ 进入第五层
 
    **第五层：LSP + AST 检查（类型安全与结构合规）**
    ```
    # LSP 诊断（TypeScript/静态类型语言必须）
    lsp_diagnostics(path="{变更文件目录}")
-   → 存在 Error 级别诊断 → 带诊断信息重新调用 executor，禁止继续
+   → 存在 Error 级别诊断 → 带诊断信息重新调用 executor → executor 完成后重新执行第五层检查，循环直到无 Error
 
    # AST 结构搜索（验证模式合规）
    ast_grep_search(pattern="{关键接口或类名}", path="{变更文件目录}")
-   → 实现与接口契约不符 → 带问题重新调用 executor
+   → 实现与接口契约不符 → 带问题重新调用 executor → executor 完成后重新执行第五层检查
    ```
 
    **五层检查全部通过后**，主 Claude 直接运行测试命令（Bash 工具）收集真实输出：
    - 测试全部通过 → 继续
-   - 测试失败 → 将失败输出注入下一次 executor 调用（重新从四层检查开始）
+   - 测试失败 → 将失败输出注入下一次 executor 调用 → executor 完成后**重新从四层审查开始**，循环直到测试通过
    - 无测试输出证据 → 不得声明子任务完成
 4. 每个子任务完成后派发 verifier：
    ```
@@ -142,12 +138,14 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
    ```
 5. **子任务成功**：
    - `fail_count` 重置为 0
+   - **立即更新 manifest.md（H-4 强制）**：将对应任务的 `[ ]` 改为 `[x]`
    - 更新 `completed_tasks`，输出进度：
      ```
      ✅ T{N} 完成 | {bar} {pct}% ({done}/{total})
      ```
    - 继续下一个子任务
-6. **子任务失败（Phase 5 系统调试）**：
+6. **子任务失败或审查发现 Critical 问题（Phase 5 系统调试，H-2）**：
+   - 触发条件：测试失败 **或** 四层审查发现 Critical/High 问题需修复（每次触发均显式记录到 operations-log.md）
    - `fail_count += 1`
    - 若 `fail_count >= 3`：更新 `task_status: BLOCKED`，`blocked_reason: 连续失败{N}次，需要人工介入`，终止流程
    - 否则触发 Phase 5 调试流程：
@@ -157,6 +155,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
         axiom_search_by_tag tags=["调试", "错误修复", "{错误类型}"] limit=5
         → 更新 kb_context
         ```
+        **MCP 不可用降级**：若调用失败，读取 `.agent/memory/evolution/knowledge_base.md` 提取相关条目作为 kb_context，继续执行。
      2. 调用 `systematic-debugging` 技能进行 4 阶段根因分析
      3. 派发 debugger agent 执行修复（必须，禁止主 Claude 直接分析）：
         ```
@@ -181,6 +180,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
         ```
      7. 重试当前子任务
 7. 全部完成后：
+   - **M-2 环境变量检查**：若项目含环境变量（DATABASE_URL、SECRET 等），verifier 检查 `.env.example` 是否存在；不存在则派发 executor 补充，再继续
    - **完成前验证**：调用 `verification-before-completion` 技能，确认所有测试通过、构建成功，再进入代码审查。
    - **规格合规审查**（参考 `subagent-driven-development/spec-reviewer-prompt.md`）：
      ```
@@ -189,7 +189,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
        prompt="你正在审查实现是否符合规格。\n\n被要求的内容：{manifest.md 中的完整任务列表}\n\n实现者声称构建的内容：{各子任务完成报告}\n\n关键：不要相信汇报，必须独立读取代码验证。\n\n检查：\n1. 所有验收标准是否都已实现？\n2. 是否有超出规格的额外实现？\n3. 是否有误解需求的情况？\n\n输出：✅ 规格合规 / ❌ 问题列表（缺失/多余，含文件:行号）"
      )
      ```
-     规格审查失败 → 派发 executor 修复后重新验证
+     规格审查失败 → 派发 executor 修复 → **重新调用规格合规审查**，循环直到输出 ✅ 规格合规
    - **代码质量审查**（仅在规格合规审查通过后，参考 `subagent-driven-development/code-quality-reviewer-prompt.md`）：
      ```
      Task(
@@ -212,7 +212,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
        prompt="你是架构审查专家（Architect Reviewer）。审查本次变更是否符合系统架构约束。\n\n审查范围：本次所有变更文件\n\n检查维度：模块边界、接口契约一致性、循环依赖、架构决策合规\n\n输出：APPROVE 或 REJECT + 具体问题列表"
      )
      ```
-     代码质量/安全/架构任一发现 Critical/High 问题 → 派发 executor 修复后重新验证
+     代码质量/安全/架构任一发现 Critical/High 问题 → 派发 executor 修复 → **重新并行调用代码质量/安全/架构审查**，循环直到全部输出 APPROVE/PASS
 
    - **Phase 6.5 文档编写与审查**（与代码审查完成后执行）：
 
@@ -242,7 +242,7 @@ description: Axiom Phase 3 实现 - TDD + 四层审查 + Phase 5 调试 + Phase 
      ```
 
      **步骤3：主 Claude 交互检查**
-     - 若 reviewer 发现问题 → 带问题列表重新调用 writer
+     - 若 reviewer 发现问题 → 带问题列表重新调用 writer → **writer 完成后重新调用 quality-reviewer 审查**，循环直到审查无问题
      - 全部通过 → 记录文档路径
 
    - **知识沉淀（必须）**：

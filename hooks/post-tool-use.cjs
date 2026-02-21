@@ -30,19 +30,44 @@ async function main() {
   const cwd = process.cwd();
   appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'hook_write', tool: toolName, file: path.basename(filePath) });
 
-  // active_context.md 变更时记录状态转换
+  // active_context.md 变更时记录状态转换，并自动补全 manifest_path
   if (filePath.includes('active_context.md')) {
     try {
-      const content = fs.readFileSync(filePath, 'utf8');
+      let content = fs.readFileSync(filePath, 'utf8');
       const status = (content.match(/task_status:\s*(\w+)/) || [])[1];
       const execMode = (content.match(/execution_mode:\s*"?([^"\n]+)"?/) || [])[1];
       if (status) appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'state_change', task_status: status, execution_mode: execMode || '' });
+
+      // 自动补全 manifest_path：若字段为空且 manifest.md 存在则写入
+      const manifestPath = (content.match(/manifest_path:\s*"?([^"\n]*)"?/) || [])[1] || '';
+      const defaultManifest = '.agent/memory/manifest.md';
+      if (!manifestPath.trim() && fs.existsSync(path.join(cwd, defaultManifest))) {
+        content = content.replace(/^(manifest_path:\s*).*$/m, `$1${defaultManifest}`);
+        fs.writeFileSync(filePath, content);
+      }
     } catch {}
+  }
+
+  // manifest.md 写入时同步更新 phase-context.json 的 manifest 字段
+  if (filePath.includes('manifest.md')) {
+    syncPhaseContext(cwd, { manifest_path: '.agent/memory/manifest.md' });
   }
 
   triggerEvolutionHook(hook);
   syncToOmcProjectMemory(filePath);
   process.exit(0);
+}
+
+function syncPhaseContext(cwd, patch) {
+  const pcFile = path.join(cwd, '.agent/memory/phase-context.json');
+  try {
+    let pc = {};
+    if (fs.existsSync(pcFile)) {
+      try { pc = JSON.parse(fs.readFileSync(pcFile, 'utf8')); } catch {}
+    }
+    Object.assign(pc, patch);
+    fs.writeFileSync(pcFile, JSON.stringify(pc, null, 2));
+  } catch {}
 }
 
 function triggerEvolutionHook(hook) {

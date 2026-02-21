@@ -8,9 +8,22 @@ description: Axiom Phase 2 任务拆解 - Manifest 生成、Phase 3 隔离开发
 ## 子代理强制调用铁律
 
 ```
-主 Claude 禁止：直接制定计划、直接操作 git
+主 Claude 禁止：直接制定计划、直接操作 git、直接编写代码
 每个阶段的核心工作必须通过 Task() 调用子代理完成。
 ```
+
+**主 Claude 允许的编排操作**（无需子代理）：
+- AskUserQuestion 向用户确认
+- 读取文件（Read 工具）获取上下文
+- 运行测试命令（Bash 工具）收集验证证据
+- 写入状态文件（`.agent/memory/`、`.omc/`）
+- 调用 MCP 工具（axiom_get_knowledge、axiom_harvest 等）
+
+**必须通过 Task() 子代理完成的实现操作**：
+- 架构设计、接口规范制定
+- 任务拆解与计划制定
+- 代码实现、文档编写
+- 代码审查、质量评估
 
 ## 阶段上下文对象
 
@@ -41,6 +54,8 @@ axiom_get_knowledge query="任务分解 {模块名称}" limit=5
 axiom_search_by_tag tags=["任务规划", "TDD"] limit=3
 → 将查询结果保存为 kb_context
 ```
+
+**MCP 不可用降级**：若调用失败，读取 `.agent/memory/evolution/knowledge_base.md` 提取相关条目作为 kb_context，继续执行。
 
 ### 门禁：工作量评估
 
@@ -133,6 +148,22 @@ Task(
 axiom_write_manifest feature={功能名称} tasks=[{id, description, priority, depends, complexity, acceptance}...]
 phase_context_write phase=phase2 data={tasks, critical_path, test_strategy, plan_file}
 phase_context_write phase=kb_context data={本阶段所有知识库查询结果}
+context-manager.create_checkpoint → git tag checkpoint-phase2-{feature}
+```
+
+**MCP 不可用降级**：若 `context-manager.create_checkpoint` 调用失败：
+```bash
+git tag checkpoint-phase2-{feature} 2>/dev/null || true
+```
+
+**MCP 不可用降级**：若 `axiom_write_manifest` 或 `phase_context_write` 调用失败：
+- Manifest：直接用 Write 工具写入 `.agent/memory/manifest.md`（见下方格式）
+- phase-context：用 Write 工具将阶段数据写入 `.agent/memory/phase-context.json`：
+```json
+{
+  "phase2": { "tasks": [...], "critical_path": [...], "test_strategy": "...", "plan_file": "..." },
+  "phase3": { "branch": "", "worktree": "", "skipped": false }
+}
 ```
 
 **知识沉淀（必须）**：
@@ -140,6 +171,14 @@ phase_context_write phase=kb_context data={本阶段所有知识库查询结果}
 axiom_harvest source_type=workflow_run
   title="实现计划: {功能名称}"
   summary="{任务数量} | {关键路径} | {风险任务} | {测试策略}"
+```
+
+**MCP 不可用降级**：若 `axiom_harvest` 调用失败，用 Write 工具追加写入 `.agent/memory/evolution/knowledge_base.md`：
+```markdown
+## K-{timestamp}
+**标题**: 实现计划: {功能名称}
+**摘要**: {任务数量} | {关键路径} | {风险任务} | {测试策略}
+**来源**: workflow_run
 ```
 
 **硬门控**：
@@ -179,6 +218,8 @@ axiom_harvest source_type=workflow_run
   title="隔离开发: {功能名称}"
   summary="{分支名} | {worktree路径} | {基础提交} | {隔离策略}"
 ```
+
+**MCP 不可用降级**：若 `axiom_harvest` 调用失败，追加写入 `.agent/memory/evolution/knowledge_base.md`（同上格式）。
 
 ### 执行引擎选择（硬门控，必须执行）
 

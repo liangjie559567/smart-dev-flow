@@ -38,6 +38,36 @@ async function main() {
     process.exit(0);
   }
 
+  // IMPLEMENTING 阶段：进入前必须已设置 execution_mode
+  if (status === 'IMPLEMENTING' && toolName === 'Task') {
+    const execMode = (content.match(/execution_mode:\s*"?([^"\n]+)"?/) || [])[1] || '';
+    if (!execMode || execMode === '""' || execMode.trim() === '') {
+      console.log(JSON.stringify({
+        decision: 'block',
+        reason: `[dev-flow 硬门控] IMPLEMENTING 阶段必须先设置 execution_mode。\n请通过 AskUserQuestion 选择执行引擎（standard/ultrawork/ralph/team），写入 active_context.md 后再继续。`
+      }));
+      process.exit(0);
+    }
+  }
+
+  // IMPLEMENTING 阶段：主 Claude 禁止直接写代码，必须通过 Task() 子代理
+  if (status === 'IMPLEMENTING' && ['Write', 'Edit'].includes(toolName)) {
+    const filePath = hook.tool_input?.file_path || '';
+    // 允许写入状态文件和记忆文件，禁止写入源代码
+    const isMemory = filePath.includes('.agent/memory/') || filePath.includes('.omc/') || filePath.includes('.claude/');
+    const isConfig = filePath.endsWith('.json') || filePath.endsWith('.md') || filePath.endsWith('.cjs') || filePath.endsWith('.mjs');
+    // 拦截：写入 scripts/ src/ 等源码目录
+    const isSourceCode = /\/(scripts|src|lib|components|pages|api|hooks|utils|tests?)\//i.test(filePath) ||
+                         /\.(ts|tsx|js|jsx|py|go|rs|java|c|cpp|vue|svelte)$/.test(filePath);
+    if (isSourceCode && !isMemory) {
+      console.log(JSON.stringify({
+        decision: 'block',
+        reason: `[dev-flow 硬门控] IMPLEMENTING 阶段主 Claude 禁止直接写代码。\n必须通过 Task(subagent_type="general-purpose", prompt="你是 executor...") 调用子代理实现。\n目标文件: ${filePath}`
+      }));
+      process.exit(0);
+    }
+  }
+
   if (status === 'BLOCKED') {
     const isDebug = hook.tool_input?.prompt?.includes('debugger') ||
                     hook.tool_input?.prompt?.includes('analyze-error');

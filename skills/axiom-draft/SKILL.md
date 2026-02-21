@@ -95,8 +95,8 @@ Task(
 ```
 
 **步骤4：主 Claude 交互检查**
-- 若 quality-reviewer 发现**需求歧义/逻辑缺口**（High/Critical）→ 退回 analyst 重新分析，不得直接调用 writer 修补
-- 若 quality-reviewer 发现**文档格式/表达问题**（Medium/Low）→ 带问题列表重新调用 writer
+- 若 quality-reviewer 发现**需求歧义/逻辑缺口**（High/Critical）→ 退回 analyst 重新分析 → analyst 完成后重新调用 writer → **writer 完成后重新调用 quality-reviewer 审查**，循环直到无 High/Critical
+- 若 quality-reviewer 发现**文档格式/表达问题**（Medium/Low）→ 带问题列表重新调用 writer → **writer 完成后重新调用 quality-reviewer 审查**，循环直到审查无问题
 - 全部通过 → 写入 phase0 上下文，记录文档路径
 
 **知识沉淀（必须）**：
@@ -130,7 +130,8 @@ Task(
   prompt="你是系统架构师（Architect）。
   【phase0上下文】acceptance_criteria={phase0.acceptance_criteria} constraints={phase0.constraints}
   【知识库经验】{kb_context}
-  设计系统架构，输出：模块划分、接口契约（含错误码）、ADR"
+  设计系统架构，输出：模块划分、接口契约（含错误码）、ADR
+  ⚠️ 接口契约强制规则（C-2）：每个接口必须包含完整的请求/响应 JSON 示例，列出所有字段名、类型和说明，禁止仅描述字段用途而不给出具体字段名"
 )
 ```
 
@@ -150,7 +151,7 @@ Task(
 ```
 
 **步骤3：主 Claude 交互检查**
-- 有 Critical/High 问题 → 带问题列表重新调用 architect
+- 有 Critical/High 问题 → 带问题列表重新调用 architect → **architect 完成后重新调用 critic 审查**，循环直到无 Critical/High
 - 确认无循环依赖、接口契约含错误码 → 写入 phase1 上下文
 
 **步骤4：调用 writer 子代理生成设计文档（必须）**
@@ -175,6 +176,8 @@ Task(
   审查：准确性、完整性、与需求一致性，输出问题列表"
 )
 ```
+- 若 reviewer 发现问题 → 带问题列表重新调用 writer → **writer 完成后重新调用 quality-reviewer 审查**，循环直到审查无问题
+- 全部通过 → 记录文档路径到 phase1 上下文
 
 **知识沉淀（必须）**：
 ```

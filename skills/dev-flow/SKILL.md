@@ -27,7 +27,7 @@ triggers: ["dev-flow", "smart dev", "axiom", "/dev-flow"]
 IDLE 状态下收到任何新功能/需求请求，必须先调用 `brainstorming` 技能完成设计审批，才能进入 axiom-draft。不允许跳过，不允许直接写代码。唯一例外：用户明确传入 `--skip-brainstorm` 参数。
 </HARD-GATE>
 
-通过**2轮** AskUserQuestion 收集信息（AskUserQuestion 不支持开放文本，需求描述通过对话收集）：
+通过**1轮** AskUserQuestion 收集信息（AskUserQuestion 不支持开放文本，需求描述通过对话收集）：
 
 **第1步：对话收集需求描述**（直接文本回复，不用 AskUserQuestion）
 - 向用户说："请描述你想构建的功能或解决的问题（可以自由描述）："
@@ -46,20 +46,8 @@ AskUserQuestion({
 })
 ```
 
-**第3步：AskUserQuestion 收集执行模式**
-```
-AskUserQuestion({
-  question: "选择执行模式（技术栈偏好可在需求描述中说明）",
-  header: "执行模式",
-  options: [
-    { label: "标准模式（推荐）", description: "每个阶段需要确认，适合复杂需求" },
-    { label: "自动驾驶模式", description: "跳过所有确认门禁，调用 OMC autopilot 端到端执行" }
-  ]
-})
-```
-
 收到回答后：
-1. 若用户传入 `--skip-brainstorm`：跳过 brainstorming，直接执行步骤3
+1. 若用户传入 `--skip-brainstorm`：跳过 brainstorming，直接执行步骤2
 2. 否则调用 `brainstorming` 技能（硬门控，等待设计审批）
 3. 将 `task_status` 更新为 `DRAFTING`
 4. 携带收集到的信息调用 `axiom-draft`

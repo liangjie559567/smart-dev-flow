@@ -1,4 +1,4 @@
-import re, json, sys
+import re, json, sys, argparse
 from pathlib import Path
 from datetime import datetime
 from typing import Tuple
@@ -36,6 +36,17 @@ def count_lines_matching(text, pattern):
     return sum(1 for l in text.splitlines() if re.search(pattern, l))
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rich', action='store_true', help='使用 rich 渲染输出')
+    args = parser.parse_args()
+
+    if args.rich:
+        try:
+            import rich  # noqa: F401
+        except ImportError:
+            print('rich 未安装，请运行: pip install rich\n降级为 Markdown 输出。\n')
+            args.rich = False
+
     sys.stdout.reconfigure(encoding='utf-8')
     root = Path(__file__).parent.parent
     mem = root / '.agent/memory'
@@ -86,7 +97,12 @@ def main():
         try: omc_status = json.loads(pm.read_text('utf-8')).get('axiom_status', 'N/A')
         except: pass
 
-    print(f"""# 📊 Axiom — System Dashboard
+    if args.rich:
+        render_rich_status(ctx, status, session, phase, task, provider, updated, omc_status)
+        render_rich_progress(bar, pct, done, total)
+        render_rich_evolution(kb_count, pat_count, lq_count)
+    else:
+        print(f"""# 📊 Axiom — System Dashboard
 
 ## 🎯 系统状态
 | 字段 | 值 |
@@ -156,6 +172,32 @@ def render_monitor_section(root: Path) -> str:
     table = '| 时间 | 类型 | 详情 |\n|------|------|------|\n' + '\n'.join(rows)
     return f'## 🔍 监控日志（最近 {len(rows)} 条）\n{table}\n'
 
+
+def render_rich_status(ctx, status, session, phase, task, provider, updated, omc_status):
+    from rich.console import Console
+    from rich.table import Table
+    console = Console()
+    t = Table(title="🎯 系统状态", show_header=True)
+    t.add_column("字段"); t.add_column("值")
+    for k, v in [("Status", status), ("Session", session), ("Phase", phase),
+                 ("Current Task", task), ("Provider", provider),
+                 ("Last Updated", updated), ("OMC Status", omc_status)]:
+        t.add_row(k, v)
+    console.print(t)
+
+def render_rich_progress(bar, pct, done, total):
+    from rich.console import Console
+    Console().print(f"[bold]📋 任务进度[/bold]  {bar} [cyan]{pct}%[/cyan] ({done}/{total if total > 0 else '—'} tasks)")
+
+def render_rich_evolution(kb_count, pat_count, lq_count):
+    from rich.console import Console
+    from rich.table import Table
+    console = Console()
+    t = Table(title="🧬 进化统计", show_header=True)
+    t.add_column("指标"); t.add_column("数量", justify="right")
+    for label, val in [("📚 知识条目", kb_count), ("🔄 活跃模式", pat_count), ("📥 学习队列", lq_count)]:
+        t.add_row(label, str(val))
+    console.print(t)
 
 if __name__ == '__main__':
     main()

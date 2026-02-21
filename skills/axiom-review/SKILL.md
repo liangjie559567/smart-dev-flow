@@ -22,6 +22,8 @@ axiom_search_by_tag tags=["需求评审", "验收标准"] limit=3
 → 将查询结果保存为 kb_context
 ```
 
+**MCP 不可用降级**：若 `axiom_get_knowledge` 调用失败，直接读取 `.agent/memory/evolution/knowledge_base.md` 提取相关条目作为 kb_context，继续执行，不得阻塞流程。
+
 ### 步骤1：调用 critic 子代理进行批判性评审（必须）
 
 ```
@@ -46,7 +48,9 @@ Task(
 
 → critic 发现 Critical 问题 → **强制退回 axiom-draft，不得继续**（此规则优先于评分阈值，无论综合评分多少）
 
-### 步骤2：critic 通过后，并行调用5个专家 agent
+### 步骤2：critic 通过后，并行调用5个专家 agent（强制，不得跳过）
+
+> ⚠️ **此步骤为强制执行**：critic 通过后必须立即并行调用全部5个专家 agent，不得以"评分已足够"或"时间有限"为由跳过。
 
 1. 读取 `.agent/memory/project_decisions.md` 中最新 PRD 草稿
 2. **并行**调用5个专家 agent：
@@ -101,6 +105,14 @@ last_updated: {timestamp}
 axiom_harvest source_type=conversation
   title="PRD评审: {功能名称}"
   summary="{综合评分} | {critic关键问题} | {必须修复项} | {通过条件}"
+```
+
+**MCP 不可用降级**：若 `axiom_harvest` 调用失败，用 Write 工具追加写入 `.agent/memory/evolution/knowledge_base.md`：
+```markdown
+## K-{timestamp}
+**标题**: PRD评审: {功能名称}
+**摘要**: {综合评分} | {critic关键问题} | {必须修复项} | {通过条件}
+**来源**: conversation
 ```
 
 ## 阶段完成总结（必须输出）

@@ -19,7 +19,7 @@ export function parseManifest(text) {
   let inTask = false;
   const result = [];
   for (const line of lines) {
-    if (line.startsWith('## ')) { inTask = !inTask; continue; }
+    if (line.startsWith('## ')) { if (inTask) break; inTask = true; continue; }
     if (!inTask) continue;
     const m = line.match(/^- \[( |x)\] (T\d+): (.+)$/);
     if (m) result.push({ id: m[2], desc: m[3], done: m[1] === 'x' });
@@ -34,9 +34,9 @@ export function parseContext(text) {
   if (!fm) return defaults;
   const result = { ...defaults };
   for (const line of fm[1].split('\n')) {
-    const m = line.match(/^(\w+):\s*"?([^"]*)"?\s*$/);
+    const m = line.match(/^(\w+):\s*(?:"([^"]*)"|(.+?))?\s*$/);
     if (m) {
-      const [, k, v] = m;
+      const [, k, v] = [m[0], m[1], m[2] !== undefined ? m[2] : (m[3] ?? '')];
       if (k in result) result[k] = (k === 'fail_count' || k === 'rollback_count') ? Number(v) : v;
     }
   }
@@ -82,4 +82,4 @@ async function main() {
   }
 }
 
-main();
+main().catch(err => { process.stderr.write(err.message + '\n'); process.exit(1); });

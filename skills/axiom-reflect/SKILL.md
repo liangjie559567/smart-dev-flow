@@ -26,6 +26,14 @@ axiom_harvest source_type=workflow_run
   summary="{合并策略} | {提交数量} | {变更文件数} | {合并时间}"
 ```
 
+**MCP 不可用降级**：若 `axiom_harvest` 调用失败，追加写入 `.agent/memory/evolution/knowledge_base.md`：
+```markdown
+## K-{timestamp}
+**标题**: 分支合并: {功能名称}
+**摘要**: {合并策略} | {提交数量} | {变更文件数} | {合并时间}
+**来源**: workflow_run
+```
+
 ### Phase 9：知识收割
 
 **步骤1：收集本次会话信息**
