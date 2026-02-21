@@ -1,7 +1,7 @@
 {
   "name": "smart-dev-flow",
   "version": "1.15.0",
-  "description": "智能开发助手流程 - oh-my-claudecode + Axiom 深度融合",
+  "description": "智能开发助手 - OMC 执行引擎 + Axiom 状态机深度融合的 Claude Code 插件",
   "type": "module",
   "files": [
     "agents",
