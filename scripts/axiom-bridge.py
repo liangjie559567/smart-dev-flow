@@ -75,6 +75,35 @@ def dispatch(tool, args):
         evo = EvolutionOrchestrator(base_dir=BASE_DIR)
         return evo.reflect(**args)
 
+    elif tool == "axiom_detect_patterns":
+        from evolution.pattern_detector import PatternDetector
+        d = PatternDetector(base_dir=BASE_DIR)
+        diff = args.get("diff", "")
+        return d.detect_and_update(diff)
+
+    elif tool == "axiom_suggest_patterns":
+        from evolution.pattern_detector import PatternDetector
+        d = PatternDetector(base_dir=BASE_DIR)
+        return d.suggest_reuse(args.get("feature_description", ""))
+
+    elif tool == "axiom_reflection_report":
+        from evolution.reflection import ReflectionEngine
+        e = ReflectionEngine(base_dir=BASE_DIR)
+        report = e.reflect(
+            session_name=args["session_name"],
+            duration=args.get("duration", 0),
+            went_well=args.get("went_well", []),
+            could_improve=args.get("could_improve", []),
+            learnings=args.get("learnings", []),
+            action_items=args.get("action_items", []),
+        )
+        return report.to_markdown()
+
+    elif tool == "axiom_pending_actions":
+        from evolution.reflection import ReflectionEngine
+        e = ReflectionEngine(base_dir=BASE_DIR)
+        return e.get_pending_action_items()
+
     elif tool == "axiom_status":
         from status_dashboard import StatusDashboard
         base = os.path.dirname(BASE_DIR)  # .agent/memory -> .agent

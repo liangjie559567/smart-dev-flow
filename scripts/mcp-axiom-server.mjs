@@ -105,6 +105,48 @@ const TOOLS = [
     },
   },
   {
+    name: 'axiom_detect_patterns',
+    description: '扫描 Git diff 检测代码模式，自动更新 pattern_library.md，出现≥3次自动提升为 ACTIVE。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        diff: { type: 'string', description: 'Git diff 文本，留空则自动获取最近一次 commit 的 diff' },
+      },
+    },
+  },
+  {
+    name: 'axiom_suggest_patterns',
+    description: '根据功能描述推荐可复用的 ACTIVE 模式，避免重复造轮子。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        feature_description: { type: 'string', description: '新功能描述' },
+      },
+      required: ['feature_description'],
+    },
+  },
+  {
+    name: 'axiom_reflection_report',
+    description: '生成结构化反思报告（WWW/WCI/Learnings/Action Items）并追加到 reflection_log.md。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        session_name: { type: 'string', description: '会话/功能名称' },
+        duration: { type: 'number', description: '耗时（分钟）', default: 0 },
+        went_well: { type: 'array', items: { type: 'string' }, description: '做得好的事' },
+        could_improve: { type: 'array', items: { type: 'string' }, description: '待改进的事' },
+        learnings: { type: 'array', items: { type: 'string' }, description: '学到的经验' },
+        action_items: { type: 'array', items: { type: 'string' }, description: '后续行动项' },
+      },
+      required: ['session_name'],
+    },
+  },
+  {
+    name: 'axiom_pending_actions',
+    description: '从 reflection_log.md 提取所有未完成的 Action Items（[ ] 状态）。',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
     name: 'axiom_status',
     description: '生成 Axiom 系统仪表盘：任务进度、进化统计、工作流指标、守卫状态。',
     inputSchema: { type: 'object', properties: {} },
