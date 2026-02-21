@@ -16,7 +16,7 @@ steps:
     check: "DAG Ready & File Lock"
 
   - name: "编译门禁 (Compilation Gate)"
-    run: "flutter build apk --debug"
+    run: "npm run build"
     on_success: "proceed"
     on_fail: "workflow: analyze-error"
 

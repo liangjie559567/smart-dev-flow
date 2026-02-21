@@ -13,8 +13,8 @@ steps:
     run: |
       run("git -C ${project_root} status --short")
       run("git -C ${project_root} diff --stat")
-      run("flutter analyze", allow_fail=true)
-      run("flutter test", allow_fail=true)
+      run("npm run lint", allow_fail=true)
+      run("npm test", allow_fail=true)
 
   - name: "根因分析"
     uses: "analyze-error"
