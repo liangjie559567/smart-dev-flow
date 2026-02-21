@@ -62,14 +62,26 @@ Task(
   model="opus",
   prompt="你是需求分析师（Analyst）。你的任务是将产品需求转化为可实现的验收标准，识别需求缺口。
   【知识库经验】{kb_context}
-  分析以下需求，提取验收标准和隐含约束：{需求描述}
-  输出：
-  - 用户故事（作为...，我希望...，以便...）
-  - 验收标准列表（可测试的 pass/fail 标准）
-  - 技术约束
-  - 排除范围
-  - 未解决的疑问"
+  分析以下需求，先执行可行性门禁（Requirement Analyst Gate）：
+  **Red Gate（可行性）**：是否违反安全/伦理？是否严重偏离开发工具范畴？是否技术上不可能？
+  **Yellow Gate（清晰度）**：关键角色/动作/结果是否已定义？是否存在多义词？是否有足够上下文？
+  输出门禁结论：
+  - **REJECT**：原因 + 建议转向
+  - **CLARIFY**（清晰度 < 90%）：缺失信息列表 + 3-5个澄清问题
+  - **PASS**（清晰度 ≥ 90%）：继续输出：
+    - 用户故事（作为...，我希望...，以便...）
+    - 验收标准列表（可测试的 pass/fail 标准）
+    - 技术约束
+    - 排除范围
+    - 未解决的疑问
+  需求描述：{需求描述}
+  【知识库经验】{kb_context}"
 )
+
+> ⚠️ **门禁处理**：
+> - analyst 返回 **REJECT** → 向用户说明原因，终止流程
+> - analyst 返回 **CLARIFY** → 向用户提出澄清问题，收到回答后重新调用 analyst
+> - analyst 返回 **PASS** → 继续步骤2
 ```
 
 **步骤2：调用 writer 子代理生成需求文档（必须）**
@@ -206,7 +218,7 @@ axiom_harvest source_type=code_change
 
 ### 确认流程
 
-展示 PRD 草稿 + 架构设计后，通过 AskUserQuestion 等待用户确认：
+展示 PRD 草稿 + 架构设计后，写入 `task_status: CONFIRMING`，然后通过 AskUserQuestion 等待用户确认：
 
 ```
 AskUserQuestion({

@@ -136,6 +136,8 @@ axiom_harvest source_type=conversation
 
 ## 确认流程
 
+写入 `task_status: CONFIRMING`，然后：
+
 ```
 AskUserQuestion({
   question: "Phase 1.5 专家评审已完成，综合评分 {N}/100。如何继续？",
