@@ -58,6 +58,7 @@ smart-dev-flow 融合 oh-my-claudecode (OMC) 多智能体编排能力与 Axiom �
 | `team` | "team", "coordinated team" | N 个协调 agent（Team 原生） |
 | `pipeline` | "pipeline" | 顺序 agent 链式执行 |
 | `ralplan` | "ralplan", "consensus plan" | 迭代规划直到共识 |
+| `ultraqa` | "ultraqa" | 实现后密集 QA 测试-修复循环直到质量达标 |
 
 ## Skills 目录（`skills/`）
 
@@ -76,16 +77,25 @@ OMC 工作流：`autopilot`, `ultrawork`, `ralph`, `team`, `pipeline`, `plan`, `
 | `.omc/project-memory.json` | 自动学习的项目技术栈和约定 |
 | `.omc/notepad.md` | 会话记事本（priority/working/manual） |
 
+## MCP 服务器
+
+| 服务器 | 别名 | 入口 | 用途 |
+|--------|------|------|------|
+| OMC 工具服务器 | `t` | `bridge/mcp-server.cjs` | 状态读写、notepad、project-memory |
+| Codex 代理服务器 | `x` | `bridge/codex-server.cjs` | OpenAI Codex 代码分析 |
+| Gemini 代理服务器 | `g` | `bridge/gemini-server.cjs` | Google Gemini 大上下文分析 |
+| Axiom 工具服务器 | `a` | `scripts/mcp-axiom-server.mjs` | 20 个 Axiom 工具（知识库/状态/进化） |
+
 ## 关键文件
 
 | 文件 | 用途 |
 |------|------|
 | `.claude-plugin/plugin.json` | 插件清单（skills 目录注册 + hooks） |
-| `scripts/keyword-detector.mjs` | 关键词检测 → 激活执行模式 |
-| `scripts/persistent-mode.mjs` | ralph/autopilot 持久模式核心 |
-| `scripts/skill-injector.mjs` | 触发词自动注入 skill 上下文 |
-| `scripts/post-tool-verifier.mjs` | `<remember>` 标签处理 + bash 失败检测 |
-| `scripts/project-memory-*.mjs` | 项目记忆自动学习（PostToolUse/SessionStart/PreCompact） |
-| `.agent/evolution/orchestrator.py` | Axiom 进化引擎 |
+| `.mcp.json` | MCP 服务器配置（t/x/g/a 四个服务器） |
+| `hooks/pre-tool-use.cjs` | 状态机门禁（CONFIRMING/REFLECTING 拦截） |
+| `hooks/post-tool-use.cjs` | 进化引擎（.agent/memory → .omc 双写同步） |
+| `hooks/user-prompt-submit.cjs` | 用户提交时注入上下文 |
+| `hooks/dna-manager.cjs` | DNA 已知坑管理 |
+| `scripts/mcp-axiom-server.mjs` | Axiom MCP 服务器（20 个工具） |
 | `.agent/adapters/` | 9 个 AI 平台适配器（claude/codex/gemini/cursor 等） |
 | `omc-dist/` | OMC 编译输出（hooks/notepad/project-memory/skill-bridge 等） |
