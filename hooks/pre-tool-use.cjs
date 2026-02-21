@@ -68,6 +68,18 @@ async function main() {
     }
   }
 
+  if (status === 'BLOCKED') {
+    const isDebug = hook.tool_input?.prompt?.includes('debugger') ||
+                    hook.tool_input?.prompt?.includes('analyze-error');
+    if (!isDebug) {
+      console.log(JSON.stringify({
+        decision: 'block',
+        reason: `[smart-dev-flow] 当前状态 BLOCKED，请先解决阻塞问题。使用 /dev-flow 查看详情。`
+      }));
+      process.exit(0);
+    }
+  }
+
   // DNA BUG 预防：Write/Edit 前检查已知坑
   if (['Write', 'Edit'].includes(toolName)) {
     try {
@@ -88,18 +100,6 @@ async function main() {
         process.exit(0);
       }
     } catch {}
-  }
-
-  if (status === 'BLOCKED') {
-    const isDebug = hook.tool_input?.prompt?.includes('debugger') ||
-                    hook.tool_input?.prompt?.includes('analyze-error');
-    if (!isDebug) {
-      console.log(JSON.stringify({
-        decision: 'block',
-        reason: `[smart-dev-flow] 当前状态 BLOCKED，请先解决阻塞问题。使用 /dev-flow 查看详情。`
-      }));
-      process.exit(0);
-    }
   }
 
   process.exit(0);
