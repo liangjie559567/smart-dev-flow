@@ -250,8 +250,8 @@ AskUserQuestion({
   header: "选择执行引擎",
   options: [
     { label: "标准模式（逐步确认）", description: "每个子任务完成后确认，调用 axiom-implement 逐步执行。" },
-    { label: "ultrawork（并行加速）", description: "将独立任务分发给多个并行 agent 同时执行。" },
     { label: "ultrapilot（分区并行）", description: "文件所有权分区，最多 5 个 worker 并行执行，适合多组件系统，避免文件冲突。" },
+    { label: "ultrawork（并行加速）", description: "将独立任务分发给多个并行 agent 同时执行。" },
     { label: "ralph（持久执行）", description: "自我循环直到所有任务完成，中途不停止。" },
     { label: "team（多 agent 流水线）", description: "team-plan → team-exec → team-verify → team-fix 完整流水线。" },
     { label: "ultraqa（密集QA循环）", description: "实现完成后进入密集测试-修复循环，直到质量达标。" }

@@ -160,9 +160,10 @@ AskUserQuestion({
   question: "Phase 1 需求澄清与架构设计已完成。如何继续？",
   header: "Phase 1 → Phase 1.5",
   options: [
-    { label: "✅ 进入 Phase 1.5 专家评审", description: "架构设计通过，进行多专家评审" },
-    { label: "📝 需要修改架构", description: "部分设计需要调整" },
-    { label: "⏭️ 跳过评审，直接进入 Phase 2", description: "简单任务，无需专家评审" }
+    { label: "✅ 进入 Phase 1.5 专家评审", description: "需求和架构已就绪，开始多专家评审" },
+    { label: "⏭️ 跳过评审，直接进入 Phase 2", description: "简单任务，无需专家评审" },
+    { label: "📝 需要修改后再进入", description: "部分内容需要调整" },
+    { label: "🔄 返工需求澄清", description: "重新澄清需求" }
   ]
 })
 ```
