@@ -81,6 +81,35 @@ async function main() {
     } catch {}
   }
 
+  // DNA 注入：dev-flow 活跃状态时注入历史经验
+  const DEV_STATES = ['DRAFTING', 'DECOMPOSING', 'IMPLEMENTING'];
+  const cwd = process.cwd();
+  const ctxStatus = (() => {
+    try {
+      const ctx = fs.readFileSync(path.join(cwd, '.agent/memory/active_context.md'), 'utf8');
+      return (ctx.match(/task_status:\s*(\w+)/) || [])[1] || 'IDLE';
+    } catch { return 'IDLE'; }
+  })();
+  if (DEV_STATES.includes(ctxStatus)) {
+    try {
+      const { readDna, extractRelevant } = require('./dna-manager.cjs');
+      const dna = readDna(cwd);
+      if (dna) {
+        const keywords = prompt.split(/\s+/).filter(w => w.length > 3);
+        const relevant = extractRelevant(dna, keywords);
+        if (relevant.length > 0) {
+          console.log(JSON.stringify({
+            hookSpecificOutput: {
+              hookEventName: 'UserPromptSubmit',
+              additionalContext: `🧬 历史经验：\n${relevant.map(l => `- ${l}`).join('\n')}`
+            }
+          }));
+          process.exit(0);
+        }
+      }
+    } catch {}
+  }
+
   process.exit(0);
 }
 

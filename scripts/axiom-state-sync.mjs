@@ -12,7 +12,7 @@ const SKILL_STATE_MAP = {
   'axiom-review':     { task_status: 'REVIEWING',     current_phase: 'Phase 1.5 - Reviewing',   last_gate: 'Gate 2' },
   'axiom-decompose':  { task_status: 'DECOMPOSING',   current_phase: 'Phase 2 - Decomposing',   last_gate: 'Gate 3' },
   'axiom-implement':  { task_status: 'IMPLEMENTING',  current_phase: 'Phase 3 - Implementing',  last_gate: 'Gate 4' },
-  'axiom-reflect':    { task_status: 'REFLECTING',    current_phase: 'Phase 8 - Reflecting',    last_gate: 'Gate 5' },
+  'axiom-reflect':    { task_status: 'IDLE',           current_phase: 'Phase 8 - Reflecting',    last_gate: 'Gate 5' },
 };
 
 async function main() {
@@ -44,6 +44,17 @@ async function main() {
   if (updated !== content) {
     writeFileSync(contextPath, updated, 'utf8');
   }
+
+  // DNA 更新提示
+  const today = new Date().toISOString().slice(0, 10);
+  const isEnd = stateUpdate.task_status === 'IDLE';
+  const dnaHint = isEnd
+    ? `🧬 dev-flow 完成！请提取本次可复用模式追加到 .agent/memory/project-dna.md ## 成功模式，跨项目通用经验追加到 ~/.claude/global-dna.md ## 通用模式。格式：- [${today}] 描述`
+    : `🧬 Phase 完成。本次有新踩的坑吗？有则追加到 .agent/memory/project-dna.md ## 踩过的坑。格式：- [${today}][${stateUpdate.current_phase}] 描述`;
+
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: dnaHint }
+  }) + '\n');
 }
 
 function readStdin() {
