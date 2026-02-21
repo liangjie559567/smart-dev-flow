@@ -200,6 +200,12 @@ async function main() {
     try { fs.appendFileSync(monitorLog, JSON.stringify({ ts: new Date().toISOString(), type: 'session_start', sessionId }) + '\n'); } catch {}
   }
 
+  // 0. Node.js 版本检测
+  const nodeVersion = process.versions.node.split('.').map(Number);
+  if (nodeVersion[0] < 20) {
+    parts.push(`⚠️ Node.js 版本过低（当前 ${process.version}，需要 v20+），部分 hooks 和 MCP 服务器可能无法正常运行。请升级 Node.js。`);
+  }
+
   // 1. superpowers 注入
   const skillContent = findUsingSuperpowers(cwd);
   if (skillContent) {
