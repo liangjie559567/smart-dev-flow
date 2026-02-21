@@ -13,7 +13,10 @@
       "author": {
         "name": "liangjie559567"
       },
-      "source": "./",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/liangjie559567/smart-dev-flow.git"
+      },
       "category": "productivity",
       "homepage": "https://github.com/liangjie559567/smart-dev-flow",
       "tags": ["dev-flow", "axiom", "omc", "multi-agent", "tdd"]
