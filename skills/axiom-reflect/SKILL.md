@@ -118,6 +118,17 @@ python scripts/evolve.py evolve
 - 任务状态：即将归档（IDLE）
 ```
 
+**步骤5.6：输出接力摘要（必须，供下次会话恢复）**
+
+```markdown
+## 🔁 接力摘要
+- 当前任务: {功能名称 / 无}
+- 状态: IDLE
+- 最近检查点: {last_checkpoint tag / 无}
+- 阻塞: 无
+- 下一步: 1) {action_items[0]} 2) {action_items[1]}
+```
+
 **用户确认（必须）**：
 ```
 AskUserQuestion({
