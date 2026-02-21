@@ -9,10 +9,7 @@
   "plugins": [
     {
       "name": "smart-dev-flow",
-      "source": {
-        "source": "github",
-        "repo": "liangjie559567/smart-dev-flow"
-      },
+      "source": "./",
       "description": "智能开发助手 - OMC 执行引擎 + Axiom 状态机融合，完整开发流程（需求→架构→实现→验证）+ 70+ 技能 + 4 个 MCP 服务器",
       "version": "1.15.0",
       "author": {
