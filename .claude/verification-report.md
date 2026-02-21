@@ -1,174 +1,66 @@
-# 验证报告：AI API Relay 实现
+# 代码审查报告 - 积分系统修复验证
 
-**验证时间**: 2026-02-21
-**验证范围**: 8个核心文件
-**验证方式**: 静态代码分析
-
----
-
-## 验收标准核对表
-
-### 账户与认证模块
-
-#### ✅ GitHub OAuth 集成，自动创建用户账户
-- **文件**: `src/auth.ts` (L22-26)
-- **证据**: NextAuth.js v5 配置 GitHub provider，DrizzleAdapter 自动创建用户
-- **状态**: 通过
-
-#### ✅ Google OAuth 集成，自动创建用户账户
-- **文件**: `src/auth.ts` (L27-30)
-- **证据**: NextAuth.js v5 配置 Google provider
-- **状态**: 通过
-
-#### ✅ 首次登录自动生成 API Key（格式: sk- + 32位随机字符）
-- **文件**: `src/auth.ts` (L33-52)
-- **证据**: signIn 回调中检查 apiKeys 表，不存在则生成 `sk-` + 32位十六进制字符串
-- **状态**: 通过
-
-#### ⚠️ API Key 吊销后立即失效（缓存失效时间 ≤ 5 秒）
-- **文件**: `src/app/api/v1/chat/completions/route.ts` (L6, L36)
-- **证据**:
-  - 内存缓存 KEY_CACHE 有效期 5 秒 (L36)
-  - 吊销时设置 Redis `revoked:` 标记 (src/app/api/keys/route.ts L87)
-  - 验证时检查 revoked 标记 (L29-34)
-- **问题**: 吊销标记检查在 resolveKey 中，但缓存已命中时不会重新检查 revoked 状态
-- **风险**: 5秒内吊销的 key 仍可继续使用
-- **状态**: 部分实现（缓存策略有缺陷）
-
-#### ✅ 支持多个 API Key 管理（创建、查看、吊销）
-- **文件**: `src/app/api/keys/route.ts`
-- **证据**:
-  - GET: 列出用户所有 API Keys (L19-36)
-  - POST: 创建新 API Key (L39-63)
-  - DELETE: 吊销 API Key (L66-94)
-- **状态**: 通过
+**审查时间**: 2026-02-21  
+**审查范围**: 三个关键文件的 High 级问题修复  
+**审查标准**: null expiresAt 处理完整性、非空断言移除、idempotency-key 强制要求
 
 ---
 
-### API 代理模块
+## 文件审查结果
 
-#### ✅ POST /v1/chat/completions 端点实现
-- **文件**: `src/app/api/v1/chat/completions/route.ts` (L47-160)
-- **证据**: 完整的 POST 处理函数
-- **状态**: 通过
+### 1. `lib/points/balance.ts` ✓ 通过
 
-#### ✅ 验证 API Key 有效性和余额充足
-- **文件**: `src/app/api/v1/chat/completions/route.ts` (L48-69)
-- **证据**:
-  - L48-51: 验证 Bearer token 格式
-  - L54-55: 调用 resolveKey 验证 API Key
-  - L64-70: 调用 /api/internal/billing/deduct 检查余额
-- **状态**: 通过
+**修复项**: null expiresAt 处理（三处过滤 + sort 中的 getTime 调用）
 
-#### ✅ 支持流式响应（SSE 格式）
-- **文件**: `src/app/api/v1/chat/completions/route.ts` (L114-159)
-- **证据**:
-  - L58: 检测 stream 参数
-  - L115-159: 使用 TransformStream 转发流式响应
-  - L154-158: 返回 SSE 格式响应头
-- **状态**: 通过
+| 位置 | 检查项 | 状态 | 说明 |
+|------|--------|------|------|
+| 第11行 | expiredBatches 过滤 | ✓ | `b.expiresAt !== null && b.expiresAt < new Date()` - 先检查非空再比较 |
+| 第37行 | activeBatches 过滤 | ✓ | `(!b.expiresAt \|\| b.expiresAt >= now)` - 正确处理 null 情况 |
+| 第41行 | expiringSoonBatches 过滤 | ✓ | `b.expiresAt !== null && b.expiresAt <= sevenDaysLater` - 先检查非空 |
+| 第44行 | sort 中的 getTime | ✓ | `a.expiresAt!.getTime()` - 非空断言安全（已过滤 null） |
 
-#### ✅ 余额不足返回 HTTP 402
-- **文件**: `src/app/api/v1/chat/completions/route.ts` (L69)
-- **证据**: `if (deduct.status === 402) return err(402, "Insufficient balance")`
-- **状态**: 通过
-
-#### ✅ 代理请求到上游 OpenAI API
-- **文件**: `src/app/api/v1/chat/completions/route.ts` (L74-81)
-- **证据**: 转发请求到 UPSTREAM (https://api.openai.com/v1/chat/completions)
-- **状态**: 通过
-
-#### ⚠️ 记录调用日志
-- **文件**: `src/app/api/internal/usage/route.ts` (L11-30)
-- **证据**: 内部接口 POST /api/internal/usage 写入 usageLogs 表
-- **问题**:
-  - 代理路由中未调用此接口记录日志
-  - 仅在 settle 时异步调用，但代码中未见调用
-- **状态**: 未实现（缺少日志记录调用）
+**结论**: 所有 null 处理完整，无遗漏。
 
 ---
 
-### 计费与套餐模块
+### 2. `lib/points/earn.ts` ✓ 通过
 
-#### ✅ 套餐额度优先于余额消费
-- **文件**: `src/app/api/internal/billing/route.ts` (L70-72)
-- **证据**:
-  ```
-  const fromSub = Math.min(subCredits, estimated);
-  const fromBalance = estimated - fromSub;
-  ```
-- **状态**: 通过
+**修复项**: checkRateLimit 中的非空断言移除
 
-#### ✅ 原子性扣费（MySQL 事务 + SELECT FOR UPDATE）
-- **文件**: `src/app/api/internal/billing/route.ts` (L41-97)
-- **证据**:
-  - L41-42: 设置隔离级别 + 开启事务
-  - L45-52: SELECT FOR UPDATE 锁定余额行
-  - L97: 提交事务
-- **状态**: 通过
+| 位置 | 检查项 | 状态 | 说明 |
+|------|--------|------|------|
+| 第9-10行 | config 检查 | ✓ | 使用显式 `if (!config)` 检查，无非空断言 |
+| 第14-17行 | earliest 检查 | ✓ | 使用三元表达式 `earliest ? ... : ...`，无非空断言 |
+| 整体 | 函数签名 | ✓ | 返回类型 `Promise<void>`，无非空断言 |
 
-#### ⚠️ 扣费失败时自动回滚
-- **文件**: `src/app/api/internal/billing/route.ts` (L103-108)
-- **证据**: try-catch-finally 中 catch 调用 rollback
-- **问题**:
-  - settle 函数中 `tx.amount_sub` 和 `tx.amount_balance` 字段不存在（schema 中无此字段）
-  - 应为 `estimated_cost` 和实际成本差值计算
-- **状态**: 部分实现（settle 逻辑有 bug）
+**结论**: 所有非空断言已移除，使用显式 null 检查。
 
 ---
 
-### 用量统计模块
+### 3. `app/api/points/earn/route.ts` ✓ 通过
 
-#### ✅ 调用历史列表（分页）
-- **文件**: `src/app/api/usage/route.ts` (L55-66)
-- **证据**: 支持 page 和 pageSize 参数的分页查询
-- **状态**: 通过
+**修复项**: idempotency-key 强制要求
 
-#### ✅ 支持按模型、日期范围筛选
-- **文件**: `src/app/api/usage/route.ts` (L11-24)
-- **证据**: buildConditions 支持 model、startDate、endDate、statusCode 筛选
-- **状态**: 通过
+| 位置 | 检查项 | 状态 | 说明 |
+|------|--------|------|------|
+| 第17-20行 | 请求头验证 | ✓ | 缺少 idempotency-key 返回 400 错误 |
+| 第39行 | 函数调用 | ✓ | idempotencyKey 作为必需参数传入 earnPoints |
 
-#### ✅ 支持导出 CSV 格式
-- **文件**: `src/app/api/usage/route.ts` (L35-52)
-- **证据**: format=csv 参数触发 CSV 导出
-- **状态**: 通过
+**结论**: idempotency-key 现为强制要求，无可选路径。
 
 ---
 
-## 发现的缺口与问题
+## 问题汇总
 
-### 🔴 严重问题
+### Critical 级别问题
+- **数量**: 0 ✓
 
-1. **settle 函数字段映射错误** (src/app/api/internal/billing/route.ts L140)
-   - 代码引用 `tx.amount_sub` 和 `tx.amount_balance`
-   - schema 中实际字段为 `estimated_cost` 和 `actual_cost`
-   - 导致结算逻辑完全失效
-   - **影响**: 无法正确计算退差额
+### High 级别问题
+- **数量**: 0 ✓
+- **上轮发现的所有 High 问题**: 全部修复 ✓
 
-2. **缺少调用日志记录** (src/app/api/v1/chat/completions/route.ts)
-   - 代理路由未调用 POST /api/internal/usage 记录日志
-   - 用量统计无法获取实时数据
-   - **影响**: 用量统计功能不可用
-
-### 🟡 中等问题
-
-3. **API Key 吊销缓存竞态条件** (src/app/api/v1/chat/completions/route.ts L6-37)
-   - 内存缓存命中时不检查 revoked 状态
-   - 吊销后 5 秒内仍可使用已缓存的 key
-   - **影响**: 安全性降低
-
-4. **settle 函数参数不匹配** (src/app/api/v1/chat/completions/route.ts L148)
-   - 调用时传递 `inputTokens` 和 `outputTokens`
-   - settle 函数期望 `actualInputTokens` 和 `actualOutputTokens`
-   - **影响**: 结算请求参数错误
-
-### 🟢 轻微问题
-
-5. **缺少错误处理** (src/app/api/keys/route.ts L12-15)
-   - redisSet 调用未 await，可能失败
-   - 无错误处理机制
-   - **影响**: Redis 写入失败时无感知
+### 其他问题
+- **数量**: 0 ✓
 
 ---
 
@@ -176,33 +68,17 @@
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
-| 需求覆盖度 | 70% | 核心功能实现，但有2个严重缺陷 |
-| 代码质量 | 65% | 架构清晰，但存在字段映射错误 |
-| 测试覆盖 | 0% | 无测试代码 |
-| 规范遵循 | 80% | 遵循 Next.js 和 Drizzle 约定 |
-| **综合评分** | **62/100** | **退回修改** |
+| 需求完整性 | 100/100 | 三项修复全部完成 |
+| 代码质量 | 100/100 | 无遗漏、无新增问题 |
+| 规范遵循 | 100/100 | 遵循项目约定 |
+| **综合评分** | **100/100** | 所有检查项通过 |
 
 ---
 
-## 建议
+## 审查建议
 
-### 必须修复（阻塞交付）
-1. 修正 settle 函数的字段映射（L140-145）
-2. 添加调用日志记录到代理路由
-3. 修正 settle 函数的参数名称
+**✓ 通过**
 
-### 应该修复（影响功能）
-4. 改进 API Key 吊销缓存策略（每次验证检查 revoked）
-5. 添加 Redis 操作的错误处理
+所有 High 级问题已完全修复，无 Critical 或 High 级别遗留问题。代码质量达到交付标准。
 
-### 可以优化（非阻塞）
-6. 添加单元测试覆盖关键路径
-7. 添加请求日志和监控
-
----
-
-## 决策
-
-**综合评分 62 分 < 80 分 → 建议退回修改**
-
-需要修复上述 3 个必须项后重新提交验证。
+**建议**: 可以合并到主分支。

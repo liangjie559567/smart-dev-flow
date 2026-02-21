@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ActionConfig {
+  id              String   @id @default(cuid())
+  actionType      String   @unique
+  points          Int
+  validityDays    Int      @default(365)
+  rateLimitWindow Int      @default(3600)
+  rateLimitMax    Int      @default(1)
+  createdAt       DateTime @default(now())
+}
+
+model ItemConfig {
+  id         String   @id @default(cuid())
+  itemCode   String   @unique
+  name       String
+  pointsCost Int
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model PointsBatch {
+  id           String      @id @default(cuid())
+  userId       String
+  actionType   String
+  originalPts  Int
+  remainingPts Int
+  status       BatchStatus @default(active)
+  issuedAt     DateTime    @default(now())
+  expiresAt    DateTime
+
+  @@index([userId, expiresAt])
+  @@index([userId, status, expiresAt])
+}
+
+model PointTransaction {
+  id            String          @id @default(cuid())
+  userId        String
+  type          TransactionType
+  points        Int
+  actionType    String?
+  balanceBefore Int
+  balanceAfter  Int
+  refId         String?
+  description   String?
+  createdAt     DateTime        @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, actionType, type, createdAt])
+}
+
+model Redemption {
+  id         String   @id @default(cuid())
+  userId     String
+  itemCode   String
+  pointsCost Int
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model IdempotencyKey {
+  id           String   @id @default(cuid())
+  key          String
+  userId       String
+  responseCode Int
+  responseBody Json
+  createdAt    DateTime @default(now())
+
+  @@unique([key, userId])
+  @@index([createdAt])
+}
+
+enum TransactionType {
+  earn
+  redeem
+  expire
+}
+
+enum BatchStatus {
+  active
+  redeemed
+  expired
+}
