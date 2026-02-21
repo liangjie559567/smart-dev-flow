@@ -6,18 +6,14 @@ OMC 执行引擎 + Axiom 状态机深度融合的 Claude Code 智能开发插件
 
 ```bash
 # 方式一：通过插件市场安装（推荐）
-/plugin marketplace add liangjie559567/smart-dev-flow
-/plugin install smart-dev-flow@liangjie559567
+claude plugin marketplace add "liangjie559567/smart-dev-flow"
+claude plugin install "smart-dev-flow@smart-dev-flow"
 
 # 方式二：本地目录加载（单次会话）
 claude --plugin-dir /path/to/smart-dev-flow
-
-# 方式三：克隆后本地加载
-git clone https://github.com/liangjie559567/smart-dev-flow
-claude --plugin-dir smart-dev-flow
 ```
 
-**前置要求**：Node.js 20+、Claude Code CLI
+**前置要求**：Claude Code CLI
 
 ## 快速开始
 
