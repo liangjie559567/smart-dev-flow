@@ -72,6 +72,32 @@ describe('session-start 集成：Axiom 状态感知', () => {
   });
 });
 
+describe('session-start 集成：知识库注入（学习循环）', () => {
+  it('knowledge_base.md 有条目时 stdout 包含知识库内容', () => {
+    mkdirSync(join(tmpDir, '.agent', 'memory', 'evolution'), { recursive: true });
+    writeFileSync(
+      join(tmpDir, '.agent', 'memory', 'active_context.md'),
+      '---\ntask_status: IDLE\n---\n'
+    );
+    writeFileSync(
+      join(tmpDir, '.agent', 'memory', 'evolution', 'knowledge_base.md'),
+      '# KB\n\n## K-001\n**标题**: 登录模块重构\n**摘要**: 将 login() 改为 signIn()\n**来源**: auto_harvest\n**语言**: ts\n**日期**: 2026-02-21\n'
+    );
+    const result = runHook({ cwd: tmpDir }, tmpDir);
+    expect(result.stdout).toContain('知识库');
+    expect(result.stdout).toContain('登录模块重构');
+  });
+
+  it('knowledge_base.md 不存在时正常退出（不崩溃）', () => {
+    writeFileSync(
+      join(tmpDir, '.agent', 'memory', 'active_context.md'),
+      '---\ntask_status: IDLE\n---\n'
+    );
+    const result = runHook({ cwd: tmpDir }, tmpDir);
+    expect(result.status).toBe(0);
+  });
+});
+
 describe('session-start 集成：project-memory 注入', () => {
   it('存在 project-memory.json 时 stdout 包含技术栈信息', () => {
     writeFileSync(

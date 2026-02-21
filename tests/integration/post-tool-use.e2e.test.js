@@ -99,6 +99,65 @@ describe('post-tool-use 集成：manifest.md 变更', () => {
   });
 });
 
+describe('post-tool-use 集成：auto-harvest 学习循环', () => {
+  it('Write 源码文件时自动追加知识条目到 knowledge_base.md', () => {
+    const kbPath = join(tmpDir, '.agent', 'memory', 'evolution', 'knowledge_base.md');
+    writeFileSync(kbPath, '# Knowledge Base\n');
+
+    const input = {
+      tool_name: 'Write',
+      tool_input: { file_path: join(tmpDir, 'src', 'login.ts').replace(/\\/g, '/') },
+    };
+    runHook(input, tmpDir);
+
+    const kb = readFileSync(kbPath, 'utf8');
+    expect(kb).toContain('## K-auto-');
+    expect(kb).toContain('login.ts');
+  });
+
+  it('Edit 源码文件时摘要包含 old_string → new_string', () => {
+    const kbPath = join(tmpDir, '.agent', 'memory', 'evolution', 'knowledge_base.md');
+    writeFileSync(kbPath, '# Knowledge Base\n');
+
+    const input = {
+      tool_name: 'Edit',
+      tool_input: {
+        file_path: join(tmpDir, 'src', 'auth.js').replace(/\\/g, '/'),
+        old_string: 'function login()',
+        new_string: 'function signIn()',
+      },
+    };
+    runHook(input, tmpDir);
+
+    const kb = readFileSync(kbPath, 'utf8');
+    expect(kb).toContain('function login()');
+    expect(kb).toContain('function signIn()');
+  });
+
+  it('Write .agent/memory/ 文件时不触发 auto-harvest', () => {
+    const kbPath = join(tmpDir, '.agent', 'memory', 'evolution', 'knowledge_base.md');
+    writeFileSync(kbPath, '# Knowledge Base\n');
+    const before = readFileSync(kbPath, 'utf8');
+
+    const ctxPath = join(tmpDir, '.agent', 'memory', 'active_context.md');
+    writeFileSync(ctxPath, 'task_status: IDLE\nmanifest_path: \n');
+    const input = { tool_name: 'Write', tool_input: { file_path: ctxPath.replace(/\\/g, '/') } };
+    runHook(input, tmpDir);
+
+    const after = readFileSync(kbPath, 'utf8');
+    expect(after).toBe(before);
+  });
+
+  it('knowledge_base.md 不存在时 Write 源码文件正常退出（不崩溃）', () => {
+    const input = {
+      tool_name: 'Write',
+      tool_input: { file_path: join(tmpDir, 'src', 'util.py').replace(/\\/g, '/') },
+    };
+    const result = runHook(input, tmpDir);
+    expect(result.status).toBe(0);
+  });
+});
+
 describe('post-tool-use 集成：TodoWrite', () => {
   it('TodoWrite 含 completed 任务时追加 task_completed 到 monitor.log', () => {
     const input = {
