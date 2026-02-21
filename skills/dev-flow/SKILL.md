@@ -173,7 +173,7 @@ AskUserQuestion({
 | `/ralplan [需求]` | 调用 OMC `ralplan`，Planner+Architect+Critic 三方共识规划 |
 | `/doctor` | 调用 OMC `omc-doctor`，诊断并修复环境配置问题 |
 | `/research [主题]` | 调用 OMC `external-context`，并行 document-specialist 网页搜索 |
-| `/hud` | 调用 OMC `hud`，显示当前任务状态仪表盘 |
+| `/hud` | 调用 `axiom-hud`，显示 Dev Flow 工作流状态仪表盘 |
 | `/ask-codex [角色] [问题]` | 调用 `mcp__x__ask_codex`（architect/planner/critic/analyst/code-reviewer） |
 | `/ask-gemini [角色] [问题]` | 调用 `mcp__g__ask_gemini`（designer/writer/vision） |
 

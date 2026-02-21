@@ -29,6 +29,7 @@ smart-dev-flow 技能库 — Axiom 状态机 + OMC 多智能体编排融合系�
 | `axiom-analyze-error/SKILL.md` | "/analyze-error" | 错误根因分析 |
 | `axiom-knowledge/SKILL.md` | "/knowledge [词]" | 查询知识库 |
 | `axiom-patterns/SKILL.md` | "/patterns [词]" | 查询模式库 |
+| `axiom-hud/SKILL.md` | "/hud", "hud", "查看进度" | Dev Flow 工作流状态仪表盘 |
 
 ## OMC 执行模式技能
 
