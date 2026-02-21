@@ -19,15 +19,24 @@ async function main() {
   const raw = await readStdin();
   const hook = JSON.parse(raw);
 
-  if (hook.tool_name !== 'Skill') return;
+  if (hook.tool_name !== 'Skill') {
+    process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true }) + '\n');
+    return;
+  }
 
   const skillName = (hook.tool_input?.skill || '').replace(/^.*:/, ''); // 去掉前缀如 "superpowers:"
   const stateUpdate = SKILL_STATE_MAP[skillName];
-  if (!stateUpdate) return;
+  if (!stateUpdate) {
+    process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true }) + '\n');
+    return;
+  }
 
   const cwd = process.cwd();
   const contextPath = join(cwd, '.agent/memory/active_context.md');
-  if (!existsSync(contextPath)) return;
+  if (!existsSync(contextPath)) {
+    process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true }) + '\n');
+    return;
+  }
 
   const content = readFileSync(contextPath, 'utf8');
   const now = new Date().toISOString();
