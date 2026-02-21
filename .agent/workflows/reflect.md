@@ -85,7 +85,19 @@ python scripts/evolve.py evolve
    - 阻塞: 无
    - 下一步: 1) {action_items[0]} 2) {action_items[1]}
    ```
-4. 更新 `.agent/memory/active_context.md`：
+4. **用户确认（必须）**：
+   ```
+   AskUserQuestion({
+     question: "Dev Flow 全流程已完成！本次开发共沉淀 {N} 条知识。如何处理？",
+     header: "Dev Flow 完成",
+     options: [
+       { label: "✅ 完成，结束流程", description: "所有阶段已完成，知识已沉淀" },
+       { label: "🔁 开始新功能", description: "继续下一个功能的 Dev Flow" },
+       { label: "🔄 返工某个阶段", description: "需要回到某个阶段重新处理" }
+     ]
+   })
+   ```
+5. 更新 `.agent/memory/active_context.md`：
    ```yaml
    task_status: IDLE
    current_phase:

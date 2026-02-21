@@ -121,7 +121,8 @@ AskUserQuestion({
 })
 ```
 
-评分 < 60 → 强制退回，不展示 AskUserQuestion，直接输出退回提示并将 task_status 设为 DRAFTING，不允许确认通过
+- **规则优先级**：critic 发现 Critical 问题 → 强制退回（优先于评分阈值）；评分 < 60 → 强制退回；两者均满足时按 Critical 规则处理
+- 评分 < 60 → 强制退回，不展示 AskUserQuestion，直接输出退回提示并将 task_status 设为 DRAFTING，调用 1-drafting.md 重新起草
 
 ## active_context.md 写入格式
 ```yaml
