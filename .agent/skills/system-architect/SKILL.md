@@ -12,7 +12,7 @@ description: A specialist skill focused on decomposing complex PRDs into atomic 
 
 ## 2. Input (输入)
 - **Rough PRD**: `docs/prd/[name]-rough.md` (真理之源)。
-- **Project Structure**: `lib/` 和 `test/` (必须尊重现有模式)。
+- **Project Structure**: `src/`、`tests/`、`skills/`、`agents/`、`hooks/` (必须尊重现有模式)。
 
 ## 3. Actions (执行步骤)
 
