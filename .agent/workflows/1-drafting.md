@@ -149,8 +149,8 @@ axiom_harvest source_type=code_change
 - 技术边界：包含 {X}，不包含 {Y}
 - 接口契约：{N} 个接口已定义
 - ADR：{N} 条架构决策
-- 需求文档：docs/requirements/YYYY-MM-DD-{feature}-requirements.md
-- 设计文档：docs/design/YYYY-MM-DD-{feature}-design.md
+- 需求文档：docs/requirements/YYYY-MM-DD-{feature}-requirements.md（已审查通过）
+- 设计文档：docs/design/YYYY-MM-DD-{feature}-design.md（已审查通过）
 ```
 
 ## 硬门控（必须全部通过）

@@ -96,13 +96,23 @@ Task(
   审查：任务粒度、依赖完整性、验收标准可测试性，输出问题列表"
 )
 ```
-→ 发现问题 → 带问题列表重新调用 writer
+→ 发现问题 → 带问题列表重新调用 writer → writer 完成后重新调用 quality-reviewer 审查，循环直到审查无问题
 
 ## 步骤7.5：持久化产物（必须）
 ```
 axiom_write_manifest path=".agent/memory/manifest.md" content={planner输出}
 phase_context_write phase=2 tasks={phase2.tasks} critical_path={phase2.critical_path} test_strategy={phase2.test_strategy}
 context-manager.create_checkpoint → git tag checkpoint-phase2-{feature}
+```
+
+**MCP 不可用降级**：若 `axiom_write_manifest` 或 `phase_context_write` 调用失败：
+- Manifest：直接用 Write 工具写入 `.agent/memory/manifest.md`
+- phase-context：用 Write 工具将阶段数据写入 `.agent/memory/phase-context.json`：
+```json
+{
+  "phase2": { "tasks": [...], "critical_path": [...], "test_strategy": "..." },
+  "phase3": { "branch": "", "worktree": "", "skipped": false }
+}
 ```
 
 ## 步骤8：Phase 3 隔离开发（可选）

@@ -22,6 +22,21 @@ Skill("finishing-a-development-branch")
 ```
 若 phase3.skipped=true，跳过本阶段。
 
+**知识沉淀（必须）**：
+```
+axiom_harvest source_type=workflow_run
+  title="分支合并: {功能名称}"
+  summary="{合并策略} | {提交数量} | {变更文件数} | {合并时间}"
+```
+
+**MCP 不可用降级**：若 `axiom_harvest` 调用失败，追加写入 `.agent/memory/evolution/knowledge_base.md`：
+```markdown
+## K-{timestamp}
+**标题**: 分支合并: {功能名称}
+**摘要**: {合并策略} | {提交数量} | {变更文件数} | {合并时间}
+**来源**: workflow_run
+```
+
 ### Step 1: 读取会话状态
 // turbo
 1. 读取 `.agent/memory/active_context.md`
@@ -61,7 +76,16 @@ python scripts/evolve.py evolve
 ### Step 7: 输出报告并重置状态
 1. 向用户展示反思摘要
 2. 列出新提取的知识和 Action Items
-3. 更新 `.agent/memory/active_context.md`：
+3. **输出接力摘要（必须，供下次会话恢复）**：
+   ```markdown
+   ## 🔁 接力摘要
+   - 当前任务: {功能名称 / 无}
+   - 状态: IDLE
+   - 最近检查点: {last_checkpoint tag / 无}
+   - 阻塞: 无
+   - 下一步: 1) {action_items[0]} 2) {action_items[1]}
+   ```
+4. 更新 `.agent/memory/active_context.md`：
    ```yaml
    task_status: IDLE
    current_phase:
