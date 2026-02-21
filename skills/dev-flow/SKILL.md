@@ -1,7 +1,7 @@
 ---
-name: dev-flow
-description: 智能开发助手主入口 - 融合 Axiom 状态机与 OMC 多智能体编排
-triggers: ["axiom-flow", "axiom dev", "axiom", "/axiom-flow", "smart-dev-flow"]
+name: smart-dev-flow
+description: 本项目（smart-dev-flow）的智能开发助手主入口 - 融合 Axiom 状态机与 OMC 多智能体编排。在此项目中调用 dev-flow 时必须使用本技能，禁止使用 superpowers:dev-flow。
+triggers: ["axiom-flow", "axiom dev", "axiom", "/axiom-flow", "smart-dev-flow", "dev-flow"]
 ---
 
 # dev-flow - 智能开发助手
