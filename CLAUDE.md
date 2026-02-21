@@ -55,7 +55,7 @@ npm run test:integration
   - `user-prompt-submit.cjs` — 用户提交时注入上下文
   - `rules-injector.cjs` — 注入路由规则
   - `session-end.cjs`, `stop.cjs`, `recovery.cjs` — 会话生命周期管理
-- `scripts/` — MCP 服务器（`mcp-omc-tools-server.mjs`, `mcp-codex-server.mjs`, `mcp-gemini-server.mjs`）和辅助脚本
+- `scripts/` — MCP 服务器（`mcp-axiom-server.mjs`, `mcp-omc-tools-server.mjs`, `mcp-codex-server.mjs`, `mcp-gemini-server.mjs`）和辅助脚本（`evolve.py`）
 - `bridge/` — 插件入口（`smart-dev-bridge.cjs`）和预构建 MCP 服务器（`mcp-server.cjs`, `codex-server.cjs`, `gemini-server.cjs`）
 - `.agent/` — Axiom 运行时：`memory/`（状态/知识/决策）、`skills/`（Axiom 内置技能）、`rules/`（路由规则）
 
@@ -70,6 +70,7 @@ IDLE → DRAFTING → CONFIRMING → REVIEWING → CONFIRMING → DECOMPOSING �
 - `t` — OMC 工具服务器（状态读写、notepad、project-memory）
 - `x` — Codex 代理服务器
 - `g` — Gemini 代理服务器
+- `a` — Axiom 工具服务器（axiom_harvest、axiom_get_knowledge、phase_context_write 等 20 个工具）
 
 # smart-dev-flow 开发准则
 
@@ -239,6 +240,7 @@ OMC Workflow Skills:
 - `autopilot` ("autopilot", "build me", "I want a"): full autonomous execution
 - `ralph` ("ralph", "don't stop", "must complete"): persistence until task completion
 - `ultrawork` ("ulw", "ultrawork"): maximum parallelism
+- `ultraqa` ("ultraqa"): 实现后密集 QA 循环直到质量达标
 - `team` ("team", "coordinated team"): N coordinated agents
 - `pipeline` ("pipeline", "chain agents"): sequential agent chaining
 - `plan` ("plan this", "plan the"): strategic planning
