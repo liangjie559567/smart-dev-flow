@@ -36,7 +36,14 @@ async function main() {
       let content = fs.readFileSync(filePath, 'utf8');
       const status = (content.match(/task_status:\s*(\w+)/) || [])[1];
       const execMode = (content.match(/execution_mode:\s*"?([^"\n]+)"?/) || [])[1];
-      if (status) appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'state_change', task_status: status, execution_mode: execMode || '' });
+      if (status) {
+        const prevStatus = getPrevStatus(cwd);
+        appendMonitorLog(cwd, { ts: new Date().toISOString(), type: 'state_change', task_status: status, execution_mode: execMode || '' });
+        // G: IMPLEMENTING/REFLECTING → IDLE 时自动触发进化引擎
+        if (status === 'IDLE' && ['IMPLEMENTING', 'REFLECTING'].includes(prevStatus)) {
+          autoEvolve(cwd, content);
+        }
+      }
 
       // 自动补全 manifest_path：若字段为空且 manifest.md 存在则写入
       const manifestPath = (content.match(/manifest_path:\s*"?([^"\n]*)"?/) || [])[1] || '';
@@ -135,6 +142,29 @@ function readStdin() {
     process.stdin.on('end', () => resolve(data || '{}'));
     setTimeout(() => resolve(data || '{}'), 3000);
   });
+}
+
+function getPrevStatus(cwd) {
+  const logFile = path.join(cwd, '.agent/memory/monitor.log');
+  if (!fs.existsSync(logFile)) return '';
+  try {
+    const lines = fs.readFileSync(logFile, 'utf8').trim().split('\n').filter(Boolean);
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const entry = JSON.parse(lines[i]);
+      if (entry.type === 'state_change') return entry.task_status || '';
+    }
+  } catch {}
+  return '';
+}
+
+function autoEvolve(cwd, ctxContent) {
+  const scriptPath = path.join(cwd, 'scripts/evolve.py');
+  if (!fs.existsSync(scriptPath)) return;
+  const sessionName = (ctxContent.match(/session_name:\s*"?([^"\n]+)"?/) || [])[1] || 'auto';
+  try {
+    execSync(`python scripts/evolve.py reflect --session-name "${sessionName}" --duration 0 --went-well "" --could-improve "" --learnings "" --action-items "" --auto-fix-count 0 --rollback-count 0`, { cwd, stdio: 'ignore' });
+    execSync(`python scripts/evolve.py evolve`, { cwd, stdio: 'ignore' });
+  } catch {}
 }
 
 function appendMonitorLog(cwd, entry) {

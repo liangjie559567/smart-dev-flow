@@ -29,7 +29,18 @@ npm run build:gemini   # Gemini MCP 服务器
 npm run build:mcp      # OMC 工具服务器
 ```
 
-无测试框架，验证通过手动运行 `claude plugin install .` 后测试技能。
+```bash
+# 运行所有测试
+npm test
+
+# 单元测试
+npm run test:unit
+
+# 集成测试
+npm run test:integration
+```
+
+验证技能：`claude plugin install .` 后手动测试。
 
 ## 架构概览
 
@@ -38,8 +49,14 @@ npm run build:mcp      # OMC 工具服务器
 **核心层次：**
 - `skills/` — 用户可调用的技能（每个子目录含 `SKILL.md` 定义），通过 `/smart-dev-flow:<name>` 触发
 - `agents/` — Agent 角色定义（`analyst.md`, `executor.md` 等），通过 `Task()` 内联调用
-- `hooks/` — Claude Code 钩子（`pre-tool-use.cjs`, `post-tool-use.cjs`），负责状态同步和门控
+- `hooks/` — Claude Code 钩子，负责状态同步和门控：
+  - `pre-tool-use.cjs` — 状态机门禁，CONFIRMING 状态时拦截 Write/Edit/Bash/Task
+  - `post-tool-use.cjs` — 进化引擎，监听 `.agent/memory/` 写入并同步到 `.omc/project-memory.json`
+  - `user-prompt-submit.cjs` — 用户提交时注入上下文
+  - `rules-injector.cjs` — 注入路由规则
+  - `session-end.cjs`, `stop.cjs`, `recovery.cjs` — 会话生命周期管理
 - `scripts/` — MCP 服务器（`mcp-omc-tools-server.mjs`, `mcp-codex-server.mjs`, `mcp-gemini-server.mjs`）和辅助脚本
+- `bridge/` — 插件入口（`smart-dev-bridge.cjs`）和预构建 MCP 服务器（`mcp-server.cjs`, `codex-server.cjs`, `gemini-server.cjs`）
 - `.agent/` — Axiom 运行时：`memory/`（状态/知识/决策）、`skills/`（Axiom 内置技能）、`rules/`（路由规则）
 
 **状态流转（`.agent/memory/active_context.md` 中的 `task_status`）：**

@@ -34,6 +34,22 @@ async function main() {
 
   if (!prompt) process.exit(0);
 
+  // HUD：非 IDLE 状态时注入进度条
+  const ctxFile = path.join(process.cwd(), '.agent/memory/active_context.md');
+  if (fs.existsSync(ctxFile)) {
+    try {
+      const ctx = fs.readFileSync(ctxFile, 'utf8');
+      const status = (ctx.match(/task_status:\s*(\w+)/) || [])[1] || 'IDLE';
+      if (status !== 'IDLE') {
+        const phase = (ctx.match(/current_phase:\s*"?([^"\n]+)"?/) || [])[1] || '';
+        const task = (ctx.match(/current_task:\s*"?([^"\n]+)"?/) || [])[1] || '';
+        const name = (ctx.match(/session_name:\s*"?([^"\n]+)"?/) || [])[1] || '';
+        const parts = [status, phase, name || task].filter(Boolean);
+        console.log(`[dev-flow] ${parts.join(' · ')}`);
+      }
+    } catch {}
+  }
+
   for (const [kw, msg] of Object.entries(KEYWORDS)) {
     if (prompt === kw || prompt.startsWith(kw + ' ')) {
       console.log(`[smart-dev-flow] ${msg}`);
