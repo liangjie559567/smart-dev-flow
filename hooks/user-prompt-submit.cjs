@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const KEYWORDS = {
+  '/dev-flow':       '检测到 /dev-flow，建议运行 /smart-dev-flow:dev-flow 启动完整开发流程。',
   '/start':          '检测到 /start，建议运行 /axiom-start 恢复会话上下文。',
   '/suspend':        '检测到 /suspend，建议运行 /axiom-suspend 保存会话现场。',
   '/status':         '检测到 /status，建议运行 /axiom-status 查看当前状态。',

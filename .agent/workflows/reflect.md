@@ -8,9 +8,19 @@ description: Reflect Workflow - 反思工作流，总结经验并提取知识
 
 ## Trigger
 - 用户输入 `/reflect` 或 "反思"
-- 状态从 EXECUTING 变为 ARCHIVING 时自动触发
+- 由用户在 Phase 7 末尾 AskUserQuestion 确认后触发（dev-flow 将状态写入 REFLECTING 并调用本工作流）
 
 ## Steps
+
+### Phase 8: 分支合并（若 phase3.skipped=false）
+
+若创建了隔离分支，执行：
+```
+Skill("finishing-a-development-branch")
+→ 提供结构化选项：merge/PR/keep/cleanup
+→ 验证主分支测试仍通过
+```
+若 phase3.skipped=true，跳过本阶段。
 
 ### Step 1: 读取会话状态
 // turbo
@@ -42,9 +52,26 @@ description: Reflect Workflow - 反思工作流，总结经验并提取知识
 1. 将反思报告追加到 `reflection_log.md`
 2. 更新统计数据
 
-### Step 6: 输出报告
+### Step 6: 知识进化（必须）
+```bash
+python scripts/evolve.py evolve
+```
+若脚本不存在，跳过并提示"进化引擎未安装，知识库更新已跳过"。
+
+### Step 7: 输出报告并重置状态
 1. 向用户展示反思摘要
 2. 列出新提取的知识和 Action Items
+3. 更新 `.agent/memory/active_context.md`：
+   ```yaml
+   task_status: IDLE
+   current_phase:
+   current_task:
+   completed_tasks:
+   fail_count: 0
+   rollback_count: 0
+   blocked_reason:
+   last_updated: {timestamp}
+   ```
 
 ## Output Format
 ```markdown
